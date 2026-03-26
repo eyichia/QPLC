@@ -1,0 +1,24 @@
+{
+ 	"step": {
+    	"1": { "text": "1軸運動控制", "mode": { "0": "單動", "2": "復歸" }, "axis": {"0": "飛叉", "1": "排線"} },
+        "1": "檔案",
+        "2": "儲存參數",
+        "3": "CSV(逗号分隔)(*.csv)",
+        "4": "文字档(*.txt)",
+        "5": "開啟參數",,
+        "6": "CSV(逗号分隔)(*.csv)",
+        "7": "文字档(*.txt)",
+        "Export": "匯出報告",
+        "file_export_csv": "CSV(逗号分隔)(*.csv)",
+        "file_export_pdf": ".pdf",
+        "file_export_xlsx": ".xlsx",
+        "file_exit": "結束",
+        "file_reset": "恢復出廠設定",
+        "About": "關於",
+        "about_version": "版本",
+        "Language": "語言",
+        "languagea_tc": "繁體中文",
+        "languagea_sc": "简体中文",
+        "languagea_en": "English"
+	}
+}	
