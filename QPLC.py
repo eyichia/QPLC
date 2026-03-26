@@ -4,7 +4,7 @@ import pymcprotocol
 
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import QThread, Signal, Slot
-from ui_QPLC_GUI import Ui_Form
+from QPLC_StepConvertToCsv_GUI_ui import Ui_Form
 
 class PLCWorker(QThread):
     """
