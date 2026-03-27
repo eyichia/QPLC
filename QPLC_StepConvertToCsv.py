@@ -51,14 +51,18 @@ class PLC1Worker(QThread):
                     res_len = plc.batchread_wordunits(headdevice=self.addr_len, readsize=1)
                     if res_total and res_len:
                         self.step_data.emit(res_total[0], res_len[0])
+                        # --- 【關鍵修正 A】：連線成功且讀取完成，才設為 True ---
+                        is_connected = True
 
-                # 正常讀取循環
-                _sm413_data = plc.batchread_bitunits(headdevice="SM413", readsize=1)
-                if _sm413_data:
-                    self.sm413_status.emit(bool(_sm413_data[0]))
+                # 2. 正常讀取循環 (只有連線成功才執行)
+                if is_connected:
+                    _sm413_data = plc.batchread_bitunits(headdevice="SM413", readsize=1)
+                    if _sm413_data:
+                        self.sm413_status.emit(bool(_sm413_data[0]))
                 
-                time.sleep(0.2)        
+                time.sleep(0.2) # 正常每 200ms 讀一次      
             except Exception as e:
+                is_connected = False # 發生任何錯誤都視為連線失敗，重置旗標
                 # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
                 error_msg = str(e)
                 if "command error" in error_msg.lower() or "device" in error_msg.lower():
