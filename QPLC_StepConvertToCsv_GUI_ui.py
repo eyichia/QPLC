@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'QPLC_StepConvertToCsv_GUI.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.1
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -23,7 +23,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1024, 768)
+        MainWindow.resize(1020, 760)
         MainWindow.setStyleSheet(u"background-color: #B5B5B5;")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -832,7 +832,7 @@ class Ui_MainWindow(object):
         self.step_groupBox.raise_()
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1024, 21))
+        self.menubar.setGeometry(QRect(0, 0, 1020, 33))
         MainWindow.setMenuBar(self.menubar)
 
         self.retranslateUi(MainWindow)
