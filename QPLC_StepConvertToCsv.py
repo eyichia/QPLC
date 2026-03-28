@@ -119,11 +119,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logo_pixmap = QPixmap(resource_path("Assets/Mylogo.png"))
         self.style_pixmap = QPixmap(resource_path("Assets/Mystyle.png"))
         self.current_lang = "TW" # 開機語言
-
-
         self.worker = PLC1Worker() # 執行背景 PLC1 連線程
         self.set_default_value() # 預設值
         self.connect_signals() # 按鈕輸入訊號
+
 # """預設值"""
     def set_default_value(self):
         self.server_ip_1.setValue(192)
@@ -148,11 +147,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.PB_connect_plc.clicked.connect(self.connect_plc)
         self.PB_deconnect_plc.clicked.connect(self.deconnect_plc)
         self.PB_read_step.clicked.connect(self.read_step_data)
-        # --- 【新增】連接 Worker 的數據回傳信號 ---
+
+        # ----- 連接 Worker 的數據回傳信號 -----
         self.worker.step_info.connect(self.update_step_info)
         self.worker.error_occurred.connect(self.handle_error)
         self.worker.sm413_status.connect(self.update_sm413_status)
         self.worker.steps_data.connect(self.display_steps_data)
+
+# 讀取step資料
+    def read_step_data(self):
+        self.connect_plc() # 確保已連線
+        start_address = self.start_address.text().strip().upper()
+        total_step_length = int(self.total_steps.text()) * int(self.step_length.text())
+        self.worker.tirgger_read_steps(start_address, total_step_length) 
+# 解碼步驟數據的函式
+    #def decode_step_data(self, data):  
+
+
+
+# ----- PLC 連線與數據處理相關函式 -----        
 # --- 【新增】更新 UI 數值的函式 ---
     @Slot(int, int)
     def update_step_info(self, total, length):
@@ -173,20 +186,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def display_steps_data(self, data):
         # 這裡的 data 是從 Worker 傳回來的 PLC 數據列表
         # 你可以根據實際需求來處理這些數據，例如顯示在 UI 上或存成 CSV
+        #self.step_data = data # 儲存到 MainWindow 的屬性，方便其他方法使用
+        self.decode_step_data(data) # 呼叫解碼函式來處理數據
         print("收到步驟數據:", data)
-
-
-
-# 讀取step資料
-    def read_step_data(self):
-        self.connect_plc() # 確保已連線
-        start_address = self.start_address.text().strip().upper()
-        total_step_length = int(self.total_steps.text()) * int(self.step_length.text())
-        self.worker.tirgger_read_steps(start_address, total_step_length) 
-
-
-
-
 # --- 【新增】錯誤處理 ---
     def handle_error(self, err_msg):
         self.label_connect_status.setText(f"錯誤: {err_msg}")
