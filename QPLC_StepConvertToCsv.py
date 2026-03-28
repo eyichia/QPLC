@@ -23,7 +23,8 @@ def resource_path(relative_path):
 
 # 背景 PLC 連線程式
 class PLC1Worker(QThread):
-    step_data = Signal(int, int)
+    step_info = Signal(int, int)
+    steps_data = Signal(list) # 如果需要傳回更多數據，可以使用 list 或 dict
     sm413_status = Signal(bool)
     error_occurred = Signal(str)
 
@@ -34,6 +35,11 @@ class PLC1Worker(QThread):
         self.addr_total = ""
         self.addr_len = ""
         self.running = True # 控制迴圈開關
+
+    def tirgger_read_steps(self, start_addr, total_length):
+        self.batch_start_addr = start_addr
+        self.batch_size = total_length
+        self.batch_read_trigger = True    
 
     def run(self):
         self.running = True # 確保每次 run 都從 True 開始
@@ -50,7 +56,7 @@ class PLC1Worker(QThread):
                     res_total = plc.batchread_wordunits(headdevice=self.addr_total, readsize=1) #ZR是用16進制
                     res_len = plc.batchread_wordunits(headdevice=self.addr_len, readsize=1)
                     if res_total and res_len:
-                        self.step_data.emit(res_total[0], res_len[0])
+                        self.step_info.emit(res_total[0], res_len[0])
                         # --- 【關鍵修正 A】：連線成功且讀取完成，才設為 True ---
                         is_connected = True
 
@@ -59,6 +65,15 @@ class PLC1Worker(QThread):
                     _sm413_data = plc.batchread_bitunits(headdevice="SM413", readsize=1)
                     if _sm413_data:
                         self.sm413_status.emit(bool(_sm413_data[0]))
+
+                if self.batch_read_trigger:
+                    results = plc.batchread_wordunits(
+                        headdevice=self.batch_start_addr, 
+                        readsize=self.batch_size
+                    )
+                    if results:
+                        self.steps_data.emit(results)
+                        self.batch_read_trigger = False        
                 
                 time.sleep(0.2) # 正常每 200ms 讀一次      
             except Exception as e:
@@ -126,20 +141,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_connect_status.setText("--離線中--")
         self.step_no.setValue(1)
         for i in range(1, 11):
-            no = self.findChild(QLabel, f"label_step_no_{i}")
-            no.setText(f"{i}")
+            self.findChild(QLabel, f"label_step_no_{i}").setText(f"{i}")
 
 # 按鈕輸入訊號
     def connect_signals(self):
         self.PB_connect_plc.clicked.connect(self.connect_plc)
         self.PB_deconnect_plc.clicked.connect(self.deconnect_plc)
+        self.PB_read_step.clicked.connect(self.read_step_data)
         # --- 【新增】連接 Worker 的數據回傳信號 ---
-        self.worker.step_data.connect(self.update_initial_values)
+        self.worker.step_info.connect(self.update_step_info)
         self.worker.error_occurred.connect(self.handle_error)
         self.worker.sm413_status.connect(self.update_sm413_status)
+        self.worker.steps_data.connect(self.display_steps_data)
 # --- 【新增】更新 UI 數值的函式 ---
     @Slot(int, int)
-    def update_initial_values(self, total, length):
+    def update_step_info(self, total, length):
         self.total_steps.setText(str(total))
         self.step_length.setText(str(length))
         self.label_connect_status.setText("--連線成功且讀取完成--")
@@ -153,7 +169,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 border-radius: 15px;
             }}
         """)  
+    @Slot(list)
+    def display_steps_data(self, data):
+        # 這裡的 data 是從 Worker 傳回來的 PLC 數據列表
+        # 你可以根據實際需求來處理這些數據，例如顯示在 UI 上或存成 CSV
+        print("收到步驟數據:", data)
 
+
+
+# 讀取step資料
+    def read_step_data(self):
+        self.connect_plc() # 確保已連線
+        start_address = self.start_address.text().strip().upper()
+        total_step_length = int(self.total_steps.text()) * int(self.step_length.text())
+        self.worker.tirgger_read_steps(start_address, total_step_length) 
 
 
 
