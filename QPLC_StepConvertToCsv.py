@@ -353,11 +353,11 @@ def decode_step_data(self, data):
     _cylinderMap = ["1", "2", "3", "4", "7", "8", "9", "10", "11"]
 
     for i in range(0, len(data), length):
-        # 計算真正的步驟編號 (1, 2, 3...)
-        step_num = (i // length) + 1
+        step_num = (i // length) + 1 # 步序編號
         motion_type = str(data[i]) # 第1個字是動作類型
         type_name = self.get_step(motion_type, "text")
         row = [f"Step {step_num}", type_name] # 先放入步驟編號和動作類型名稱
+        
         #mode_name = "無"
         if motion_type in _modeMap:
             _mode_code = str(data[i+1])
@@ -389,7 +389,7 @@ def decode_step_data(self, data):
             cylinder_details.append("氣缸選項")
             cylinder_details.append(str(cylinder))
             row += cylinder_details # 如果有氣缸資訊，再把氣缸的詳細資料放入 row
-            
+
             self.step_list.append(row)
 
 
