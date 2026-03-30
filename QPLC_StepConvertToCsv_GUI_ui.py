@@ -11,13 +11,15 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
 from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QFrame, QGroupBox,
-    QLabel, QLineEdit, QMainWindow, QMenuBar,
-    QPushButton, QSizePolicy, QSpinBox, QWidget)
+    QLabel, QLineEdit, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QSizePolicy, QSpinBox,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -25,6 +27,18 @@ class Ui_MainWindow(object):
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1020, 760)
         MainWindow.setStyleSheet(u"background-color: #B5B5B5;")
+        self.file_exit = QAction(MainWindow)
+        self.file_exit.setObjectName(u"file_exit")
+        font = QFont()
+        font.setFamilies([u"Microsoft YaHei"])
+        font.setPointSize(10)
+        self.file_exit.setFont(font)
+        self.language_tc = QAction(MainWindow)
+        self.language_tc.setObjectName(u"language_tc")
+        self.language_sc = QAction(MainWindow)
+        self.language_sc.setObjectName(u"language_sc")
+        self.language_en = QAction(MainWindow)
+        self.language_en.setObjectName(u"language_en")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.PB_read_step = QPushButton(self.centralwidget)
@@ -35,11 +49,11 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.PB_read_step.sizePolicy().hasHeightForWidth())
         self.PB_read_step.setSizePolicy(sizePolicy)
-        font = QFont()
-        font.setFamilies([u"Microsoft YaHei"])
-        font.setPointSize(14)
-        font.setStyleStrategy(QFont.PreferDefault)
-        self.PB_read_step.setFont(font)
+        font1 = QFont()
+        font1.setFamilies([u"Microsoft YaHei"])
+        font1.setPointSize(14)
+        font1.setStyleStrategy(QFont.PreferDefault)
+        self.PB_read_step.setFont(font1)
         self.PB_read_step.setStyleSheet(u"/*border-width	\u908a\u6846\u7c97\u7d30	1px, 5px\n"
 "border-style	\u908a\u6846\u6a23\u5f0f	solid (\u5be6\u7dda), dashed (\u865b\u7dda), dotted (\u9ede\u7dda)\n"
 "border-top-width	\u53ea\u8a2d\u5b9a\u4e0a\u65b9\u908a\u6846	2px\n"
@@ -78,7 +92,7 @@ class Ui_MainWindow(object):
         self.PB_export_csv.setGeometry(QRect(420, 460, 110, 40))
         sizePolicy.setHeightForWidth(self.PB_export_csv.sizePolicy().hasHeightForWidth())
         self.PB_export_csv.setSizePolicy(sizePolicy)
-        self.PB_export_csv.setFont(font)
+        self.PB_export_csv.setFont(font1)
         self.PB_export_csv.setStyleSheet(u"/*border-width	\u908a\u6846\u7c97\u7d30	1px, 5px\n"
 "border-style	\u908a\u6846\u6a23\u5f0f	solid (\u5be6\u7dda), dashed (\u865b\u7dda), dotted (\u9ede\u7dda)\n"
 "border-top-width	\u53ea\u8a2d\u5b9a\u4e0a\u65b9\u908a\u6846	2px\n"
@@ -117,7 +131,7 @@ class Ui_MainWindow(object):
         self.PB_write_step.setGeometry(QRect(420, 125, 110, 40))
         sizePolicy.setHeightForWidth(self.PB_write_step.sizePolicy().hasHeightForWidth())
         self.PB_write_step.setSizePolicy(sizePolicy)
-        self.PB_write_step.setFont(font)
+        self.PB_write_step.setFont(font1)
         self.PB_write_step.setStyleSheet(u"/*border-width	\u908a\u6846\u7c97\u7d30	1px, 5px\n"
 "border-style	\u908a\u6846\u6a23\u5f0f	solid (\u5be6\u7dda), dashed (\u865b\u7dda), dotted (\u9ede\u7dda)\n"
 "border-top-width	\u53ea\u8a2d\u5b9a\u4e0a\u65b9\u908a\u6846	2px\n"
@@ -156,7 +170,7 @@ class Ui_MainWindow(object):
         self.PB_import_csv.setGeometry(QRect(420, 505, 110, 40))
         sizePolicy.setHeightForWidth(self.PB_import_csv.sizePolicy().hasHeightForWidth())
         self.PB_import_csv.setSizePolicy(sizePolicy)
-        self.PB_import_csv.setFont(font)
+        self.PB_import_csv.setFont(font1)
         self.PB_import_csv.setStyleSheet(u"/*border-width	\u908a\u6846\u7c97\u7d30	1px, 5px\n"
 "border-style	\u908a\u6846\u6a23\u5f0f	solid (\u5be6\u7dda), dashed (\u865b\u7dda), dotted (\u9ede\u7dda)\n"
 "border-top-width	\u53ea\u8a2d\u5b9a\u4e0a\u65b9\u908a\u6846	2px\n"
@@ -212,10 +226,10 @@ class Ui_MainWindow(object):
         self.label_step_no_3.setObjectName(u"label_step_no_3")
         self.label_step_no_3.setEnabled(True)
         self.label_step_no_3.setGeometry(QRect(10, 135, 40, 30))
-        font1 = QFont()
-        font1.setFamilies([u"Microsoft YaHei"])
-        font1.setPointSize(14)
-        self.label_step_no_3.setFont(font1)
+        font2 = QFont()
+        font2.setFamilies([u"Microsoft YaHei"])
+        font2.setPointSize(14)
+        self.label_step_no_3.setFont(font2)
         self.label_step_no_3.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no_3.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -225,7 +239,7 @@ class Ui_MainWindow(object):
         self.label_step_no_4.setObjectName(u"label_step_no_4")
         self.label_step_no_4.setEnabled(True)
         self.label_step_no_4.setGeometry(QRect(10, 175, 40, 30))
-        self.label_step_no_4.setFont(font1)
+        self.label_step_no_4.setFont(font2)
         self.label_step_no_4.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no_4.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -235,7 +249,7 @@ class Ui_MainWindow(object):
         self.label_step_no_6.setObjectName(u"label_step_no_6")
         self.label_step_no_6.setEnabled(True)
         self.label_step_no_6.setGeometry(QRect(10, 255, 40, 30))
-        self.label_step_no_6.setFont(font1)
+        self.label_step_no_6.setFont(font2)
         self.label_step_no_6.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no_6.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -245,7 +259,7 @@ class Ui_MainWindow(object):
         self.label_step_no_8.setObjectName(u"label_step_no_8")
         self.label_step_no_8.setEnabled(True)
         self.label_step_no_8.setGeometry(QRect(10, 335, 40, 30))
-        self.label_step_no_8.setFont(font1)
+        self.label_step_no_8.setFont(font2)
         self.label_step_no_8.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no_8.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -279,7 +293,7 @@ class Ui_MainWindow(object):
         self.label_step_no_7.setObjectName(u"label_step_no_7")
         self.label_step_no_7.setEnabled(True)
         self.label_step_no_7.setGeometry(QRect(10, 295, 40, 30))
-        self.label_step_no_7.setFont(font1)
+        self.label_step_no_7.setFont(font2)
         self.label_step_no_7.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no_7.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -289,7 +303,7 @@ class Ui_MainWindow(object):
         self.label_step_no_10.setObjectName(u"label_step_no_10")
         self.label_step_no_10.setEnabled(True)
         self.label_step_no_10.setGeometry(QRect(10, 415, 40, 30))
-        self.label_step_no_10.setFont(font1)
+        self.label_step_no_10.setFont(font2)
         self.label_step_no_10.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no_10.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -299,7 +313,7 @@ class Ui_MainWindow(object):
         self.label_step_no_5.setObjectName(u"label_step_no_5")
         self.label_step_no_5.setEnabled(True)
         self.label_step_no_5.setGeometry(QRect(10, 215, 40, 30))
-        self.label_step_no_5.setFont(font1)
+        self.label_step_no_5.setFont(font2)
         self.label_step_no_5.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no_5.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -357,7 +371,7 @@ class Ui_MainWindow(object):
         self.label_step_no_1.setObjectName(u"label_step_no_1")
         self.label_step_no_1.setEnabled(True)
         self.label_step_no_1.setGeometry(QRect(10, 55, 40, 30))
-        self.label_step_no_1.setFont(font1)
+        self.label_step_no_1.setFont(font2)
         self.label_step_no_1.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no_1.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -367,7 +381,7 @@ class Ui_MainWindow(object):
         self.label_step_no_2.setObjectName(u"label_step_no_2")
         self.label_step_no_2.setEnabled(True)
         self.label_step_no_2.setGeometry(QRect(10, 95, 40, 30))
-        self.label_step_no_2.setFont(font1)
+        self.label_step_no_2.setFont(font2)
         self.label_step_no_2.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no_2.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -389,7 +403,7 @@ class Ui_MainWindow(object):
         self.label_step_no_9.setObjectName(u"label_step_no_9")
         self.label_step_no_9.setEnabled(True)
         self.label_step_no_9.setGeometry(QRect(10, 375, 40, 30))
-        self.label_step_no_9.setFont(font1)
+        self.label_step_no_9.setFont(font2)
         self.label_step_no_9.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no_9.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -423,7 +437,7 @@ class Ui_MainWindow(object):
         self.label_step_no.setObjectName(u"label_step_no")
         self.label_step_no.setEnabled(True)
         self.label_step_no.setGeometry(QRect(10, 15, 40, 30))
-        self.label_step_no.setFont(font1)
+        self.label_step_no.setFont(font2)
         self.label_step_no.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_no.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -432,11 +446,11 @@ class Ui_MainWindow(object):
         self.step_no = QSpinBox(self.step_groupBox)
         self.step_no.setObjectName(u"step_no")
         self.step_no.setGeometry(QRect(55, 15, 100, 30))
-        font2 = QFont()
-        font2.setFamilies([u"Microsoft YaHei"])
-        font2.setPointSize(14)
-        font2.setBold(False)
-        self.step_no.setFont(font2)
+        font3 = QFont()
+        font3.setFamilies([u"Microsoft YaHei"])
+        font3.setPointSize(14)
+        font3.setBold(False)
+        self.step_no.setFont(font3)
         self.step_no.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid;\n"
 "	border-width: 1;\n"
@@ -465,7 +479,7 @@ class Ui_MainWindow(object):
         self.plc_setting_groupBox = QGroupBox(self.setting_groupBox)
         self.plc_setting_groupBox.setObjectName(u"plc_setting_groupBox")
         self.plc_setting_groupBox.setGeometry(QRect(50, 10, 266, 241))
-        self.plc_setting_groupBox.setFont(font1)
+        self.plc_setting_groupBox.setFont(font2)
         self.plc_setting_groupBox.setStyleSheet(u"QGroupBox{\n"
 "	background-color: transparent;\n"
 "}")
@@ -474,7 +488,7 @@ class Ui_MainWindow(object):
         self.label_ip4.setObjectName(u"label_ip4")
         self.label_ip4.setEnabled(True)
         self.label_ip4.setGeometry(QRect(25, 155, 120, 30))
-        self.label_ip4.setFont(font1)
+        self.label_ip4.setFont(font2)
         self.label_ip4.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_ip4.setStyleSheet(u"background-color: transparent;")
         self.label_ip4.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -482,14 +496,14 @@ class Ui_MainWindow(object):
         self.label_ip3.setObjectName(u"label_ip3")
         self.label_ip3.setEnabled(True)
         self.label_ip3.setGeometry(QRect(25, 115, 120, 30))
-        self.label_ip3.setFont(font1)
+        self.label_ip3.setFont(font2)
         self.label_ip3.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_ip3.setStyleSheet(u"background-color: transparent;")
         self.label_ip3.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.server_ip_4 = QSpinBox(self.plc_setting_groupBox)
         self.server_ip_4.setObjectName(u"server_ip_4")
         self.server_ip_4.setGeometry(QRect(150, 155, 100, 30))
-        self.server_ip_4.setFont(font2)
+        self.server_ip_4.setFont(font3)
         self.server_ip_4.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid;\n"
 "	border-width: 1;\n"
@@ -507,7 +521,7 @@ class Ui_MainWindow(object):
         self.server_ip_2 = QSpinBox(self.plc_setting_groupBox)
         self.server_ip_2.setObjectName(u"server_ip_2")
         self.server_ip_2.setGeometry(QRect(150, 75, 100, 30))
-        self.server_ip_2.setFont(font2)
+        self.server_ip_2.setFont(font3)
         self.server_ip_2.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid;\n"
 "	border-width: 1;\n"
@@ -526,14 +540,14 @@ class Ui_MainWindow(object):
         self.label_ip1.setObjectName(u"label_ip1")
         self.label_ip1.setEnabled(True)
         self.label_ip1.setGeometry(QRect(25, 35, 120, 30))
-        self.label_ip1.setFont(font1)
+        self.label_ip1.setFont(font2)
         self.label_ip1.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_ip1.setStyleSheet(u"background-color: transparent;")
         self.label_ip1.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.port_no = QSpinBox(self.plc_setting_groupBox)
         self.port_no.setObjectName(u"port_no")
         self.port_no.setGeometry(QRect(150, 195, 100, 30))
-        self.port_no.setFont(font2)
+        self.port_no.setFont(font3)
         self.port_no.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid;\n"
 "	border-width: 1;\n"
@@ -553,14 +567,14 @@ class Ui_MainWindow(object):
         self.label_port.setObjectName(u"label_port")
         self.label_port.setEnabled(True)
         self.label_port.setGeometry(QRect(25, 195, 120, 30))
-        self.label_port.setFont(font1)
+        self.label_port.setFont(font2)
         self.label_port.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_port.setStyleSheet(u"background-color: transparent;")
         self.label_port.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.server_ip_3 = QSpinBox(self.plc_setting_groupBox)
         self.server_ip_3.setObjectName(u"server_ip_3")
         self.server_ip_3.setGeometry(QRect(150, 115, 100, 30))
-        self.server_ip_3.setFont(font2)
+        self.server_ip_3.setFont(font3)
         self.server_ip_3.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid;\n"
 "	border-width: 1;\n"
@@ -578,7 +592,7 @@ class Ui_MainWindow(object):
         self.server_ip_1 = QSpinBox(self.plc_setting_groupBox)
         self.server_ip_1.setObjectName(u"server_ip_1")
         self.server_ip_1.setGeometry(QRect(150, 35, 100, 30))
-        self.server_ip_1.setFont(font2)
+        self.server_ip_1.setFont(font3)
         self.server_ip_1.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid;\n"
 "	border-width: 1;\n"
@@ -597,30 +611,30 @@ class Ui_MainWindow(object):
         self.label_ip2.setObjectName(u"label_ip2")
         self.label_ip2.setEnabled(True)
         self.label_ip2.setGeometry(QRect(25, 75, 120, 30))
-        self.label_ip2.setFont(font1)
+        self.label_ip2.setFont(font2)
         self.label_ip2.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_ip2.setStyleSheet(u"background-color: transparent;")
         self.label_ip2.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.step_setting_groupBox = QGroupBox(self.setting_groupBox)
         self.step_setting_groupBox.setObjectName(u"step_setting_groupBox")
         self.step_setting_groupBox.setGeometry(QRect(15, 260, 336, 161))
-        self.step_setting_groupBox.setFont(font1)
+        self.step_setting_groupBox.setFont(font2)
         self.step_setting_groupBox.setStyleSheet(u"QGroupBox{\n"
 "	background-color: transparent;\n"
 "}")
-        self.label_max_step = QLabel(self.step_setting_groupBox)
-        self.label_max_step.setObjectName(u"label_max_step")
-        self.label_max_step.setEnabled(True)
-        self.label_max_step.setGeometry(QRect(25, 35, 120, 30))
-        self.label_max_step.setFont(font1)
-        self.label_max_step.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.label_max_step.setStyleSheet(u"background-color: transparent;")
-        self.label_max_step.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.label_total_step = QLabel(self.step_setting_groupBox)
+        self.label_total_step.setObjectName(u"label_total_step")
+        self.label_total_step.setEnabled(True)
+        self.label_total_step.setGeometry(QRect(25, 35, 120, 30))
+        self.label_total_step.setFont(font2)
+        self.label_total_step.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.label_total_step.setStyleSheet(u"background-color: transparent;")
+        self.label_total_step.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.label_step_length = QLabel(self.step_setting_groupBox)
         self.label_step_length.setObjectName(u"label_step_length")
         self.label_step_length.setEnabled(True)
         self.label_step_length.setGeometry(QRect(25, 75, 120, 30))
-        self.label_step_length.setFont(font1)
+        self.label_step_length.setFont(font2)
         self.label_step_length.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_step_length.setStyleSheet(u"background-color: transparent;")
         self.label_step_length.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -628,14 +642,14 @@ class Ui_MainWindow(object):
         self.label_start_address.setObjectName(u"label_start_address")
         self.label_start_address.setEnabled(True)
         self.label_start_address.setGeometry(QRect(25, 115, 120, 30))
-        self.label_start_address.setFont(font1)
+        self.label_start_address.setFont(font2)
         self.label_start_address.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_start_address.setStyleSheet(u"background-color: transparent;")
         self.label_start_address.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.start_address = QLineEdit(self.step_setting_groupBox)
         self.start_address.setObjectName(u"start_address")
         self.start_address.setGeometry(QRect(150, 115, 100, 30))
-        self.start_address.setFont(font1)
+        self.start_address.setFont(font2)
         self.start_address.setStyleSheet(u"QLineEdit{\n"
 "	border-style: solid; \n"
 "	border-width: 1;\n"
@@ -645,11 +659,11 @@ class Ui_MainWindow(object):
 "	border-bottom-color: black;\n"
 "	border-right-color: black;\n"
 "}")
-        self.max_step_address = QLineEdit(self.step_setting_groupBox)
-        self.max_step_address.setObjectName(u"max_step_address")
-        self.max_step_address.setGeometry(QRect(150, 35, 100, 30))
-        self.max_step_address.setFont(font1)
-        self.max_step_address.setStyleSheet(u"QLineEdit{\n"
+        self.total_step_address = QLineEdit(self.step_setting_groupBox)
+        self.total_step_address.setObjectName(u"total_step_address")
+        self.total_step_address.setGeometry(QRect(150, 35, 100, 30))
+        self.total_step_address.setFont(font2)
+        self.total_step_address.setStyleSheet(u"QLineEdit{\n"
 "	border-style: solid; \n"
 "	border-width: 1;\n"
 "	background-color: #FFFFFF;\n"
@@ -661,7 +675,7 @@ class Ui_MainWindow(object):
         self.step_length_address = QLineEdit(self.step_setting_groupBox)
         self.step_length_address.setObjectName(u"step_length_address")
         self.step_length_address.setGeometry(QRect(150, 75, 100, 30))
-        self.step_length_address.setFont(font1)
+        self.step_length_address.setFont(font2)
         self.step_length_address.setStyleSheet(u"QLineEdit{\n"
 "	border-style: solid; \n"
 "	border-width: 1;\n"
@@ -675,7 +689,7 @@ class Ui_MainWindow(object):
         self.total_steps.setObjectName(u"total_steps")
         self.total_steps.setEnabled(True)
         self.total_steps.setGeometry(QRect(260, 35, 60, 30))
-        self.total_steps.setFont(font1)
+        self.total_steps.setFont(font2)
         self.total_steps.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.total_steps.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -691,7 +705,7 @@ class Ui_MainWindow(object):
         self.step_length.setObjectName(u"step_length")
         self.step_length.setEnabled(True)
         self.step_length.setGeometry(QRect(260, 75, 60, 30))
-        self.step_length.setFont(font1)
+        self.step_length.setFont(font2)
         self.step_length.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.step_length.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -708,7 +722,7 @@ class Ui_MainWindow(object):
         self.PB_connect_plc.setGeometry(QRect(25, 430, 150, 40))
         sizePolicy.setHeightForWidth(self.PB_connect_plc.sizePolicy().hasHeightForWidth())
         self.PB_connect_plc.setSizePolicy(sizePolicy)
-        self.PB_connect_plc.setFont(font)
+        self.PB_connect_plc.setFont(font1)
         self.PB_connect_plc.setStyleSheet(u"/*border-width	\u908a\u6846\u7c97\u7d30	1px, 5px\n"
 "border-style	\u908a\u6846\u6a23\u5f0f	solid (\u5be6\u7dda), dashed (\u865b\u7dda), dotted (\u9ede\u7dda)\n"
 "border-top-width	\u53ea\u8a2d\u5b9a\u4e0a\u65b9\u908a\u6846	2px\n"
@@ -747,7 +761,7 @@ class Ui_MainWindow(object):
         self.PB_deconnect_plc.setGeometry(QRect(190, 430, 150, 40))
         sizePolicy.setHeightForWidth(self.PB_deconnect_plc.sizePolicy().hasHeightForWidth())
         self.PB_deconnect_plc.setSizePolicy(sizePolicy)
-        self.PB_deconnect_plc.setFont(font)
+        self.PB_deconnect_plc.setFont(font1)
         self.PB_deconnect_plc.setStyleSheet(u"/*border-width	\u908a\u6846\u7c97\u7d30	1px, 5px\n"
 "border-style	\u908a\u6846\u6a23\u5f0f	solid (\u5be6\u7dda), dashed (\u865b\u7dda), dotted (\u9ede\u7dda)\n"
 "border-top-width	\u53ea\u8a2d\u5b9a\u4e0a\u65b9\u908a\u6846	2px\n"
@@ -785,7 +799,7 @@ class Ui_MainWindow(object):
         self.label_sm413.setObjectName(u"label_sm413")
         self.label_sm413.setEnabled(True)
         self.label_sm413.setGeometry(QRect(190, 480, 70, 30))
-        self.label_sm413.setFont(font1)
+        self.label_sm413.setFont(font2)
         self.label_sm413.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_sm413.setStyleSheet(u"background-color: transparent;")
         self.label_sm413.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -793,7 +807,7 @@ class Ui_MainWindow(object):
         self.SM413.setObjectName(u"SM413")
         self.SM413.setEnabled(True)
         self.SM413.setGeometry(QRect(270, 480, 30, 30))
-        self.SM413.setFont(font1)
+        self.SM413.setFont(font2)
         self.SM413.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.SM413.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -809,11 +823,8 @@ class Ui_MainWindow(object):
         self.label_connect_status = QLabel(self.centralwidget)
         self.label_connect_status.setObjectName(u"label_connect_status")
         self.label_connect_status.setEnabled(True)
-        self.label_connect_status.setGeometry(QRect(25, 580, 831, 30))
-        font3 = QFont()
-        font3.setFamilies([u"Microsoft YaHei"])
-        font3.setPointSize(10)
-        self.label_connect_status.setFont(font3)
+        self.label_connect_status.setGeometry(QRect(20, 580, 841, 30))
+        self.label_connect_status.setFont(font)
         self.label_connect_status.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_connect_status.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -836,8 +847,21 @@ class Ui_MainWindow(object):
         self.label_connect_status.raise_()
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1020, 33))
+        self.menubar.setGeometry(QRect(0, 0, 1020, 23))
+        self.menubar.setFont(font)
+        self.File = QMenu(self.menubar)
+        self.File.setObjectName(u"File")
+        self.File.setFont(font)
+        self.Language = QMenu(self.menubar)
+        self.Language.setObjectName(u"Language")
         MainWindow.setMenuBar(self.menubar)
+
+        self.menubar.addAction(self.File.menuAction())
+        self.menubar.addAction(self.Language.menuAction())
+        self.File.addAction(self.file_exit)
+        self.Language.addAction(self.language_tc)
+        self.Language.addAction(self.language_sc)
+        self.Language.addAction(self.language_en)
 
         self.retranslateUi(MainWindow)
 
@@ -846,6 +870,13 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.file_exit.setText(QCoreApplication.translate("MainWindow", u"\u7d50\u675f(&X)", None))
+#if QT_CONFIG(shortcut)
+        self.file_exit.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+X", None))
+#endif // QT_CONFIG(shortcut)
+        self.language_tc.setText(QCoreApplication.translate("MainWindow", u"\u7e41\u9ad4\u4e2d\u6587", None))
+        self.language_sc.setText(QCoreApplication.translate("MainWindow", u"\u7b80\u4f53\u4e2d\u6587", None))
+        self.language_en.setText(QCoreApplication.translate("MainWindow", u"English", None))
         self.PB_read_step.setText(QCoreApplication.translate("MainWindow", u"\u8b80\u53d6", None))
         self.PB_export_csv.setText(QCoreApplication.translate("MainWindow", u"Export .csv", None))
         self.PB_write_step.setText(QCoreApplication.translate("MainWindow", u"\u5beb\u5165", None))
@@ -870,11 +901,11 @@ class Ui_MainWindow(object):
         self.label_port.setText(QCoreApplication.translate("MainWindow", u"Port No", None))
         self.label_ip2.setText(QCoreApplication.translate("MainWindow", u"Server  IP2", None))
         self.step_setting_groupBox.setTitle(QCoreApplication.translate("MainWindow", u"Step format settings", None))
-        self.label_max_step.setText(QCoreApplication.translate("MainWindow", u"Total steps", None))
+        self.label_total_step.setText(QCoreApplication.translate("MainWindow", u"Total steps", None))
         self.label_step_length.setText(QCoreApplication.translate("MainWindow", u"Step length", None))
         self.label_start_address.setText(QCoreApplication.translate("MainWindow", u"Start address", None))
         self.start_address.setText(QCoreApplication.translate("MainWindow", u"D2000", None))
-        self.max_step_address.setText(QCoreApplication.translate("MainWindow", u"D680", None))
+        self.total_step_address.setText(QCoreApplication.translate("MainWindow", u"D680", None))
         self.step_length_address.setText(QCoreApplication.translate("MainWindow", u"D681", None))
         self.total_steps.setText(QCoreApplication.translate("MainWindow", u"999", None))
         self.step_length.setText(QCoreApplication.translate("MainWindow", u"999", None))
@@ -883,5 +914,7 @@ class Ui_MainWindow(object):
         self.label_sm413.setText(QCoreApplication.translate("MainWindow", u"SM413", None))
         self.SM413.setText("")
         self.label_connect_status.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u9023\u7dda", None))
+        self.File.setTitle(QCoreApplication.translate("MainWindow", u"\u6a94\u6848", None))
+        self.Language.setTitle(QCoreApplication.translate("MainWindow", u"\u8a9e\u8a00", None))
     # retranslateUi
 

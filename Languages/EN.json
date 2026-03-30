@@ -1,6 +1,6 @@
 {
-    "Window_main": {
-        "Winding": "Wire Arrangement Calculation"
+    "Window_title": {
+        "Main": "Step Editing Tools"
     },
     "Menubar": {
         "menubarFont": { "font_size": 10, "font_family": "Microsoft YaHei" },
@@ -26,38 +26,26 @@
     },
     "QLabel": {
         "textFont": { "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_1": {"text": "Cross-sectional area", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_2": {"text": "Winding area", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_3": {"text": "Slot fill rate", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_4": {"text": "Coordinates", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_5": {"text": "Point A", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_6": {"text": "Point C", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_7": {"text": "Point D", "font_size": 14, "font_family": "Microsoft YaHei" }
+        "label_ip1": { "text": "IP address 1", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_ip2": { "text": "IP address 2", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_ip3": { "text": "IP address 3", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_ip4": { "text": "IP address 4", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_port": { "text": "Port number", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_total_step": { "text": "Total steps", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_step_length": { "text": "Step length", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_start_address": { "text": "Start address", "font_size": 14, "font_family": "Microsoft YaHei" }
     },
     "QPushButton": {
-        "PB_chart": {"text": "Diagram", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_chart_A": {"text": "Type A", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_chart_B": {"text": "Type B", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_chart_C": {"text": "Type C", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_Calculate": {"text": "Calculate", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_Clear_process": {"text": "Clear", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_Export_coordinates": {"text": "Export coords", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_A_export_coordinates": {"text": "Export A", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_B_export_coordinates": {"text": "Export B", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_C_export_coordinates": {"text": "Export C", "font_size": 14, "font_family": "Microsoft YaHei" }
+        "PB_connect_plc": { "text": "Connection", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "PB_deconnect_plc": { "text": "Disconnection", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "PB_read_step": { "text": "Read", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "PB_write_step": { "text": "Write", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "PB_export_csv": { "text": "Export.csv", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "PB_import_csv": { "text": "Import.csv", "font_size": 14, "font_family": "Microsoft YaHei" }
     },
-    "Data1": {
-        "lb_pa_001": {"text": "Wire diameter", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "lb_pa_002": {"text": "AB length", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "lb_pa_003": {"text": "BC length", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "lb_pa_004": {"text": "CD length", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "lb_pa_005": {"text": "Point B", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_001": {"text": "Wire diameter", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_002": {"text": "AB length", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_003": {"text": "BC length", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_004": {"text": "CD length", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_005": {"text": "Point Bx", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_006": {"text": "Point By", "font_size": 14, "font_family": "Microsoft YaHei" }
+    "QGroupBox": {
+        "plc_setting_groupBox": { "text": "PLC connection settings", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "step_setting_groupBox": { "text": "Step address settings", "font_size": 14, "font_family": "Microsoft YaHei" }
     },
     "Messages": {
         "csv_save_title": "Saving CSV Data",
@@ -126,5 +114,55 @@
         "axis_y": "Y (mm)",
         "diagram": "schematic diagram",
         "...": "..."
+    },
+    "step": {
+        "1": { "text": "1-axis motion ctrl", "mode": { "0": "单动", "2": "复归" } },
+        "2": { "text": "2-axis motion ctrl", "mode": { "0": "单动", "1": "补间", "2": "复归" } },
+        "3": { "text": "3-axis motion ctrl", "mode": { "0": "单动", "1": "补间", "2": "复归" } },
+        "4": { "text": "4-axis motion ctrl", "mode": { "0": "单动", "1": "补间", "2": "复归" } },
+        "5": { "text": "Winding", "mode": { "0": "顺", "1": "逆" } },
+        "6": { "text": "Winding arrange", "mode": {} },
+        "7": { "text": "Flyer", "mode": { "0": "顺ABS", "1": "逆ABS" } },
+        "8": { "text": "Arrange", "mode": {} },
+        "9": { "text": "Index", "mode": { "0": "顺", "1": "逆" } },
+        "10": { "text": "Mold width", "mode": { "0": "绝对", "1": "相对" } },
+        "11": { "text": "Cylinder", "mode": {} },
+        "18": { "text": "Wait", "mode": {} },
+        "19": { "text": "Pause", "mode": {} },
+        "20": { "text": "Jump P0", "mode": {} },
+        "21": { "text": "Jump P1", "mode": {} },
+        "22": { "text": "Jump P2", "mode": {} },
+        "23": { "text": "Jump P3", "mode": {} },
+        "24": { "text": "Jump P4", "mode": {} },
+        "25": { "text": "Jump P5", "mode": {} },
+        "26": { "text": "Jump P6", "mode": {} },
+        "27": { "text": "Jump P7", "mode": {} },
+        "28": { "text": "GoTo", "mode": {} },
+        "29": { "text": "RET", "mode": {} },
+        "30": { "text": "Subprogram", "mode": {} },
+        "31": { "text": "Subprogram end", "mode": {} },
+        "32": { "text": "Parameter 1", "mode": {} },
+        "33": { "text": "Parameter 2", "mode": {} },
+        "40": { "text": "Label", "mode": {} },
+        "41": { "text": "Comment", "mode": {} },
+        "99": { "text": "END", "mode": {} }
+    },
+    "Axis": {
+        "0": "Flyer",
+        "1": "Arrange",
+        "2": "Index",
+        "3": "Mold width",
+        "4": "Right_X",
+        "5": "Right_Y",
+        "6": "Right_Z",
+        "7": "",
+        "8": "",
+        "9": "",
+        "10": "",
+        "11": "",
+        "12": "",
+        "13": "",
+        "14": "",
+        "15": ""
     }
 }

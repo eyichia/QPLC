@@ -1344,7 +1344,7 @@ QPushButton:pressed {
      <property name="title">
       <string>Step format settings</string>
      </property>
-     <widget class="QLabel" name="label_max_step">
+     <widget class="QLabel" name="label_total_step">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -1467,7 +1467,7 @@ QPushButton:pressed {
        <string>D2000</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="max_step_address">
+     <widget class="QLineEdit" name="total_step_address">
       <property name="geometry">
        <rect>
         <x>150</x>
@@ -1804,9 +1804,9 @@ QPushButton:pressed {
     </property>
     <property name="geometry">
      <rect>
-      <x>25</x>
+      <x>20</x>
       <y>580</y>
-      <width>831</width>
+      <width>841</width>
       <height>30</height>
      </rect>
     </property>
@@ -1852,10 +1852,67 @@ QPushButton:pressed {
      <x>0</x>
      <y>0</y>
      <width>1020</width>
-     <height>33</height>
+     <height>23</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Microsoft YaHei</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <widget class="QMenu" name="File">
+    <property name="font">
+     <font>
+      <family>Microsoft YaHei</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>檔案</string>
+    </property>
+    <addaction name="file_exit"/>
+   </widget>
+   <widget class="QMenu" name="Language">
+    <property name="title">
+     <string>語言</string>
+    </property>
+    <addaction name="language_tc"/>
+    <addaction name="language_sc"/>
+    <addaction name="language_en"/>
+   </widget>
+   <addaction name="File"/>
+   <addaction name="Language"/>
   </widget>
+  <action name="file_exit">
+   <property name="text">
+    <string>結束(&amp;X)</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Microsoft YaHei</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string>Alt+X</string>
+   </property>
+  </action>
+  <action name="language_tc">
+   <property name="text">
+    <string>繁體中文</string>
+   </property>
+  </action>
+  <action name="language_sc">
+   <property name="text">
+    <string>简体中文</string>
+   </property>
+  </action>
+  <action name="language_en">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

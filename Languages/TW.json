@@ -1,6 +1,6 @@
 {
-    "Window_main": {
-        "Winding": "繞線排線計算"
+    "Window_title": {
+        "Main": "編程編輯工具"
     },
     "Menubar": {
         "menubarFont": { "font_size": 10, "font_family": "Microsoft YaHei" },
@@ -26,38 +26,26 @@
     },
     "QLabel": {
         "textFont": { "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_1": {"text": "截面積", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_2": {"text": "繞線面積", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_3": {"text": "槽滿率", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_4": {"text": "座標", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_5": {"text": "點A", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_6": {"text": "點C", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_7": {"text": "點D", "font_size": 14, "font_family": "Microsoft YaHei" }
+        "label_ip1": { "text": "IP 地址1", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_ip2": { "text": "IP 地址2", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_ip3": { "text": "IP 地址3", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_ip4": { "text": "IP 地址4", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_port": { "text": "本地埠號", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_total_step": { "text": "總步序", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_step_length": { "text": "單步長度", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_start_address": { "text": "起始地址", "font_size": 14, "font_family": "Microsoft YaHei" }
     },
     "QPushButton": {
-        "PB_chart": {"text": "排線示意", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_chart_A": {"text": "方式 A", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_chart_B": {"text": "方式 B", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_chart_C": {"text": "方式 C", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_Calculate": {"text": "計算", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_Clear_process": {"text": "清除", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_Export_coordinates": {"text": "匯出座標", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_A_export_coordinates": {"text": "匯出A", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_B_export_coordinates": {"text": "匯出B", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_C_export_coordinates": {"text": "匯出C", "font_size": 14, "font_family": "Microsoft YaHei" }
+        "PB_connect_plc": { "text": "連線", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "PB_deconnect_plc": { "text": "離線", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "PB_read_step": { "text": "讀取", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "PB_write_step": { "text": "寫入", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "PB_export_csv": { "text": "匯出.csv", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "PB_import_csv": { "text": "匯入.csv", "font_size": 14, "font_family": "Microsoft YaHei" }
     },
-    "Data1": {
-        "lb_pa_001": {"text": "線徑", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "lb_pa_002": {"text": "AB長度", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "lb_pa_003": {"text": "BC長度", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "lb_pa_004": {"text": "CD長度", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "lb_pa_005": {"text": "點B", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_001": {"text": "線徑", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_002": {"text": "AB長度", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_003": {"text": "BC長度", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_004": {"text": "CD長度", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_005": {"text": "點Bx", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "in_pa_006": {"text": "點By", "font_size": 14, "font_family": "Microsoft YaHei" }
+    "QGroupBox": {
+        "plc_setting_groupBox": { "text": "PLC連線設定", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "step_setting_groupBox": { "text": "步序地址設定", "font_size": 14, "font_family": "Microsoft YaHei" }
     },
     "Messages": {
         "csv_save_title": "儲存 CSV 數據",
@@ -126,5 +114,56 @@
         "axis_y": "Y 座標 (mm)",
         "diagram": "示意圖",
         "...": "..."
+    },
+    "step": {
+    	"1": { "text": "1軸運動控制", "mode": { "0": "單動", "2": "復歸" } },
+        "2": { "text": "2軸運動控制", "mode": { "0": "單動", "1": "補間", "2": "復歸" } },
+        "3": { "text": "3軸運動控制", "mode": { "0": "單動", "1": "補間", "2": "復歸" } },
+        "4": { "text": "4軸運動控制", "mode": { "0": "單動", "1": "補間", "2": "復歸" } },
+        "5": { "text": "繞線", "mode": { "0": "順", "1": "逆" } },
+        "6": { "text": "繞線排線", "mode": {} },
+        "7": { "text": "飛叉", "mode": { "0": "順ABS", "1": "逆ABS" } },
+        "8": { "text": "排線", "mode": {} },
+        "9": { "text": "轉槽", "mode": { "0": "順", "1": "逆" } },
+        "10": { "text": "模寬", "mode": { "0": "絕對", "1": "相對" } },
+        "11": { "text": "氣壓缸", "mode": {} },
+        "18": { "text": "動作等待", "mode": {} },
+        "19": { "text": "暫停", "mode": {} },
+        "20": { "text": "跳躍P0", "mode": {} },
+        "21": { "text": "跳躍P1", "mode": {} },
+        "22": { "text": "跳躍P2", "mode": {} },
+        "23": { "text": "跳躍P3", "mode": {} },
+        "24": { "text": "跳躍P4", "mode": {} },
+        "25": { "text": "跳躍P5", "mode": {} },
+        "26": { "text": "跳躍P6", "mode": {} },
+        "27": { "text": "跳躍P7", "mode": {} },
+        "28": { "text": "GoTo", "mode": {} },
+        "29": { "text": "RET", "mode": {} },
+        "30": { "text": "副程式", "mode": {} },
+        "31": { "text": "副程式結束", "mode": {} },
+        "32": { "text": "參數1", "mode": {} },
+        "33": { "text": "參數2", "mode": {} },
+        "40": { "text": "標籤", "mode": {} },
+        "41": { "text": "註釋", "mode": {} },
+        "99": { "text": "END", "mode": {} }
+        
+	},
+    "Axis": {
+        "0": "飛叉", 
+        "1": "排線",
+        "2": "轉槽", 
+        "3": "模寬",
+        "4": "右X軸", 
+        "5": "右Y軸",
+        "6": "右Z軸", 
+        "7": "",
+        "8": "", 
+        "9": "",
+        "10": "", 
+        "11": "",
+        "12": "", 
+        "13": "",
+        "14": "", 
+        "15": ""
     }
 }    
