@@ -1726,45 +1726,6 @@ QPushButton:pressed {
       <string>Disconnect</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_connect_status">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>25</x>
-       <y>480</y>
-       <width>150</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Microsoft YaHei</family>
-       <pointsize>14</pointsize>
-      </font>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::LayoutDirection::LeftToRight</enum>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLabel{
-	border-style: solid; 
-	border-width: 1;
-	background-color: #B5B5B5;
-	border-top-color: black;
-	border-left-color: black;
-	border-bottom-color: white;
-	border-right-color: white;
-}</string>
-     </property>
-     <property name="text">
-      <string>已連線</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignCenter</set>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_sm413">
      <property name="enabled">
       <bool>true</bool>
@@ -1837,6 +1798,45 @@ QPushButton:pressed {
      </property>
     </widget>
    </widget>
+   <widget class="QLabel" name="label_connect_status">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>25</x>
+      <y>580</y>
+      <width>831</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Microsoft YaHei</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LayoutDirection::LeftToRight</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel{
+	border-style: solid; 
+	border-width: 1;
+	background-color: #B5B5B5;
+	border-top-color: black;
+	border-left-color: black;
+	border-bottom-color: white;
+	border-right-color: white;
+}</string>
+    </property>
+    <property name="text">
+     <string>已連線</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
    <zorder>setting_groupBox</zorder>
    <zorder>line</zorder>
    <zorder>PB_read_step</zorder>
@@ -1844,6 +1844,7 @@ QPushButton:pressed {
    <zorder>PB_write_step</zorder>
    <zorder>PB_import_csv</zorder>
    <zorder>step_groupBox</zorder>
+   <zorder>label_connect_status</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -35,8 +35,11 @@ class PLC1Worker(QThread):
         self.addr_total = ""
         self.addr_len = ""
         self.running = True # 控制迴圈開關
+        self.batch_read_trigger = False 
+        self.batch_start_addr = ""
+        self.batch_size = 0
 
-    def tirgger_read_steps(self, start_addr, total_length):
+    def trigger_read_steps(self, start_addr, total_length):
         self.batch_start_addr = start_addr
         self.batch_size = total_length
         self.batch_read_trigger = True    
@@ -75,7 +78,7 @@ class PLC1Worker(QThread):
                         self.steps_data.emit(results)
                         self.batch_read_trigger = False        
                 
-                time.sleep(0.2) # 正常每 200ms 讀一次      
+                time.sleep(0.5) # 正常每 500ms 讀一次      
             except Exception as e:
                 is_connected = False # 發生任何錯誤都視為連線失敗，重置旗標
                 # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
@@ -84,7 +87,7 @@ class PLC1Worker(QThread):
                     friendly_msg = f"位址無效或超出範圍: {self.addr_total}"
                 else:
                     friendly_msg = f"通訊失敗: {error_msg}"
-
+                print(friendly_msg) # 先在控制台印出錯誤訊息，方便除錯
                 self.error_occurred.emit(friendly_msg)
                 try: plc.close() # 發生錯誤先關閉舊連線
                 except: pass
@@ -159,7 +162,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.connect_plc() # 確保已連線
         start_address = self.start_address.text().strip().upper()
         total_step_length = int(self.total_steps.text()) * int(self.step_length.text())
-        self.worker.tirgger_read_steps(start_address, total_step_length) 
+        self.worker.trigger_read_steps(start_address, total_step_length) 
 # 解碼步驟數據的函式
     #def decode_step_data(self, data):  
 
@@ -187,7 +190,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 這裡的 data 是從 Worker 傳回來的 PLC 數據列表
         # 你可以根據實際需求來處理這些數據，例如顯示在 UI 上或存成 CSV
         #self.step_data = data # 儲存到 MainWindow 的屬性，方便其他方法使用
-        self.decode_step_data(data) # 呼叫解碼函式來處理數據
+        #self.decode_step_data(data) # 呼叫解碼函式來處理數據
         print("收到步驟數據:", data)
 # --- 【新增】錯誤處理 ---
     def handle_error(self, err_msg):
@@ -214,6 +217,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_connect_status.setText("--離線中--") 
         self.worker.stop() 
 
+    def closeEvent(self, event):
+        """
+        關閉視窗時也要記得停止背景執行緒，避免程式卡在背景
+        """
+        self.worker.stop() # 確保背景執行緒被正確停止
+        event.accept()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

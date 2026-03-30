@@ -781,22 +781,6 @@ class Ui_MainWindow(object):
 "	bord"
                         "er-right-color: white;\n"
 "}")
-        self.label_connect_status = QLabel(self.setting_groupBox)
-        self.label_connect_status.setObjectName(u"label_connect_status")
-        self.label_connect_status.setEnabled(True)
-        self.label_connect_status.setGeometry(QRect(25, 480, 150, 30))
-        self.label_connect_status.setFont(font1)
-        self.label_connect_status.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.label_connect_status.setStyleSheet(u"QLabel{\n"
-"	border-style: solid; \n"
-"	border-width: 1;\n"
-"	background-color: #B5B5B5;\n"
-"	border-top-color: black;\n"
-"	border-left-color: black;\n"
-"	border-bottom-color: white;\n"
-"	border-right-color: white;\n"
-"}")
-        self.label_connect_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.label_sm413 = QLabel(self.setting_groupBox)
         self.label_sm413.setObjectName(u"label_sm413")
         self.label_sm413.setEnabled(True)
@@ -822,6 +806,25 @@ class Ui_MainWindow(object):
 "	border-right-color: white;\n"
 "}")
         self.SM413.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label_connect_status = QLabel(self.centralwidget)
+        self.label_connect_status.setObjectName(u"label_connect_status")
+        self.label_connect_status.setEnabled(True)
+        self.label_connect_status.setGeometry(QRect(25, 580, 831, 30))
+        font3 = QFont()
+        font3.setFamilies([u"Microsoft YaHei"])
+        font3.setPointSize(10)
+        self.label_connect_status.setFont(font3)
+        self.label_connect_status.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.label_connect_status.setStyleSheet(u"QLabel{\n"
+"	border-style: solid; \n"
+"	border-width: 1;\n"
+"	background-color: #B5B5B5;\n"
+"	border-top-color: black;\n"
+"	border-left-color: black;\n"
+"	border-bottom-color: white;\n"
+"	border-right-color: white;\n"
+"}")
+        self.label_connect_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.setting_groupBox.raise_()
         self.line.raise_()
@@ -830,6 +833,7 @@ class Ui_MainWindow(object):
         self.PB_write_step.raise_()
         self.PB_import_csv.raise_()
         self.step_groupBox.raise_()
+        self.label_connect_status.raise_()
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 1020, 33))
@@ -876,8 +880,8 @@ class Ui_MainWindow(object):
         self.step_length.setText(QCoreApplication.translate("MainWindow", u"999", None))
         self.PB_connect_plc.setText(QCoreApplication.translate("MainWindow", u"\u9023\u7dda", None))
         self.PB_deconnect_plc.setText(QCoreApplication.translate("MainWindow", u"Disconnect", None))
-        self.label_connect_status.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u9023\u7dda", None))
         self.label_sm413.setText(QCoreApplication.translate("MainWindow", u"SM413", None))
         self.SM413.setText("")
+        self.label_connect_status.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u9023\u7dda", None))
     # retranslateUi
 
