@@ -136,7 +136,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.current_lang = "TW" # 開機語言
 
         self.worker = PLC1Worker() # 執行背景 PLC1 連線程
-
+        
         self.init_ui_settings() # 設定圖示與預設圖
         self.set_default_value() # 預設值
         self.load_languages_json() #載入語言json檔案
@@ -249,11 +249,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # 從當前語言包抓取step文字 """
     def get_step(self, m_code, text_mode):
         s_data = self.languages.get(self.current_lang, {})
-        return s_data.get("step", {}).get(m_code, {}).get(text_mode, {})
+        return s_data.get("step", {}).get(str(m_code), {}).get(str(text_mode), {})
+# get mode
+    def get_mode_name(self,type, mode):
+        mode_info = self.get_step(type, "mode")
+        return mode_info.get(mode, "未知模式")
 # 從當前語言包抓取step軸名稱
     def get_ax_name(self, ax_no):
         a_data = self.languages.get(self.current_lang, {})
-        return a_data.get("Axis", {}).get(ax_no) # 預設回傳原名稱，如果找不到對應的翻譯  
+        return a_data.get("Axis", {}).get(str(ax_no)) # 預設回傳原名稱，如果找不到對應的翻譯  
+# 步序項目名稱
+    def get_item_name(self, key, idx=0):  
+        i_data = self.languages.get(self.current_lang, {})
+        item_list = i_data.get("Item", {}).get(str(key), [])
+        if 0 <= idx < len(item_list):
+            return item_list[idx]
+        # 如果找不到，回傳一個辨識用的字串（方便除錯）
+        return f"Unknown_{key}[{idx}]" 
     
 # 按鈕輸入訊號
     def connect_signals(self):
@@ -339,59 +351,68 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             combined -= (1 << 32)
         return combined        
 # step data解碼        
-def decode_step_data(self, data):
-    self.step_list = []
-    self.step_list.append("Step")
-    try:
+    def decode_step_data(self, data):
+        self.step_list = []
+        self.step_list.append("Step")
+        try:
+            length = int(self.step_length.text())
+        except ValueError:
+            length = 20 # 預設值，防止 UI 沒填數字當機
         length = int(self.step_length.text())
-    except ValueError:
-        length = 20 # 預設值，防止 UI 沒填數字當機
+        _cylinderMap = ["1", "2", "3", "4"]
+    
+    
+        for i in range(0, len(data), length):
+            step_num = (i // length) + 1 # 步序編號
+            type_code = data[i] # 第1個字是動作類型
+            type_name = self.get_step(type_code, "text")
+            row = [f"Step {step_num}", type_name] # 先放入步驟編號和動作類型名稱
 
-    length = int(self.step_length.text())
-    _modeMap = ["1", "2", "3", "4", "5", "7", "8", "9", "10"]
-    _axopMap = ["1", "2", "3", "4"]
-    _cylinderMap = ["1", "2", "3", "4", "7", "8", "9", "10", "11"]
+            # 1~4軸運動控制
+            if type_code in range(1, 5): 
+                mode_code = data[i+1] #ZR951
+                mode_name = self.get_mode_name(type_code, mode_code) # 取得模式名稱的函式
+                item = self.get_item_name(type_code, 0) # 取得模式項目名稱
+                row += [item, mode_name] # 如果有模式資訊，再把模式名稱放入 row
+                # 位置
+                ax_details = [] # 用來存 軸1, ax1, 軸2, ax2...
+                for j in range(1, type_code + 1):
+                    # 取得軸號位址：索引 i+2 開始往後推
+                    ax_no = data[i + 1 + j] #ZR952~ZR955
+                    ax_name = self.get_ax_name(ax_no)
+                    pos_low = data[i + 5 + j] #ZR956~ZR963
+                    pos_high = data[i + 6 + j]
+                    ax_pos = self.convert_16_to_32(pos_low, pos_high)
+                    # 直接把「軸序號」和「名稱」依序放入列表
+                    item = self.get_item_name(type_code, 1)
+                    ax_details.append(item)
+                    ax_details.append(ax_name)
+                    item = self.get_item_name(type_code, 2)
+                    ax_details.append(item)
+                    ax_details.append(str(float(ax_pos) / 100))
+                row += ax_details # 如果有軸資訊，再把軸的詳細資料放入 row 
+            # 5繞線     
+            elif type_code == 5:
+                mode_code = data[i+1]
+                mode_name = self.get_mode_name(type_code, mode_code) # 取得模式名稱的函式
+                item = self.get_item_name("mode")
+                row += [item, mode_name] # 如果有模式資訊，再把模式名稱放入 row    
 
-    for i in range(0, len(data), length):
-        step_num = (i // length) + 1 # 步序編號
-        motion_type = str(data[i]) # 第1個字是動作類型
-        type_name = self.get_step(motion_type, "text")
-        row = [f"Step {step_num}", type_name] # 先放入步驟編號和動作類型名稱
-        
-        #mode_name = "無"
-        if motion_type in _modeMap:
-            _mode_code = str(data[i+1])
-            mode_info = self.get_step(motion_type, "mode")
-            mode_name = mode_info.get(_mode_code, "未知模式")
-            row += ["模式", mode_name] # 如果有模式資訊，再把模式名稱放入 row
-        # --- 2. 處理軸資訊 
-        ax_details = [] # 用來存 軸1, ax1, 軸2, ax2...
-        if motion_type in _axopMap:
-            ax_count = int(motion_type)
-            for j in range(1, ax_count + 1):
-                # 取得軸號位址：索引 i+2 開始往後推
-                ax_no = str(data[i + 1 + j]) 
-                ax_name = self.get_ax_name(ax_no)
-                pos_low = data[i + 5 + j]
-                pos_high = data[i + 6 + j]
-                ax_pos = self.convert_16_to_32(pos_low, pos_high)
-                # 直接把「軸序號」和「名稱」依序放入列表
-                ax_details.append(f"軸選項{j}")
-                ax_details.append(ax_name)
-                ax_details.append(f"位置{j}")
-                ax_details.append(str(float(ax_pos) / 100))
-            row += ax_details # 如果有軸資訊，再把軸的詳細資料放入 row    
-        cylinder_details = []
-        if motion_type in _cylinderMap:
-            cyl_low = data[i + 18]
-            cyl_high = data[i + 19]            
-            cylinder = self.convert_16_to_32(cyl_low, cyl_high)
-            cylinder_details.append("氣缸選項")
-            cylinder_details.append(str(cylinder))
-            row += cylinder_details # 如果有氣缸資訊，再把氣缸的詳細資料放入 row
+
+
+            cylinder_details = [] # 用來存 氣缸選項、氣缸數值
+            if str(type_code) in _cylinderMap:
+                cyl_low = data[i + 18] #ZR968~ZR969
+                cyl_high = data[i + 19]            
+                cylinder = self.convert_16_to_32(cyl_low, cyl_high)
+                item = self.get_item_name(11, 0)
+                cylinder_details.append(item)
+                cylinder_details.append(str(cylinder))
+                row += cylinder_details # 如果有氣缸資訊，再把氣缸的詳細資料放入 row
 
             self.step_list.append(row)
-
+            
+    
 
         
         

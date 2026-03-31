@@ -19,7 +19,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QFrame, QGroupBox,
     QLabel, QLineEdit, QMainWindow, QMenu,
     QMenuBar, QPushButton, QSizePolicy, QSpinBox,
-    QWidget)
+    QTextEdit, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -823,8 +823,11 @@ class Ui_MainWindow(object):
         self.label_connect_status = QLabel(self.centralwidget)
         self.label_connect_status.setObjectName(u"label_connect_status")
         self.label_connect_status.setEnabled(True)
-        self.label_connect_status.setGeometry(QRect(20, 580, 841, 30))
-        self.label_connect_status.setFont(font)
+        self.label_connect_status.setGeometry(QRect(20, 580, 365, 30))
+        font4 = QFont()
+        font4.setFamilies([u"Microsoft YaHei"])
+        font4.setPointSize(8)
+        self.label_connect_status.setFont(font4)
         self.label_connect_status.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_connect_status.setStyleSheet(u"QLabel{\n"
 "	border-style: solid; \n"
@@ -836,6 +839,19 @@ class Ui_MainWindow(object):
 "	border-right-color: white;\n"
 "}")
         self.label_connect_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.Process = QTextEdit(self.centralwidget)
+        self.Process.setObjectName(u"Process")
+        self.Process.setGeometry(QRect(565, 550, 295, 170))
+        self.Process.setFont(font4)
+        self.Process.setStyleSheet(u"QTextEdit{\n"
+"	border-style: solid; \n"
+"	border-width: 1;\n"
+"	background-color: #B5B5B5;\n"
+"	border-top-color: black;\n"
+"	border-left-color: black;\n"
+"	border-bottom-color: white;\n"
+"	border-right-color: white;\n"
+"}")
         MainWindow.setCentralWidget(self.centralwidget)
         self.setting_groupBox.raise_()
         self.line.raise_()
@@ -845,6 +861,7 @@ class Ui_MainWindow(object):
         self.PB_import_csv.raise_()
         self.step_groupBox.raise_()
         self.label_connect_status.raise_()
+        self.Process.raise_()
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 1020, 23))
