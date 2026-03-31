@@ -10,10 +10,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QMenuBar, QMen
 from PySide6.QtCore import (QDateTime,QThread, Signal, Slot)
 from PySide6.QtGui import (QIcon, QPixmap, QFont)
 
-
-
 from QPLC_StepConvertToCsv_GUI_ui import Ui_MainWindow
-
 
 # """取得資源絕對路徑，兼容開發與 PyInstaller 打包模式"""
 def resource_path(relative_path):
@@ -22,7 +19,6 @@ def resource_path(relative_path):
         return os.path.join(sys._MEIPASS, relative_path)
     # 開啟開發模式下的路徑
     return os.path.join(os.path.abspath("."), relative_path)
-
 
 # 背景 PLC 連線程式
 class PLC1Worker(QThread):
@@ -123,7 +119,7 @@ class PLC1Worker(QThread):
 class MainWindow(QMainWindow, Ui_MainWindow):
     version = " v1.1"
     Developer = " 江乙加 Eric Chiang"
-    ver_date = " 2026-03-19"
+    ver_date = " 2026-03-31"
     Copyright = f" 2026 {Developer}" #" 2026 " + Developer
 
 # initial
@@ -159,7 +155,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.port_no.setValue(1025)        
         self.total_step_address.setText("D680")
         self.step_length_address.setText("D681")
-        self.start_address.setText("D2200")
+        self.start_address.setText("D2100")
         self.total_steps.setText("0")
         self.step_length.setText("0")
         self.PB_connect_plc.setEnabled(True)
@@ -186,28 +182,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     print(f"Error loading {filename}: {e}")
 # 選單翻譯
     def translate_menu(self, menu_obj: QMenuBar | QMenu, lan_dict: dict):
-        """ 
-        純文字切換版：只負責更新 QAction/QMenu 的文字內容。
-        """
+        # 純文字切換版：只負責更新 QAction/QMenu 的文字內容。
         for action in menu_obj.actions():
             obj_name = action.objectName()
             submenu = action.menu()
-
             # 1. 處理 QAction 與 QMenu 的名稱連動偵測
             if not obj_name and submenu:
                 obj_name = submenu.objectName()
-
             # 2. 匹配 JSON 並僅更新文字
             if obj_name in lan_dict:
                 data = lan_dict[obj_name]
                 # 相容兩種格式：如果是字典就拿 "text"，如果是純字串就直接用
                 text = data["text"] if isinstance(data, dict) else data
-                
                 action.setText(text) # 更新 Action 文字
                 if submenu:
                     submenu.setTitle(text) # 同步更新選單標題
-                    # 遞迴翻譯子選單
-                    self.translate_menu(submenu, lan_dict)   
+                    self.translate_menu(submenu, lan_dict) # 遞迴翻譯子選單
 # 語言翻譯
     def translate(self):
         if not self.languages: return
@@ -246,7 +236,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def switch_language(self, new_lan):
         self.current_lang = new_lan
         self.translate()                                          
-# """ 從當前語言包抓取訊息文字 """
+# 從當前語言包抓取訊息文字
     def get_msg(self, key, default=""):
         lang = self.languages.get(self.current_lang, {})
         return lang.get("Messages", {}).get(key, default)
@@ -262,7 +252,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def get_ax_name(self, ax_no):
         a_data = self.languages.get(self.current_lang, {})
         return a_data.get("Axis", {}).get(str(ax_no)) # 預設回傳原名稱，如果找不到對應的翻譯  
-# 步序項目名稱
+# 步序項目全部名稱
+    def get_item_list(self, key):
+        i_data = self.languages.get(self.current_lang, {})
+        # 直接回傳該 key 對應的整個列表，找不到就回傳空列表 []
+        return i_data.get("Item", {}).get(str(key), [])
+# 步序項目單一名稱
     def get_item_name(self, key, idx=0):  
         i_data = self.languages.get(self.current_lang, {})
         item_list = i_data.get("Item", {}).get(str(key), [])
@@ -270,7 +265,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return item_list[idx]
         # 如果找不到，回傳一個辨識用的字串（方便除錯）
         return f"Unknown_{key}[{idx}]" 
-    
 # 按鈕輸入訊號
     def connect_signals(self):
         # menubar
@@ -294,8 +288,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         start_address = self.start_address.text().strip().upper()
         total_step_length = int(self.total_steps.text()) * int(self.step_length.text())
         self.worker.trigger_read_steps(start_address, total_step_length) 
-# 解碼步驟數據的函式
-    #def decode_step_data(self, data):  
+
 
 
 
@@ -354,7 +347,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 如果最高位是 1，表示這是一個負數，進行符號擴展
         if combined & (1 << 31):
             combined -= (1 << 32)
-        return combined        
+        return combined  
+# 16bit有符號轉換 (PLC裡的數字如果大於32767就代表是負數，要轉換成Python的負數表示法)      
+    def convert_16bit_signed(self, value):
+        # 如果大於 32767，代表在 PLC 裡是負數
+        if value > 32767:
+            return value - 65536
+        return value    
 # step data解碼        
     def decode_step_data(self, data):
         # 匯出csv時,每一行都必須是list[]格式,所以第一行也要放在list裡面["a","b",...]
@@ -364,56 +363,112 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except ValueError:
             length = 20 # 預設值，防止 UI 沒填數字當機
         length = int(self.step_length.text())
-        _cylinderMap = ["1", "2", "3", "4"]
-    
-    
+        _cylinderMap = ["1", "2", "3", "4"] # 有氣壓缸選項的步序類型
+        # 開始解碼,每 length 個數據為一組，代表一個步序的完整資訊
         for i in range(0, len(data), length):
             step_num = (i // length) + 1 # 步序編號
-            type_code = data[i] # 第1個字是動作類型
-            type_name = self.get_step(type_code, "text")
-            row = [f"{step_num}", type_name] # 先放入步驟編號和動作類型名稱
+            step_code = data[i] # 第1個字是動作類型
+            step_name = self.get_step(step_code, "text")
+            row = [f"{step_num}", step_name] # 先放入步驟編號和動作類型名稱
 
+            item = self.get_item_list(step_code) # 取得模式項目名稱列表
+            item_data = [] # 用來存 數據
             # 1~4軸運動控制
-            if type_code in range(1, 5): 
-                mode_code = data[i+1] #ZR951
-                mode_name = self.get_mode_name(type_code, mode_code) # 取得模式名稱的函式
-                item = self.get_item_name(type_code, 0) # 取得模式項目名稱
-                row += [item, mode_name] # 如果有模式資訊，再把模式名稱放入 row
-                # 位置
-                ax_details = [] # 用來存 軸1, ax1, 軸2, ax2...
-                for j in range(1, type_code + 1):
-                    # 取得軸號位址：索引 i+2 開始往後推
-                    ax_no = data[i + 1 + j] #ZR952~ZR955
-                    ax_name = self.get_ax_name(ax_no)
-                    pos_low = data[i + 5 + j] #ZR956~ZR963
-                    pos_high = data[i + 6 + j]
-                    ax_pos = self.convert_16_to_32(pos_low, pos_high)
-                    # 直接把「軸序號」和「名稱」依序放入列表
-                    item = self.get_item_name(type_code, 1)
-                    ax_details.append(item)
-                    ax_details.append(ax_name)
-                    item = self.get_item_name(type_code, 2)
-                    ax_details.append(item)
-                    ax_details.append(f"{float(ax_pos) / 100:.2f}")
-                row += ax_details # 如果有軸資訊，再把軸的詳細資料放入 row 
+            if step_code in range(1, 5): 
+                # 填入數據
+                item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
+                id = 6
+                for j in range(1, step_code + 1):
+                    item_data.append(str(data[i + j + 1])) # ZR952~ZR955
+                    pos = self.convert_16_to_32(data[i + id], data[i + id + 1]) #ZR956~ZR963
+                    item_data.append(f"{float(pos) / 100:.2f}")
+                    id += 2
+                for label, val in zip(item, item_data):
+                    row.extend([label, val]) # 使用 extend 效能略好於 += []
             # 5繞線     
-            elif type_code == 5:
-                mode_code = data[i+1]
-                mode_name = self.get_mode_name(type_code, mode_code) # 取得模式名稱的函式
-                item = self.get_item_name("mode")
-                row += [item, mode_name] # 如果有模式資訊，再把模式名稱放入 row    
+            elif step_code == 5:
+                # 填入數據
+                item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
+                item_data.append(str(data[i+2])) # ZR952
+                item_data.append(str(data[i+3])) # ZR953
+                stop_angle = self.convert_16_to_32(data[i+6], data[i+7])
+                item_data.append(f"{float(stop_angle) / 100:.2f}") # ZR956~ZR957
+                item_data.append(str(data[i+8])) # ZR958
+                item_data.append(str(data[i+10])) # ZR960
+                item_data.append(str(data[i+11])) # ZR961
+                for label, val in zip(item, item_data):
+                    row.extend([label, val]) # 使用 extend 效能略好於 += []
+            # 6繞線排線     
+            elif step_code == 6:
+                # 填入數據
+                item_data.append(str(data[i+2])) # ZR952
+                d3_dis = self.convert_16bit_signed(data[i+3]) # ZR953 在 PLC 裡是有符號的，所以要轉換
+                item_data.append(f"{float(d3_dis) / 100:.2f}") # ZR953
+                d4_turn = data[i+4] # ZR954
+                item_data.append(f"{float(d4_turn) / 10:.1f}") # ZR954
+                d5_dis = self.convert_16bit_signed(data[i+5]) # ZR955 在 PLC 裡是有符號的，所以要轉換
+                item_data.append(f"{float(d5_dis) / 100:.2f}") # ZR955
+                item_data.append(str(data[i+7])) # ZR957
+                a_angle = self.convert_16_to_32(data[i+8], data[i+9]) #ZR958~ZR959
+                item_data.append(f"{float(a_angle) / 100:.2f}") # ZR958~ZR959
+                b_angle = self.convert_16_to_32(data[i+10], data[i+11]) #ZR960~ZR961
+                item_data.append(f"{float(b_angle) / 100:.2f}") # ZR960~ZR961
+                c_angle = self.convert_16_to_32(data[i+12], data[i+13]) #ZR962~ZR963
+                item_data.append(f"{float(c_angle) / 100:.2f}") # ZR962~ZR963
+                d_angle = self.convert_16_to_32(data[i+14], data[i+15]) #ZR964~ZR965
+                item_data.append(f"{float(d_angle) / 100:.2f}") # ZR964~ZR965
+                for label, val in zip(item, item_data):
+                    row.extend([label, val]) # 使用 extend 效能略好於 += []     
+            # 7飛叉     
+            elif step_code == 7:
+                # 填入數據
+                item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
+                stop_angle = self.convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
+                item_data.append(f"{float(stop_angle) / 100:.2f}") # ZR956~ZR957
+                item_data.append(str(data[i+8])) # ZR958
+                for label, val in zip(item, item_data):
+                    row.extend([label, val]) # 使用 extend 效能略好於 += []
+            # 8排線     
+            elif step_code == 8:
+                # 填入數據
+                stop_angle = self.convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
+                item_data.append(f"{float(stop_angle) / 100:.2f}") # ZR956~ZR957
+                for label, val in zip(item, item_data):
+                    row.extend([label, val]) # 使用 extend 效能略好於 += []
+            # 9轉槽     
+            elif step_code == 9:
+                # 填入數據
+                item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
+                d8_slot = self.convert_16_to_32(data[i+8], data[i+9]) #ZR958~ZR959
+                item_data.append(f"{d8_slot}") # ZR958~ZR959
+                for label, val in zip(item, item_data):
+                    row.extend([label, val]) # 使用 extend 效能略好於 += []  
+            # 10模寬     
+            elif step_code == 10:
+                # 填入數據
+                item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
+                d6_pos = self.convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
+                item_data.append(f"{float(d6_pos) / 100:.2f}") # ZR956~ZR957 
+                for label, val in zip(item, item_data):
+                    row.extend([label, val]) # 使用 extend 效能略好於 += []                   
+            # 18等待     
+            elif step_code == 18:
+                d2_time = data[i+2] # ZR952
+                item_data.append(f"{float(d2_time) / 10:.1f}") # ZR952  
+                for label, val in zip(item, item_data):
+                    row.extend([label, val]) # 使用 extend 效能略好於 += []    
 
+            # 有氣壓缸選項的步序類型
+            if str(step_code) in _cylinderMap:
+                # 填入數據
+                cylinder = self.convert_16_to_32(data[i+18], data[i+19])
+                item_data.append(str(cylinder)) # ZR968~ZR969 的氣缸數值
 
-
-            cylinder_details = [] # 用來存 氣缸選項、氣缸數值
-            if str(type_code) in _cylinderMap:
-                cyl_low = data[i + 18] #ZR968~ZR969
-                cyl_high = data[i + 19]            
-                cylinder = self.convert_16_to_32(cyl_low, cyl_high)
-                item = self.get_item_name(11, 0)
-                cylinder_details.append(item)
-                cylinder_details.append(str(cylinder))
-                row += cylinder_details # 如果有氣缸資訊，再把氣缸的詳細資料放入 row
+            for label, val in zip(item, item_data):
+                row.extend([label, val]) # 使用 extend 效能略好於 += [] 
+                     
+                
+               
 
             self.step_list.append(row)
             print(self.step_list)

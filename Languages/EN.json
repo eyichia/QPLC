@@ -171,7 +171,7 @@
         "3": ["Mode", "Axis Options 1", "Axis Options 2", "Axis Options 3", "Position 1", "Position 2", "Position 3"],
         "4": ["Mode", "Axis Options 1", "Axis Options 2", "Axis Options 3", "Axis Options 4", "Position 1", "Position 2", "Position 3", "Position 4"],
         "5": ["Mode", "Arrange Cam", "Mold trigger", "Stop Angle", "Total Turns", "Start Slow Turns", "End Slow Turns"],
-        "6": ["Arrange Turns", "Distance", "Mold Turns", "Distance", "Cam Mode", "Interval AB", "Interval CD"],
+        "6": ["Arrange Turns", "Distance", "Mold Turns", "Distance", "Cam Mode", "Interval A", "Interval B", "Interval C", "Interval D"],
         "7": ["Mode", "Stop Angle", "Turns"],
         "8": ["Position"],
         "9": ["Mode", "Number of Slots"],
