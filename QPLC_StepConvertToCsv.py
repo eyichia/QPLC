@@ -251,9 +251,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         s_data = self.languages.get(self.current_lang, {})
         return s_data.get("step", {}).get(str(m_code), {}).get(str(text_mode), {})
 # get mode
-    def get_mode_name(self,type, mode):
-        mode_info = self.get_step(type, "mode")
-        return mode_info.get(mode, "未知模式")
+    def get_mode_name(self, type, mode):
+        mode_info = self.get_step(str(type), "mode")
+        return mode_info.get(str(mode), "未知模式")
 # 從當前語言包抓取step軸名稱
     def get_ax_name(self, ax_no):
         a_data = self.languages.get(self.current_lang, {})
@@ -411,6 +411,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 row += cylinder_details # 如果有氣缸資訊，再把氣缸的詳細資料放入 row
 
             self.step_list.append(row)
+            self.Process.append(row)
             
     
 
