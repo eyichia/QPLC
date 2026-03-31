@@ -6,8 +6,8 @@ import math
 import json
 import pymcprotocol
 
-from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QMenuBar, QMenu, QComboBox)
-from PySide6.QtCore import (QThread, Signal, Slot)
+from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QMenuBar, QMenu, QComboBox, QFileDialog)
+from PySide6.QtCore import (QDateTime,QThread, Signal, Slot)
 from PySide6.QtGui import (QIcon, QPixmap, QFont)
 
 
@@ -246,6 +246,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def switch_language(self, new_lan):
         self.current_lang = new_lan
         self.translate()                                          
+# """ 從當前語言包抓取訊息文字 """
+    def get_msg(self, key, default=""):
+        lang = self.languages.get(self.current_lang, {})
+        return lang.get("Messages", {}).get(key, default)
 # 從當前語言包抓取step文字 """
     def get_step(self, m_code, text_mode):
         s_data = self.languages.get(self.current_lang, {})
@@ -278,6 +282,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.PB_connect_plc.clicked.connect(self.connect_plc)
         self.PB_deconnect_plc.clicked.connect(self.deconnect_plc)
         self.PB_read_step.clicked.connect(self.read_step_data)
+        self.PB_export_csv.clicked.connect(self.export_summary_csv)
         # 連接 Worker 的數據回傳信號
         self.worker.step_info.connect(self.update_step_info)
         self.worker.error_occurred.connect(self.handle_error)
@@ -317,7 +322,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 你可以根據實際需求來處理這些數據，例如顯示在 UI 上或存成 CSV
         #self.step_data = data # 儲存到 MainWindow 的屬性，方便其他方法使用
         self.decode_step_data(data) # 呼叫解碼函式來處理數據
-        print("收到步驟數據:", data)
+        #print("收到步驟數據:", data)
 # --- 【新增】錯誤處理 ---
     def handle_error(self, err_msg):
         self.label_connect_status.setText(f"錯誤: {err_msg}")
@@ -333,7 +338,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # --- 【核心修改】將 UI 上的位址設定給 Worker ---
         self.worker.ip = server_ip
         self.worker.port = port_no
-        self.worker.addr_total = self.total_steps.text().strip().upper() #去除無用字元,轉大寫
+        self.worker.addr_total = self.total_step_address.text().strip().upper() #去除無用字元,轉大寫
         self.worker.addr_len = self.step_length_address.text().strip().upper()
         self.worker.start() # 呼叫 def run(self):
 # 斷開PLC
@@ -352,8 +357,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return combined        
 # step data解碼        
     def decode_step_data(self, data):
-        self.step_list = []
-        self.step_list.append("Step")
+        # 匯出csv時,每一行都必須是list[]格式,所以第一行也要放在list裡面["a","b",...]
+        self.step_list = [["Step"]] 
         try:
             length = int(self.step_length.text())
         except ValueError:
@@ -366,7 +371,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             step_num = (i // length) + 1 # 步序編號
             type_code = data[i] # 第1個字是動作類型
             type_name = self.get_step(type_code, "text")
-            row = [f"Step {step_num}", type_name] # 先放入步驟編號和動作類型名稱
+            row = [f"{step_num}", type_name] # 先放入步驟編號和動作類型名稱
 
             # 1~4軸運動控制
             if type_code in range(1, 5): 
@@ -389,7 +394,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     ax_details.append(ax_name)
                     item = self.get_item_name(type_code, 2)
                     ax_details.append(item)
-                    ax_details.append(str(float(ax_pos) / 100))
+                    ax_details.append(f"{float(ax_pos) / 100:.2f}")
                 row += ax_details # 如果有軸資訊，再把軸的詳細資料放入 row 
             # 5繞線     
             elif type_code == 5:
@@ -411,9 +416,63 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 row += cylinder_details # 如果有氣缸資訊，再把氣缸的詳細資料放入 row
 
             self.step_list.append(row)
-            self.Process.append(row)
+            print(self.step_list)
+        self.Process.append(", ".join(map(str, self.step_list)))
             
-    
+# """資料處理,路徑,資料夾,檔名,格式"""
+    def data_processing(self, folder, filename, format, title, mode):
+        # 1. 準備路徑與資料夾
+        default_dir = os.path.join(os.getcwd(), folder)
+        if not os.path.exists(default_dir): os.makedirs(default_dir)
+        # 2. 準備過濾器
+        filters = {
+            "csv": "CSV Files (*.csv)",
+            "xlsx": "xlsx Files (*.xlsx)",
+            "txt": "Text Files (*.txt)",
+            "pdf": "PDF Files (*.pdf)",
+            "png": "Png Files (*.png)",
+            "json": "JSON Files (*.json)"
+        }
+        file_filter = filters.get(format, "All Files (*)")
+        # 3. 根據模式執行不同的對話框
+        if mode == "save":
+            # 儲存模式：自動生成帶時間戳的預設檔名
+            default_filename = f"{filename}_{QDateTime.currentDateTime().toString('yyyyMMdd_HHmmss')}.{format}"
+            initial_path = os.path.join(default_dir, default_filename)
+            file_path, _ = QFileDialog.getSaveFileName(self, self.get_msg(title), initial_path, file_filter)
+        else:
+            # 開啟模式：直接打開資料夾，不需要預設檔名
+            file_path, _ = QFileDialog.getOpenFileName(self, self.get_msg(title), default_dir, file_filter)
+        # 4. 統一回傳檢查
+        return file_path if file_path else None   
+# """ 輸出橫向對比報表 (CSV 格式) """
+    def export_summary_csv(self):
+        if not hasattr(self, "step_list") or len(self.step_list) <= 1:
+            print("沒有步驟數據可供匯出")
+            return
+        # 獲取存檔路徑 (利用你的萬用助手)
+        file_path = self.data_processing("Reports", "Step_code", "csv", "report", "save")
+        if not file_path: return
+        #data_to_save = []
+        #for item in self.step_list:
+            #if isinstance(item, list):
+                #data_to_save.append(item)
+            #else:
+                #data_to_save.append([item]) # 把 "Step" 變成 ["Step"]
+
+        try:
+            # newline='' 防止 Windows 存檔出現多餘空行
+            # utf-8-sig 確保 Excel 開啟中文不會亂碼
+            with open(file_path, 'w', newline='', encoding='utf-8-sig') as f:
+                writer = csv.writer(f)
+            
+                # 3. 寫入所有資料
+                writer.writerows(self.step_list)
+            
+            print(f"CSV 存檔成功！路徑：{file_path}")
+        except Exception as e:
+            print(f"存檔時發生錯誤: {e}")
+           
 
         
         
