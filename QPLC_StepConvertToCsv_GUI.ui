@@ -283,6 +283,12 @@ QPushButton:pressed {
        <height>30</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="styleSheet">
       <string notr="true">QLineEdit{
 	border-style: solid; 
@@ -436,6 +442,12 @@ QPushButton:pressed {
        <height>30</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="styleSheet">
       <string notr="true">QLineEdit{
 	border-style: solid; 
@@ -456,6 +468,12 @@ QPushButton:pressed {
        <width>220</width>
        <height>30</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>12</pointsize>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">QLineEdit{
@@ -577,6 +595,12 @@ QPushButton:pressed {
        <height>30</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="styleSheet">
       <string notr="true">QLineEdit{
 	border-style: solid; 
@@ -597,6 +621,12 @@ QPushButton:pressed {
        <width>220</width>
        <height>30</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>12</pointsize>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">QLineEdit{
@@ -619,6 +649,12 @@ QPushButton:pressed {
        <height>30</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="styleSheet">
       <string notr="true">QLineEdit{
 	border-style: solid; 
@@ -639,6 +675,12 @@ QPushButton:pressed {
        <width>220</width>
        <height>30</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>12</pointsize>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">QLineEdit{
@@ -727,6 +769,12 @@ QPushButton:pressed {
        <height>30</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="styleSheet">
       <string notr="true">QLineEdit{
 	border-style: solid; 
@@ -781,6 +829,12 @@ QPushButton:pressed {
        <height>30</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="styleSheet">
       <string notr="true">QLineEdit{
 	border-style: solid; 
@@ -801,6 +855,12 @@ QPushButton:pressed {
        <width>220</width>
        <height>30</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>12</pointsize>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">QLineEdit{
@@ -1880,7 +1940,7 @@ QPushButton:pressed {
      <x>0</x>
      <y>0</y>
      <width>1020</width>
-     <height>23</height>
+     <height>33</height>
     </rect>
    </property>
    <property name="font">

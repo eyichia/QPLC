@@ -6,6 +6,7 @@ import math
 import json
 import struct
 import pymcprotocol
+import re
 
 from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QMenuBar, QMenu, QComboBox, QFileDialog)
 from PySide6.QtCore import (QDateTime,QThread, Signal, Slot)
@@ -43,7 +44,18 @@ class PLC1Worker(QThread):
         self.batch_start_addr = start_addr
         self.batch_size = total_length
         self.batch_read_trigger = True    
+        print(f"已觸發讀取步驟數據: 起始位址={start_addr}, 總長度={total_length}") # 這行可以幫助確認觸發是否成功
 
+    # 【新增】必須加入這個位址遞增工具，否則分段讀取會當機
+    def increment_address(self, addr, offset):
+        # 拆分 D2100 -> prefix="D", number=2100
+        match = re.match(r"([a-zA-Z]+)([0-9]+)", addr)
+        if match:
+            prefix = match.group(1)
+            number = int(match.group(2))
+            return f"{prefix}{number + offset}"
+        return addr
+        
     def run(self):
         self.running = True # 確保每次 run 都從 True 開始
         plc = pymcprotocol.Type3E()
@@ -69,23 +81,34 @@ class PLC1Worker(QThread):
                     if _sm413_data:
                         self.sm413_status.emit(bool(_sm413_data[0]))
                 # 讀取step數據
+                #字元單位 (Word units)：單次讀取上限通常是 960 個字 (Words)
+                #位元單位 (Bit units)：單次讀取上限是 7168 點
                 if self.batch_read_trigger:
                     try:
-                        results = plc.batchread_wordunits(
-                            headdevice=self.batch_start_addr, 
-                            readsize=self.batch_size
-                        )
-                        if results:
-                            self.steps_data.emit(results)
-                        else:
-                            # 讀取結果為空，可以發送一個特定的警告給 UI
-                            self.error_occurred.emit("讀取完成但無資料，請檢查位址範圍")
+                        all_results = []
+                        current_addr = self.batch_start_addr
+                        remaining_size = self.batch_size
+                        MAX_CHUNK = 900 # 設定單次讀取上限為 900，保留一點安全邊際
+                        while remaining_size > 0:
+                            read_now = min(MAX_CHUNK, remaining_size)
+                            print(f"正在讀取位址: {current_addr}, 長度: {read_now}")
+                            chunk_results = plc.batchread_wordunits(
+                                headdevice = current_addr, 
+                                readsize = read_now
+                            )
+                            if chunk_results:
+                                all_results.extend(chunk_results) # 拼接數據
+                                # 計算下一次的起始位址與剩餘長度
+                                current_addr = self.increment_address(current_addr, read_now)
+                                remaining_size -= read_now
+                            else:
+                                raise Exception("PLC 回傳空數據")
+                        if all_results:
+                            self.steps_data.emit(all_results) # 全部讀完後一次發送給 UI
                     except Exception as e:
-                        # 這裡的錯誤會被外層的大 except 捕捉，但我們確保觸發被關閉
-                        raise e 
+                        self.error_occurred.emit(f"讀取失敗: {str(e)}")
                     finally:
-                        # --- 重點：不管成功或失敗，這次「任務」都算結束了 ---
-                        self.batch_read_trigger = False        
+                        self.batch_read_trigger = False
                 
                 time.sleep(0.5) # 正常每 500ms 讀一次      
             except Exception as e:
@@ -287,6 +310,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.PB_deconnect_plc.clicked.connect(self.deconnect_plc)
         self.PB_read_step.clicked.connect(self.read_step_data)
         self.PB_export_csv.clicked.connect(self.export_summary_csv)
+        # 變更HMI step no
+        self.step_no.valueChanged.connect(self.change_step_no)
         # 連接 Worker 的數據回傳信號
         self.worker.step_info.connect(self.update_step_info)
         self.worker.error_occurred.connect(self.handle_error)
@@ -294,7 +319,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.worker.steps_data.connect(self.display_steps_data)
 # 讀取step資料
     def read_step_data(self):
-        self.connect_plc() # 確保已連線
         start_address = self.start_address.text().strip().upper()
         total_step_length = int(self.total_steps.text()) * int(self.step_length.text())
         self.worker.trigger_read_steps(start_address, total_step_length) 
@@ -324,6 +348,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 這裡的 data 是從 Worker 傳回來的 PLC 數據列表
         # 你可以根據實際需求來處理這些數據，例如顯示在 UI 上或存成 CSV
         #self.step_data = data # 儲存到 MainWindow 的屬性，方便其他方法使用
+        self.current_plc_data = data
         self.decode_step_data(data) # 呼叫解碼函式來處理數據
         #print("收到步驟數據:", data)
 # --- 【新增】錯誤處理 ---
@@ -364,6 +389,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if value > 32767:
             return value - 65536
         return value    
+# 變更step no <翻頁>
+    def change_step_no(self,offset):
+        try:
+            # 1. 取得總步數，並確保至少為 10 
+            total = int(self.total_steps.text())
+            # 計算最大起始編號 (例如總共 100 步，最後一頁起點是 91)
+            max_no = max(1, total - 9)
+            # 2. 限制起始編號範圍：不可小於 1，也不可大於 max_no
+            first_no = max(1, offset if offset <= max_no else max_no)
+            # 3. 更新 UI 上的 10 個編號標籤 (QLabel)
+            for i in range(1, 11):
+                label = self.findChild(QLabel, f"label_step_no_{i}")
+                if label:
+                    label.setText(str(first_no + i - 1))
+
+            # 4. 【重要】編號改變後，必須重新呼叫顯示函式來更新動作名稱
+            # 假設你已經將讀回來的 PLC 資料存在 self.current_plc_data
+            if hasattr(self, "current_plc_data"):
+                length = int(self.step_length.text())
+                self.ui_display_steps(self.current_plc_data, length)
+                
+        except ValueError:
+            pass # 防止總步數還沒讀到時出錯                    
+
 # step data解碼        
     def decode_step_data(self, data):
         # 匯出csv時,每一行都必須是list[]格式,所以第一行也要放在list裡面["a","b",...]
@@ -519,25 +568,37 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Process.clear()
         for r in self.step_list:
             self.Process.append(" | ".join(map(str, r)))
+
+        self.ui_display_steps(data, length)    
 # UI單獨顯示步序            
     def ui_display_steps(self, data, length):   
-        start_no = int(self.label_step_no_1.text()) # 從 UI 上的第一個步序編號開始 
-        end_no = int(self.label_step_no_10.text()) # 從 UI 上的第一個步序編號開始
-        for n in range(start_no, end_no+1):
-            widget = getattr(self, f"label_step_no_{n}", None)
-            if widget: 
-                widget.clear()
-                widget.setStyleSheet("background-color: #B5B5B5;")
+        try:
+            start_no = int(self.label_step_no_1.text()) # 從 UI 上的第一個步序編號開始 
+            end_no = int(self.label_step_no_10.text()) # 從 UI 上的第一個步序編號開始
+            for n in range(start_no, end_no+1):
+                widget = getattr(self, f"step_{n}", None)
+                if widget: 
+                    widget.clear()
+                    widget.setStyleSheet("background-color: #B5B5B5;")
 
-        base_idx = (start_no - 1) * length
-        for i in range(10):
-            current_idx = base_idx + (i * length)
-            step_name = data[idx+1] # 每個步序的第二個數據是 step_code
-            line_edit = getattr(self, f"label_step_no_{start_no+i}", None)
-            if line_edit:
-                line_edit.setText(step_name)
-                if not line_edit.text() == "": # 不=空白
-                    line_edit.setStyleSheet("background-color: #FFFFFF;") # 有數據就變白色 
+            base_idx = (start_no - 1) * length
+            for i in range(10):
+                current_idx = base_idx + (i * length)
+                # 防呆：確保 index 沒超出 data 長度
+                if current_idx < len(data):
+                    # 取得動作代碼
+                    step_code = data[current_idx] 
+                    # 【核心修正】轉換為中文名稱，例如 "1軸運動控制"
+                    step_name = self.get_step(step_code, "text") 
+                    
+                    # 取得對應的 QLineEdit (step_1 ~ step_10)
+                    line_edit = getattr(self, f"step_{i+1}", None)
+                    if line_edit:
+                        line_edit.setText(step_name)
+                        if step_name and step_name != "":
+                            line_edit.setStyleSheet("background-color: #FFFFFF;") # 有數據就變白色 
+        except Exception as e:
+            print(f"UI 顯示失敗: {e}")                
 
 
    
