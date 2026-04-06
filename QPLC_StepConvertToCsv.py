@@ -311,7 +311,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.PB_read_step.clicked.connect(self.read_step_data)
         self.PB_export_csv.clicked.connect(self.export_summary_csv)
         # 變更HMI step no
-        self.step_no.valueChanged.connect(self.change_step_no)
+        self.step_no.editingFinished.connect(self.step_no_enter)
         # 連接 Worker 的數據回傳信號
         self.worker.step_info.connect(self.update_step_info)
         self.worker.error_occurred.connect(self.handle_error)
@@ -377,11 +377,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.worker.stop() 
 # 16bitTo32bit轉換
     def convert_16_to_32(self, low, high):
+        # 先轉16進制(無符號)
+        low_u = low & 0xFFFF
+        high_u = high & 0xFFFF
         # 將兩個 16-bit 數字合併成一個 32-bit 數字
-        combined = (high << 16) | low
+        combined = (high_u << 16) | low_u
         # 如果最高位是 1，表示這是一個負數，進行符號擴展
-        if combined & (1 << 31):
-            combined -= (1 << 32)
+        if combined >= 0x80000000:
+            combined -= 0x10000000
         return combined  
 # 16bit有符號轉換 (PLC裡的數字如果大於32767就代表是負數，要轉換成Python的負數表示法)      
     def convert_16bit_signed(self, value):
@@ -389,6 +392,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if value > 32767:
             return value - 65536
         return value    
+# 輸入步序 no
+    def step_no_enter(self):
+        self.change_step_no(self.step_no.value())
 # 變更step no <翻頁>
     def change_step_no(self,offset):
         try:
@@ -435,11 +441,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             item_data = [] # 用來存 數據
             # 1~4軸運動控制
             if step_code in range(1, 5): 
-                # 填入數據
+                # 模式
                 item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
-                id = 6
+                # 軸選項
                 for j in range(1, step_code + 1):
-                    item_data.append(str(data[i + j + 1])) # ZR952~ZR955
+                    ax_name = self.get_ax_name(data[i + j + 1]) # ZR952~ZR955
+                    item_data.append(ax_name) 
+                # 位置設定
+                id = 6
+                for j in range(1, step_code + 1): 
                     pos = self.convert_16_to_32(data[i + id], data[i + id + 1]) #ZR956~ZR963
                     item_data.append(f"{float(pos) / 100:.2f}")
                     id += 2
@@ -478,8 +488,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # 8排線     
             elif step_code == 8:
                 # 填入數據
-                stop_angle = self.convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
-                item_data.append(f"{float(stop_angle) / 100:.2f}") # ZR956~ZR957
+                pos = self.convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
+                print(data[i+6], data[i+7])
+                item_data.append(f"{float(pos) / 100:.2f}") # ZR956~ZR957
             # 9轉槽     
             elif step_code == 9:
                 # 填入數據
@@ -503,19 +514,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 item_data.append(f"{float(d2_time) / 10:.1f}") # ZR952   
             # 19暫停   
             elif step_code == 19:
-                continue
-                d2_time = data[i+2] # ZR952
-                item_data.append(f"{float(d2_time) / 10:.1f}") # ZR952  
-                d3_time = data[i+3] # ZR953
-                item_data.append(f"{float(d3_time) / 10:.1f}") # ZR953
-                item_data.append(str(data[i+4])) # ZR954
-                d5_time = data[i+5] # ZR955
-                item_data.append(f"{float(d5_time) / 10:.1f}") # ZR955 
-                item_data.append(str(data[i+6])) # ZR956
+                pass
             # 20~27跳躍
             elif step_code in range(20, 28):
                 # 填入數據
-                item_data.extend([str(data[i+2]), str(data[i+3]), str(data[i+4])]) # ZR952~ZR954
+                item_data.extend([str(data[i+3]), str(data[i+4])]) # ZR953~ZR954
                 label_string = self.to_str(data, i+6, i+16) # ZR956~ZR965 的數據切片[16-6=10個字]
                 item_data.append(label_string) # ZR956~ZR965 的標籤數
             # 28 GOTO
@@ -524,7 +527,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 item_data.append(label_string) # ZR956~ZR965 的標籤數
             # 29 RET   
             elif step_code == 29:
-                continue
+                pass
             # 30~31副程式
             elif step_code in range(30, 32): 
                 file_name = self.to_str(data, i+2, i+12) # ZR952~ZR961
@@ -541,11 +544,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # 40 標籤
             elif step_code == 40:
                 label_string = self.to_str(data, i+2, i+12) # ZR952~ZR961 的數據切片[10個字]
-                item_data.append(label_string)      
+                # 【修改】直接加進 row，這樣就不會出現重複的標題
+                row.append(label_string)
+                # 確保 item_data 保持空清單 []，後面的 zip 就不會執行
+                item_data = []
             # 41 註釋
             elif step_code == 41:
                 comment_string = self.to_str(data, i+2, i+14) # ZR952~ZR963
-                item_data.append(comment_string)     
+                row.append(label_string)
+                item_data = []
+            # 99 End
+            elif step_code == 99:
+                pass      
     
             # 有氣壓缸選項的步序類型
             if str(step_code) in _cylinderMap:
