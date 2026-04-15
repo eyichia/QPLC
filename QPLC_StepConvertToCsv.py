@@ -5,10 +5,11 @@ import csv
 import math
 import json
 import struct
+import socket
 import pymcprotocol
 import re
 
-from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QMenuBar, QMenu, QComboBox, QFileDialog)
+from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QSpinBox, QMenuBar, QMenu, QComboBox, QFileDialog)
 from PySide6.QtCore import (QDateTime,QThread, Signal, Slot)
 from PySide6.QtGui import (QIcon, QPixmap, QFont)
 
@@ -154,6 +155,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logo_pixmap = QPixmap(resource_path("Assets/Mylogo.png"))
         self.style_pixmap = QPixmap(resource_path("Assets/Mystyle.png"))
         self.current_lang = "TW" # 開機語言
+        # 程式啟動時自動讀取 IP
+        pc_ip = self.get_local_ip()
+        self.label_pc_ip.setText(f"PC IP: {pc_ip}")
 
         self.worker = PLC1Worker() # 執行背景 PLC1 連線程
         
@@ -162,6 +166,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.load_languages_json() #載入語言json檔案
         self.translate() #語言翻譯
         self.connect_signals() # 按鈕輸入訊號
+# get pc ip        
+    def get_local_ip(self):
+        import socket
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except:
+            return "127.0.0.1"    
 # 設定視窗圖示
     def init_ui_settings(self):
         self.setWindowIcon(QIcon(self.style_pixmap)) #設定視窗圖示
@@ -180,14 +195,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.total_step_address.setText("D680")
         self.step_length_address.setText("D681")
         self.start_address.setText("D2100")
-        self.total_steps.setText("0")
-        self.step_length.setText("0")
+        self.total_steps.setText("300")
+        self.step_length.setText("20")
+        self.d680_total_steps.setValue(300)
+        self.d681_step_length.setValue(20)
         self.PB_connect_plc.setEnabled(True)
         self.PB_deconnect_plc.setEnabled(False)
         self.label_connect_status.setText("--離線中--")
         self.step_no.setValue(1)
         for i in range(1, 11):
-            self.findChild(QLabel, f"label_step_no_{i}").setText(f"{i}")
+            self.findChild(QSpinBox, f"d15{i-1}_step_no{i}").setValue(i)
 # 自動掃描 Languages 資料夾並載入所有 JSON
     def load_languages_json(self):
         self.languages = {}
@@ -312,6 +329,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.PB_export_csv.clicked.connect(self.export_summary_csv)
         # 變更HMI step no
         self.step_no.editingFinished.connect(self.step_no_enter)
+        self.PB_step_up.clicked.connect(lambda: self.step_up_down(-10))
+        self.PB_step_down.clicked.connect(lambda: self.step_up_down(10))
         # 連接 Worker 的數據回傳信號
         self.worker.step_info.connect(self.update_step_info)
         self.worker.error_occurred.connect(self.handle_error)
@@ -392,6 +411,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if value > 32767:
             return value - 65536
         return value    
+# step go up or down
+    def step_up_down(self, offset):
+        no = self.d150_step_no1.value() + offset
+        self.change_step_no(no)
 # 輸入步序 no
     def step_no_enter(self):
         self.change_step_no(self.step_no.value())
@@ -399,21 +422,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def change_step_no(self,offset):
         try:
             # 1. 取得總步數，並確保至少為 10 
-            total = int(self.total_steps.text())
+            total = self.d680_total_steps.value()
             # 計算最大起始編號 (例如總共 100 步，最後一頁起點是 91)
             max_no = max(1, total - 9)
             # 2. 限制起始編號範圍：不可小於 1，也不可大於 max_no
             first_no = max(1, offset if offset <= max_no else max_no)
             # 3. 更新 UI 上的 10 個編號標籤 (QLabel)
             for i in range(1, 11):
-                label = self.findChild(QLabel, f"label_step_no_{i}")
-                if label:
-                    label.setText(str(first_no + i - 1))
+                current_spin = self.findChild(QSpinBox, f"d15{i-1}_step_no{i}")
+                if current_spin:
+                    current_spin.setValue(first_no + i - 1)
+
 
             # 4. 【重要】編號改變後，必須重新呼叫顯示函式來更新動作名稱
             # 假設你已經將讀回來的 PLC 資料存在 self.current_plc_data
             if hasattr(self, "current_plc_data"):
-                length = int(self.step_length.text())
+                length = self.d681_step_length.value()
                 self.ui_display_steps(self.current_plc_data, length)
                 
         except ValueError:
@@ -424,7 +448,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 匯出csv時,每一行都必須是list[]格式,所以第一行也要放在list裡面["a","b",...]
         self.step_list = [["Step"]] 
         try:
-            length = int(self.step_length.text())
+            length = self.d681_step_length.value()
             if length == 0: length = 20 # 防止除以 0
         except ValueError:
             length = 20 # 預設值，防止 UI 沒填數字當機
@@ -583,8 +607,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # UI單獨顯示步序            
     def ui_display_steps(self, data, length):   
         try:
-            start_no = int(self.label_step_no_1.text()) # 從 UI 上的第一個步序編號開始 
-            end_no = int(self.label_step_no_10.text()) # 從 UI 上的第一個步序編號開始
+            start_no = self.d150_step_no1.value() # 從 UI 上的第一個步序編號開始 
+            end_no = self.d159_step_no10.value() # 從 UI 上的第一個步序編號開始
             for n in range(start_no, end_no+1):
                 widget = getattr(self, f"step_{n}", None)
                 if widget: 

@@ -1,6 +1,11 @@
 {
+    "Format": {
+        "total_step" : ["D680", 500],
+        "step_length" : ["D681", 20],
+        "start_address" : "D2200"
+    }, 
     "TW": {
- 	    "step": {
+ 	    "code": {
     	    "1": "1軸運動控制",
             "2": "2軸運動控制",
             "3": "3軸運動控制",
@@ -85,7 +90,7 @@
         }
     },
     "CN": {
-        "step": {
+        "code": {
             "1": "1轴运动控制",
             "2": "2轴运动控制",
             "3": "3轴运动控制",
@@ -170,7 +175,7 @@
         }
     },
     "EN": {
-        "step": {
+        "code": {
             "1": "1-axis motion ctrl",
             "2": "2-axis motion ctrl",
             "3": "3-axis motion ctrl",
