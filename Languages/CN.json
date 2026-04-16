@@ -31,6 +31,7 @@
         "label_ip3": { "text": "IP 地址3", "font_size": 14, "font_family": "Microsoft YaHei" },
         "label_ip4": { "text": "IP 地址4", "font_size": 14, "font_family": "Microsoft YaHei" },
         "label_port": { "text": "本地埠号", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_model": { "text": "型号", "font_size": 14, "font_family": "Microsoft YaHei" },
         "label_total_step": { "text": "总步序", "font_size": 14, "font_family": "Microsoft YaHei" },
         "label_step_length": { "text": "单步长度", "font_size": 14, "font_family": "Microsoft YaHei" },
         "label_start_address": { "text": "起始地址", "font_size": 14, "font_family": "Microsoft YaHei" }

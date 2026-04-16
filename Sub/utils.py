@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 
+# 自訂視窗
 def show_prompt_window(parent, _title, _text, _icon=None, _buttons=None, _theme="default", _font_size=14, _icon_size=80):
     """
     跨檔案使用的萬用對話框
@@ -77,3 +78,20 @@ def show_prompt_window(parent, _title, _text, _icon=None, _buttons=None, _theme=
     
     
     return msg.exec()
+# 16bitTo32bit轉換
+def convert_16_to_32(parent, low, high):
+    # 先轉16進制(無符號)
+    low_u = low & 0xFFFF
+    high_u = high & 0xFFFF
+    # 將兩個 16-bit 數字合併成一個 32-bit 數字
+    combined = (high_u << 16) | low_u
+    # 如果最高位是 1，表示這是一個負數，進行符號擴展
+    if combined >= 0x80000000:
+        combined -= 0x10000000
+    return combined  
+# 16bit有符號轉換 (PLC裡的數字如果大於32767就代表是負數，要轉換成Python的負數表示法)      
+def convert_16bit_signed(parent, value):
+    # 如果大於 32767，代表在 PLC 裡是負數
+    if value > 32767:
+        return value - 65536
+    return value    

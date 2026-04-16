@@ -9,11 +9,14 @@ import socket
 import pymcprotocol
 import re
 
-from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QSpinBox, QMenuBar, QMenu, QComboBox, QFileDialog)
-from PySide6.QtCore import (QDateTime,QThread, Signal, Slot)
+from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QSpinBox, QMenuBar, QMenu, QComboBox, QFileDialog,
+                               QListView)
+from PySide6.QtCore import (Qt, QDateTime,QThread, Signal, Slot)
 from PySide6.QtGui import (QIcon, QPixmap, QFont)
 
 from QPLC_StepConvertToCsv_GUI_ui import Ui_MainWindow
+from plc_worker import PLC1Worker # PLC通訊程式
+from Sub.utils import show_prompt_window, convert_16_to_32, convert_16bit_signed # 工具程式
 
 # """取得資源絕對路徑，兼容開發與 PyInstaller 打包模式"""
 def resource_path(relative_path):
@@ -23,129 +26,14 @@ def resource_path(relative_path):
     # 開啟開發模式下的路徑
     return os.path.join(os.path.abspath("."), relative_path)
 
-# 背景 PLC 連線程式
-class PLC1Worker(QThread):
-    step_info = Signal(int, int)
-    steps_data = Signal(list) # 如果需要傳回更多數據，可以使用 list 或 dict
-    sm413_status = Signal(bool)
-    error_occurred = Signal(str)
-
-    def __init__(self):
-        super().__init__()
-        self.ip = ""
-        self.port = 0
-        self.addr_total = ""
-        self.addr_len = ""
-        self.running = True # 控制迴圈開關
-        self.batch_read_trigger = False 
-        self.batch_start_addr = ""
-        self.batch_size = 0
-
-    def trigger_read_steps(self, start_addr, total_length):
-        self.batch_start_addr = start_addr
-        self.batch_size = total_length
-        self.batch_read_trigger = True    
-        print(f"已觸發讀取步驟數據: 起始位址={start_addr}, 總長度={total_length}") # 這行可以幫助確認觸發是否成功
-
-    # 【新增】必須加入這個位址遞增工具，否則分段讀取會當機
-    def increment_address(self, addr, offset):
-        # 拆分 D2100 -> prefix="D", number=2100
-        match = re.match(r"([a-zA-Z]+)([0-9]+)", addr)
-        if match:
-            prefix = match.group(1)
-            number = int(match.group(2))
-            return f"{prefix}{number + offset}"
-        return addr
-        
-    def run(self):
-        self.running = True # 確保每次 run 都從 True 開始
-        plc = pymcprotocol.Type3E()
-        plc.setaccessopt(commtype="binary")
-        is_connected = False # 自定義一個旗標來紀錄連線狀態
-        
-        while self.running:
-            try:
-                # 如果尚未連線，則嘗試連線
-                if not is_connected: # 假設有連線檢查
-                    plc.connect(self.ip, self.port)
-                    # 只讀取一次參數
-                    res_total = plc.batchread_wordunits(headdevice=self.addr_total, readsize=1) #ZR是用16進制
-                    res_len = plc.batchread_wordunits(headdevice=self.addr_len, readsize=1)
-                    if res_total and res_len:
-                        self.step_info.emit(res_total[0], res_len[0])
-                        # --- 【關鍵修正 A】：連線成功且讀取完成，才設為 True ---
-                        is_connected = True
-
-                # 2. 正常讀取循環 (只有連線成功才執行)
-                if is_connected:
-                    _sm413_data = plc.batchread_bitunits(headdevice="SM413", readsize=1)
-                    if _sm413_data:
-                        self.sm413_status.emit(bool(_sm413_data[0]))
-                # 讀取step數據
-                #字元單位 (Word units)：單次讀取上限通常是 960 個字 (Words)
-                #位元單位 (Bit units)：單次讀取上限是 7168 點
-                if self.batch_read_trigger:
-                    try:
-                        all_results = []
-                        current_addr = self.batch_start_addr
-                        remaining_size = self.batch_size
-                        MAX_CHUNK = 900 # 設定單次讀取上限為 900，保留一點安全邊際
-                        while remaining_size > 0:
-                            read_now = min(MAX_CHUNK, remaining_size)
-                            print(f"正在讀取位址: {current_addr}, 長度: {read_now}")
-                            chunk_results = plc.batchread_wordunits(
-                                headdevice = current_addr, 
-                                readsize = read_now
-                            )
-                            if chunk_results:
-                                all_results.extend(chunk_results) # 拼接數據
-                                # 計算下一次的起始位址與剩餘長度
-                                current_addr = self.increment_address(current_addr, read_now)
-                                remaining_size -= read_now
-                            else:
-                                raise Exception("PLC 回傳空數據")
-                        if all_results:
-                            self.steps_data.emit(all_results) # 全部讀完後一次發送給 UI
-                    except Exception as e:
-                        self.error_occurred.emit(f"讀取失敗: {str(e)}")
-                    finally:
-                        self.batch_read_trigger = False
-                
-                time.sleep(0.5) # 正常每 500ms 讀一次      
-            except Exception as e:
-                is_connected = False # 發生任何錯誤都視為連線失敗，重置旗標
-                # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
-                error_msg = str(e)
-                if "command error" in error_msg.lower() or "device" in error_msg.lower():
-                    friendly_msg = f"位址無效或超出範圍: {self.addr_total}"
-                else:
-                    friendly_msg = f"通訊失敗: {error_msg}"
-                print(friendly_msg) # 先在控制台印出錯誤訊息，方便除錯
-                self.error_occurred.emit(friendly_msg)
-                try: plc.close() # 發生錯誤先關閉舊連線
-                except: pass
-                time.sleep(2) # 等待 2 秒再重試，避免過度頻繁攻擊 PLC   
-            
-        # 只有當 self.running 變成 False (按下斷開按鈕) 才會跑到這裡
-        try:
-            plc.close()
-            print("PLC 連線已安全關閉")
-        except:
-            pass
-
-    def stop(self):
-        self.running = False # 讓 run 裡的 while 迴圈結束
-        self.wait()          # 等待執行緒完全停止
-   
-
-
-
 # 主畫面
 class MainWindow(QMainWindow, Ui_MainWindow):
-    version = " v1.1"
-    Developer = " 江乙加 Eric Chiang"
-    ver_date = " 2026-03-31"
-    Copyright = f" 2026 {Developer}" #" 2026 " + Developer
+    VERSION = " v1.1"
+    DEVELOPER = " 江乙加 Eric Chiang"
+    VER_DATE = " 2026-03-31"
+    COPYRIGHT = f" 2026 {DEVELOPER}" #" 2026 " + DEVELOPER
+    # 格式檔名
+    FORMAT_NAME_LIST = ["C1M", "C1K", "C1J", "SW7B"]
 
 # initial
     def __init__(self, parent=None):
@@ -155,17 +43,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logo_pixmap = QPixmap(resource_path("Assets/Mylogo.png"))
         self.style_pixmap = QPixmap(resource_path("Assets/Mystyle.png"))
         self.current_lang = "TW" # 開機語言
+        self.current_model = "C1M" #預設機型
+        self.worker = PLC1Worker() # 執行背景 PLC1 連線程
         # 程式啟動時自動讀取 IP
         pc_ip = self.get_local_ip()
         self.label_pc_ip.setText(f"PC IP: {pc_ip}")
-
-        self.worker = PLC1Worker() # 執行背景 PLC1 連線程
         
-        self.init_ui_settings() # 設定圖示與預設圖
-        self.set_default_value() # 預設值
-        self.load_languages_json() #載入語言json檔案
-        self.translate() #語言翻譯
-        self.connect_signals() # 按鈕輸入訊號
+        # 初始設定
+        self.init_ui_settings() # 1.設定圖示與預設圖
+        self.init_combobox_data() # 2.設定清單元件
+        self.connect_signals() # 3.按鈕輸入訊號
+        self.load_languages_json() # 4.載入語言json檔案
+        self.load_model_json() # 5.自動掃描 Model 資料夾並載入 JSON
+        self.set_default_value() # 6.預設值
+        self.translate() # 7.語言翻譯
+        
+
+        
+        
 # get pc ip        
     def get_local_ip(self):
         import socket
@@ -185,26 +80,47 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.language_tc.setIcon(QIcon(resource_path("Assets/FlagTw.png")))
             self.language_sc.setIcon(QIcon(resource_path("Assets/FlagCn.png")))
             self.language_en.setIcon(QIcon(resource_path("Assets/FlagEn.png")))
-# 預設值
-    def set_default_value(self):
-        self.server_ip_1.setValue(192)
-        self.server_ip_2.setValue(168)
-        self.server_ip_3.setValue(2)
-        self.server_ip_4.setValue(140)
-        self.port_no.setValue(1025)        
-        self.total_step_address.setText("D680")
-        self.step_length_address.setText("D681")
-        self.start_address.setText("D2100")
-        self.total_steps.setText("300")
-        self.step_length.setText("20")
-        self.d680_total_steps.setValue(300)
-        self.d681_step_length.setValue(20)
-        self.PB_connect_plc.setEnabled(True)
-        self.PB_deconnect_plc.setEnabled(False)
-        self.label_connect_status.setText("--離線中--")
-        self.step_no.setValue(1)
-        for i in range(1, 11):
-            self.findChild(QSpinBox, f"d15{i-1}_step_no{i}").setValue(i)
+# 設定清單元件內容
+    def init_combobox_data(self):
+        """" 多個清單
+        all_combobox = [self.model, .., ..] # 所有清單
+        for combo in all_combobox: 
+            combo.setView(QListView()) # 統一設定View，確保 QSS 生效
+
+        for combo in [self.model,.. ,..]: # 設定元件屬性
+            combo.setEditable(True)             # 必須先設為可編輯
+            combo.lineEdit().setReadOnly(True)  # 設為唯讀，防止使用者亂打字
+            combo.lineEdit().setAlignment(Qt.AlignLeft) # 真正的靠左對齊！
+        """
+        self.model.setView(QListView())
+        self.model.setEditable(True)
+        self.model.lineEdit().setReadOnly(True)
+        self.model.lineEdit().setAlignment(Qt.AlignLeft)
+        self.model.clear()
+        self.model.addItems(self.FORMAT_NAME_LIST) # 格式檔案名稱
+# 按鈕輸入訊號
+    def connect_signals(self):
+        # menubar
+        self.language_tc.triggered.connect(lambda: self.switch_language("TW"))
+        self.language_sc.triggered.connect(lambda: self.switch_language("CN"))
+        self.language_en.triggered.connect(lambda: self.switch_language("EN"))
+        self.file_exit.triggered.connect(self.close)
+        # HMI PB
+        self.PB_connect_plc.clicked.connect(self.connect_plc)
+        self.PB_deconnect_plc.clicked.connect(self.deconnect_plc)
+        self.PB_read_step.clicked.connect(self.read_step_data)
+        self.PB_export_csv.clicked.connect(self.export_summary_csv)
+        self.model.currentIndexChanged.connect(self.load_model_json)
+        # 變更HMI step no
+        self.step_no.editingFinished.connect(self.step_no_enter)
+        self.PB_step_up.clicked.connect(lambda: self.step_up_down(-10))
+        self.PB_step_down.clicked.connect(lambda: self.step_up_down(10))
+        # 連接 Worker 的數據回傳信號
+        self.worker.step_info.connect(self.update_step_info)
+        self.worker.error_occurred.connect(self.handle_error)
+        self.worker.sm413_status.connect(self.update_sm413_status)
+        self.worker.steps_data.connect(self.display_steps_data)
+# --- 【多國語言切換】 ---
 # 自動掃描 Languages 資料夾並載入所有 JSON
     def load_languages_json(self):
         self.languages = {}
@@ -212,7 +128,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if not os.path.exists(lang_dir):
             os.makedirs(lang_dir)
             return
-
+        
         for filename in os.listdir(lang_dir):
             if filename.endswith(".json"):
                 lang_key = filename.replace(".json", "") # 例如 "en_US"
@@ -281,6 +197,64 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def get_msg(self, key, default=""):
         lang = self.languages.get(self.current_lang, {})
         return lang.get("Messages", {}).get(key, default)
+# 自動掃描 Model 資料夾並載入 JSON
+    def load_model_json(self):
+        #self.model_format = {}
+        model_dir = resource_path("Model") # 你的語言包資料夾
+        model_key = self.model.currentText()
+        model_name = f"{model_key}.json"
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir)
+            return
+
+        try:
+            with open(os.path.join(model_dir, model_name), 'r', encoding='utf-8') as f:
+                self.model_format = json.load(f)
+                self.load_step_format() # 讀取步序基本資料
+        except Exception as e:
+            print(f"Error loading {model_name}: {e}")
+# 讀取步序基本資料
+    def load_step_format(self):
+        # 這是最乾淨的寫法，前提是 JSON 格式必須 100% 吻合
+        # self.total_steps_addr = self.model_format["Format"]["total_step"][0]
+        # 這是最保險的寫法，即便檔案損壞也不會閃退[有預設值]
+        # self.total_steps_addr = self.model_format.get("Format", {}).get("total_step", ["D680"])
+        target = self.model_format.get("Format", {})
+
+        ts_data = target.get("total_step", ["D680", 500])
+        self.total_steps_addr = ts_data[0]
+        self.total_steps_val = ts_data[1]
+        ts_info = f"[{self.total_steps_addr} , {self.total_steps_val}]"
+        self.total_step_info.setText(ts_info)    
+
+        sl_data = target.get("step_length", ["D681", 20])
+        self.step_length_addr = sl_data[0]
+        self.step_length_val = sl_data[1]
+        sl_info = f"[{self.step_length_addr} , {self.step_length_val}]"
+        self.step_length_info.setText(sl_info)
+
+        self.start_addr = target.get("start_address", "D2200")
+        self.start_address_info.setText(f"[{self.start_addr}]")
+# 預設值
+    def set_default_value(self):
+        self.server_ip_1.setValue(192)
+        self.server_ip_2.setValue(168)
+        self.server_ip_3.setValue(2)
+        self.server_ip_4.setValue(140)
+        self.port_no.setValue(1025)
+        self.response_ts_val.clear()
+        self.response_sl_val.clear()
+        self.PB_connect_plc.setEnabled(True)
+        self.PB_deconnect_plc.setEnabled(False)
+        self.label_connect_status.setText("--離線中--")
+        self.step_no.setValue(1)
+        for i in range(1, 11):
+            self.findChild(QSpinBox, f"d15{i-1}_step_no{i}").setValue(i)
+
+
+
+
+
 # 從當前語言包抓取step文字 """
     def get_step(self, code, key):
         s_data = self.languages.get(self.current_lang, {})
@@ -315,31 +289,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 增加 encoding 參數，預設還是 ascii 讀繁體中文 encoding='big5'
         _string = byte_data.decode(encoding, errors='ignore').strip('\x00')
         return _string    
-# 按鈕輸入訊號
-    def connect_signals(self):
-        # menubar
-        self.language_tc.triggered.connect(lambda: self.switch_language("TW"))
-        self.language_sc.triggered.connect(lambda: self.switch_language("CN"))
-        self.language_en.triggered.connect(lambda: self.switch_language("EN"))
-        self.file_exit.triggered.connect(self.close)
-        # HMI PB
-        self.PB_connect_plc.clicked.connect(self.connect_plc)
-        self.PB_deconnect_plc.clicked.connect(self.deconnect_plc)
-        self.PB_read_step.clicked.connect(self.read_step_data)
-        self.PB_export_csv.clicked.connect(self.export_summary_csv)
-        # 變更HMI step no
-        self.step_no.editingFinished.connect(self.step_no_enter)
-        self.PB_step_up.clicked.connect(lambda: self.step_up_down(-10))
-        self.PB_step_down.clicked.connect(lambda: self.step_up_down(10))
-        # 連接 Worker 的數據回傳信號
-        self.worker.step_info.connect(self.update_step_info)
-        self.worker.error_occurred.connect(self.handle_error)
-        self.worker.sm413_status.connect(self.update_sm413_status)
-        self.worker.steps_data.connect(self.display_steps_data)
+
 # 讀取step資料
     def read_step_data(self):
-        start_address = self.start_address.text().strip().upper()
-        total_step_length = int(self.total_steps.text()) * int(self.step_length.text())
+        start_address = self.start_addr.strip().upper()
+        total_step_length = self.total_steps_val * self.step_length_val
         self.worker.trigger_read_steps(start_address, total_step_length) 
 
 
@@ -349,8 +303,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # --- 【新增】更新 UI 數值的函式 ---
     @Slot(int, int)
     def update_step_info(self, total, length):
-        self.total_steps.setText(str(total))
-        self.step_length.setText(str(length))
+        self.response_ts_val.setText(str(total))
+        self.response_sl_val.setText(str(length))
         self.label_connect_status.setText("--連線成功且讀取完成--")
     @Slot(bool)
     def update_sm413_status(self, status):
@@ -385,32 +339,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # --- 【核心修改】將 UI 上的位址設定給 Worker ---
         self.worker.ip = server_ip
         self.worker.port = port_no
-        self.worker.addr_total = self.total_step_address.text().strip().upper() #去除無用字元,轉大寫
-        self.worker.addr_len = self.step_length_address.text().strip().upper()
+        self.worker.addr_total = self.total_steps_addr.strip().upper() #去除無用字元,轉大寫
+        self.worker.addr_len = self.step_length_addr.strip().upper()
         self.worker.start() # 呼叫 def run(self):
 # 斷開PLC
     def deconnect_plc(self):
         self.PB_connect_plc.setEnabled(True)
         self.PB_deconnect_plc.setEnabled(False)
         self.label_connect_status.setText("--離線中--") 
-        self.worker.stop() 
-# 16bitTo32bit轉換
-    def convert_16_to_32(self, low, high):
-        # 先轉16進制(無符號)
-        low_u = low & 0xFFFF
-        high_u = high & 0xFFFF
-        # 將兩個 16-bit 數字合併成一個 32-bit 數字
-        combined = (high_u << 16) | low_u
-        # 如果最高位是 1，表示這是一個負數，進行符號擴展
-        if combined >= 0x80000000:
-            combined -= 0x10000000
-        return combined  
-# 16bit有符號轉換 (PLC裡的數字如果大於32767就代表是負數，要轉換成Python的負數表示法)      
-    def convert_16bit_signed(self, value):
-        # 如果大於 32767，代表在 PLC 裡是負數
-        if value > 32767:
-            return value - 65536
-        return value    
+        self.worker.stop()   
 # step go up or down
     def step_up_down(self, offset):
         no = self.d150_step_no1.value() + offset
@@ -474,7 +411,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # 位置設定
                 id = 6
                 for j in range(1, step_code + 1): 
-                    pos = self.convert_16_to_32(data[i + id], data[i + id + 1]) #ZR956~ZR963
+                    pos = convert_16_to_32(data[i + id], data[i + id + 1]) #ZR956~ZR963
                     item_data.append(f"{float(pos) / 100:.2f}")
                     id += 2
             # 5繞線     
@@ -484,7 +421,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 #item_data.append(str(data[i+2])) # ZR952
                 #item_data.append(str(data[i+3])) # ZR953
                 item_data.extend([str(data[i+2]), str(data[i+3])])
-                stop_angle = self.convert_16_to_32(data[i+6], data[i+7])
+                stop_angle = convert_16_to_32(data[i+6], data[i+7])
                 item_data.append(f"{float(stop_angle) / 100:.2f}") # ZR956~ZR957
                 #item_data.append(str(data[i+8])) # ZR958
                 #item_data.append(str(data[i+10])) # ZR960
@@ -495,42 +432,42 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # 填入數據
                 item_data.append(str(data[i+2])) # ZR952
                 # ZR953 在 PLC 裡是有符號的，所以要轉換
-                item_data.append(f"{float(self.convert_16bit_signed(data[i+3])) / 100:.2f}") # ZR953
+                item_data.append(f"{float(convert_16bit_signed(data[i+3])) / 100:.2f}") # ZR953
                 item_data.append(f"{float(data[i+4]) / 10:.1f}") # ZR954
-                item_data.append(f"{float(self.convert_16bit_signed(data[i+5])) / 100:.2f}") # ZR955
+                item_data.append(f"{float(convert_16bit_signed(data[i+5])) / 100:.2f}") # ZR955
                 item_data.append(str(data[i+7])) # ZR957
                 for offset in [8, 10, 12, 14]: # ZR958~ZR965 的四組角度數據
-                    angle = self.convert_16_to_32(data[i+offset], data[i+offset+1])
+                    angle = convert_16_to_32(data[i+offset], data[i+offset+1])
                     item_data.append(f"{float(angle) / 100:.2f}") # ZR958~ZR965  
             # 7飛叉     
             elif step_code == 7:
                 # 填入數據
                 item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
-                stop_angle = self.convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
+                stop_angle = convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
                 item_data.append(f"{float(stop_angle) / 100:.2f}") # ZR956~ZR957
                 item_data.append(str(data[i+8])) # ZR958
             # 8排線     
             elif step_code == 8:
                 # 填入數據
-                pos = self.convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
+                pos = convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
                 print(data[i+6], data[i+7])
                 item_data.append(f"{float(pos) / 100:.2f}") # ZR956~ZR957
             # 9轉槽     
             elif step_code == 9:
                 # 填入數據
                 item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
-                d8_slot = self.convert_16_to_32(data[i+8], data[i+9]) #ZR958~ZR959
+                d8_slot = convert_16_to_32(data[i+8], data[i+9]) #ZR958~ZR959
                 item_data.append(f"{d8_slot}") # ZR958~ZR959 
             # 10模寬     
             elif step_code == 10:
                 # 填入數據
                 item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
-                d6_pos = self.convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
+                d6_pos = convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
                 item_data.append(f"{float(d6_pos) / 100:.2f}") # ZR956~ZR957   
             # 11氣壓缸     
             elif step_code == 11:
                 # 填入數據
-                cylinder = self.convert_16_to_32(data[i+18], data[i+19])
+                cylinder = convert_16_to_32(data[i+18], data[i+19])
                 item_data.append(str(cylinder)) # ZR968~ZR969 的氣缸數值                      
             # 18等待     
             elif step_code == 18:
@@ -585,7 +522,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if str(step_code) in _cylinderMap:
                 item_name = self.get_item_list(11) # 氣缸選項名稱
                 item.append(item_name[0]) # 氣缸選項名稱
-                cylinder = self.convert_16_to_32(data[i+18], data[i+19])
+                cylinder = convert_16_to_32(data[i+18], data[i+19])
                 item_data.append(str(cylinder)) # ZR968~ZR969 的氣缸數值
 
             # --- 【關鍵改善】留白處理 ---

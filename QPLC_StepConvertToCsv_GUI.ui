@@ -1791,6 +1791,9 @@ QComboBox QAbstractItemView {
     outline: none;
 }</string>
       </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
       <property name="currentText">
        <string/>
       </property>
@@ -1884,7 +1887,7 @@ QComboBox QAbstractItemView {
 }</string>
       </property>
       <property name="text">
-       <string>[D680 , 500]</string>
+       <string>: [D680 , 500]</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -1917,7 +1920,7 @@ QComboBox QAbstractItemView {
 }</string>
       </property>
       <property name="text">
-       <string>[D681 , 20]</string>
+       <string>: [D681 , 20]</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -1981,10 +1984,76 @@ QComboBox QAbstractItemView {
 }</string>
       </property>
       <property name="text">
-       <string>[D2200]</string>
+       <string>: [D2200]</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="response_ts_val">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>295</x>
+        <y>75</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Microsoft YaHei</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LayoutDirection::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+	background-color: transparent;
+}</string>
+      </property>
+      <property name="text">
+       <string>500</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="response_sl_val">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>295</x>
+        <y>115</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Microsoft YaHei</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LayoutDirection::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+	background-color: transparent;
+}</string>
+      </property>
+      <property name="text">
+       <string>20</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
     </widget>
@@ -2200,7 +2269,7 @@ QComboBox QAbstractItemView {
      <string>D681</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="d680_total_steps">
+   <widget class="QSpinBox" name="D680">
     <property name="geometry">
      <rect>
       <x>275</x>
@@ -2249,7 +2318,7 @@ QComboBox QAbstractItemView {
      <number>0</number>
     </property>
    </widget>
-   <widget class="QSpinBox" name="d681_step_length">
+   <widget class="QSpinBox" name="D6881">
     <property name="geometry">
      <rect>
       <x>295</x>
@@ -2382,8 +2451,8 @@ QComboBox QAbstractItemView {
    <zorder>step_setting_groupBox</zorder>
    <zorder>total_step_address</zorder>
    <zorder>step_length_address</zorder>
-   <zorder>d680_total_steps</zorder>
-   <zorder>d681_step_length</zorder>
+   <zorder>D680</zorder>
+   <zorder>D6881</zorder>
    <zorder>label_sm413</zorder>
    <zorder>SM413</zorder>
   </widget>

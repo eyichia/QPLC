@@ -31,6 +31,7 @@
         "label_ip3": { "text": "IP address 3", "font_size": 14, "font_family": "Microsoft YaHei" },
         "label_ip4": { "text": "IP address 4", "font_size": 14, "font_family": "Microsoft YaHei" },
         "label_port": { "text": "Port number", "font_size": 14, "font_family": "Microsoft YaHei" },
+        "label_model": { "text": "Model", "font_size": 14, "font_family": "Microsoft YaHei" },
         "label_total_step": { "text": "Total steps", "font_size": 14, "font_family": "Microsoft YaHei" },
         "label_step_length": { "text": "Step length", "font_size": 14, "font_family": "Microsoft YaHei" },
         "label_start_address": { "text": "Start address", "font_size": 14, "font_family": "Microsoft YaHei" }

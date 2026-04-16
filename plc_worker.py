@@ -1,0 +1,118 @@
+import time
+import re
+import pymcprotocol
+from PySide6.QtCore import QThread, Signal
+
+# 背景 PLC 連線程式
+class PLC1Worker(QThread):
+    step_info = Signal(int, int)
+    steps_data = Signal(list) # 如果需要傳回更多數據，可以使用 list 或 dict
+    sm413_status = Signal(bool)
+    error_occurred = Signal(str)
+
+    def __init__(self):
+        super().__init__()
+        self.ip = ""
+        self.port = 0
+        self.addr_total = ""
+        self.addr_len = ""
+        self.running = True # 控制迴圈開關
+        self.batch_read_trigger = False 
+        self.batch_start_addr = ""
+        self.batch_size = 0
+
+    def trigger_read_steps(self, start_addr, total_length):
+        self.batch_start_addr = start_addr
+        self.batch_size = total_length
+        self.batch_read_trigger = True    
+        print(f"已觸發讀取步驟數據: 起始位址={start_addr}, 總長度={total_length}") # 這行可以幫助確認觸發是否成功
+
+    # 【新增】必須加入這個位址遞增工具，否則分段讀取會當機
+    def increment_address(self, addr, offset):
+        # 拆分 D2100 -> prefix="D", number=2100
+        match = re.match(r"([a-zA-Z]+)([0-9]+)", addr)
+        if match:
+            prefix = match.group(1)
+            number = int(match.group(2))
+            return f"{prefix}{number + offset}"
+        return addr
+        
+    def run(self):
+        self.running = True # 確保每次 run 都從 True 開始
+        plc = pymcprotocol.Type3E()
+        plc.setaccessopt(commtype="binary")
+        is_connected = False # 自定義一個旗標來紀錄連線狀態
+        
+        while self.running:
+            try:
+                # 如果尚未連線，則嘗試連線
+                if not is_connected: # 假設有連線檢查
+                    plc.connect(self.ip, self.port)
+                    # 只讀取一次參數
+                    res_total = plc.batchread_wordunits(headdevice=self.addr_total, readsize=1) #ZR是用16進制
+                    res_len = plc.batchread_wordunits(headdevice=self.addr_len, readsize=1)
+                    if res_total and res_len:
+                        self.step_info.emit(res_total[0], res_len[0])
+                        # --- 【關鍵修正 A】：連線成功且讀取完成，才設為 True ---
+                        is_connected = True
+
+                # 2. 正常讀取循環 (只有連線成功才執行)
+                if is_connected:
+                    _sm413_data = plc.batchread_bitunits(headdevice="SM413", readsize=1)
+                    if _sm413_data:
+                        self.sm413_status.emit(bool(_sm413_data[0]))
+                # 讀取step數據
+                #字元單位 (Word units)：單次讀取上限通常是 960 個字 (Words)
+                #位元單位 (Bit units)：單次讀取上限是 7168 點
+                if self.batch_read_trigger:
+                    try:
+                        all_results = []
+                        current_addr = self.batch_start_addr
+                        remaining_size = self.batch_size
+                        MAX_CHUNK = 900 # 設定單次讀取上限為 900，保留一點安全邊際
+                        while remaining_size > 0:
+                            read_now = min(MAX_CHUNK, remaining_size)
+                            print(f"正在讀取位址: {current_addr}, 長度: {read_now}")
+                            chunk_results = plc.batchread_wordunits(
+                                headdevice = current_addr, 
+                                readsize = read_now
+                            )
+                            if chunk_results:
+                                all_results.extend(chunk_results) # 拼接數據
+                                # 計算下一次的起始位址與剩餘長度
+                                current_addr = self.increment_address(current_addr, read_now)
+                                remaining_size -= read_now
+                            else:
+                                raise Exception("PLC 回傳空數據")
+                        if all_results:
+                            self.steps_data.emit(all_results) # 全部讀完後一次發送給 UI
+                    except Exception as e:
+                        self.error_occurred.emit(f"讀取失敗: {str(e)}")
+                    finally:
+                        self.batch_read_trigger = False
+                
+                time.sleep(0.5) # 正常每 500ms 讀一次      
+            except Exception as e:
+                is_connected = False # 發生任何錯誤都視為連線失敗，重置旗標
+                # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
+                error_msg = str(e)
+                if "command error" in error_msg.lower() or "device" in error_msg.lower():
+                    friendly_msg = f"位址無效或超出範圍: {self.addr_total}"
+                else:
+                    friendly_msg = f"通訊失敗: {error_msg}"
+                print(friendly_msg) # 先在控制台印出錯誤訊息，方便除錯
+                self.error_occurred.emit(friendly_msg)
+                try: plc.close() # 發生錯誤先關閉舊連線
+                except: pass
+                time.sleep(2) # 等待 2 秒再重試，避免過度頻繁攻擊 PLC   
+            
+        # 只有當 self.running 變成 False (按下斷開按鈕) 才會跑到這裡
+        try:
+            plc.close()
+            print("PLC 連線已安全關閉")
+        except:
+            pass
+
+    def stop(self):
+        self.running = False # 讓 run 裡的 while 迴圈結束
+        self.wait()          # 等待執行緒完全停止
