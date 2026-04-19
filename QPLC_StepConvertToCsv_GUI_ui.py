@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1020, 760)
+        MainWindow.resize(944, 760)
         MainWindow.setStyleSheet(u"background-color: #B5B5B5;")
         self.file_exit = QAction(MainWindow)
         self.file_exit.setObjectName(u"file_exit")
@@ -470,6 +470,7 @@ class Ui_MainWindow(object):
         self.d150_step_no1.setReadOnly(True)
         self.d150_step_no1.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d150_step_no1.setKeyboardTracking(True)
+        self.d150_step_no1.setMinimum(0)
         self.d150_step_no1.setMaximum(600)
         self.d150_step_no1.setSingleStep(1)
         self.d150_step_no1.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
@@ -976,92 +977,6 @@ class Ui_MainWindow(object):
         self.label_pc_ip.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_pc_ip.setStyleSheet(u"background-color: transparent;")
         self.label_pc_ip.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
-        self.step_setting_groupBox = QGroupBox(self.centralwidget)
-        self.step_setting_groupBox.setObjectName(u"step_setting_groupBox")
-        self.step_setting_groupBox.setGeometry(QRect(395, 560, 336, 161))
-        self.step_setting_groupBox.setFont(font3)
-        self.step_setting_groupBox.setStyleSheet(u"QGroupBox{\n"
-"	background-color: transparent;\n"
-"}")
-        self.start_address = QLineEdit(self.step_setting_groupBox)
-        self.start_address.setObjectName(u"start_address")
-        self.start_address.setGeometry(QRect(150, 115, 100, 30))
-        self.start_address.setFont(font3)
-        self.start_address.setStyleSheet(u"QLineEdit{\n"
-"	border-style: solid; \n"
-"	border-width: 1;\n"
-"	background-color: #FFFFFF;\n"
-"	border-top-color: white;\n"
-"	border-left-color: white;\n"
-"	border-bottom-color: black;\n"
-"	border-right-color: black;\n"
-"}")
-        self.total_step_address = QLineEdit(self.centralwidget)
-        self.total_step_address.setObjectName(u"total_step_address")
-        self.total_step_address.setGeometry(QRect(155, 635, 100, 30))
-        self.total_step_address.setFont(font3)
-        self.total_step_address.setStyleSheet(u"QLineEdit{\n"
-"	border-style: solid; \n"
-"	border-width: 1;\n"
-"	background-color: #FFFFFF;\n"
-"	border-top-color: white;\n"
-"	border-left-color: white;\n"
-"	border-bottom-color: black;\n"
-"	border-right-color: black;\n"
-"}")
-        self.step_length_address = QLineEdit(self.centralwidget)
-        self.step_length_address.setObjectName(u"step_length_address")
-        self.step_length_address.setGeometry(QRect(180, 675, 100, 30))
-        self.step_length_address.setFont(font3)
-        self.step_length_address.setStyleSheet(u"QLineEdit{\n"
-"	border-style: solid; \n"
-"	border-width: 1;\n"
-"	background-color: #FFFFFF;\n"
-"	border-top-color: white;\n"
-"	border-left-color: white;\n"
-"	border-bottom-color: black;\n"
-"	border-right-color: black;\n"
-"}")
-        self.D680 = QSpinBox(self.centralwidget)
-        self.D680.setObjectName(u"D680")
-        self.D680.setGeometry(QRect(275, 630, 60, 30))
-        self.D680.setFont(font4)
-        self.D680.setStyleSheet(u"QSpinBox{\n"
-"		border-style: solid; \n"
-"	border-width: 1;\n"
-"	background-color: #B5B5B5;\n"
-"	border-top-color: black;\n"
-"	border-left-color: black;\n"
-"	border-bottom-color: white;\n"
-"	border-right-color: white;\n"
-"}")
-        self.D680.setReadOnly(True)
-        self.D680.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
-        self.D680.setKeyboardTracking(True)
-        self.D680.setMaximum(600)
-        self.D680.setSingleStep(1)
-        self.D680.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
-        self.D680.setValue(0)
-        self.D6881 = QSpinBox(self.centralwidget)
-        self.D6881.setObjectName(u"D6881")
-        self.D6881.setGeometry(QRect(295, 670, 60, 30))
-        self.D6881.setFont(font4)
-        self.D6881.setStyleSheet(u"QSpinBox{\n"
-"		border-style: solid; \n"
-"	border-width: 1;\n"
-"	background-color: #B5B5B5;\n"
-"	border-top-color: black;\n"
-"	border-left-color: black;\n"
-"	border-bottom-color: white;\n"
-"	border-right-color: white;\n"
-"}")
-        self.D6881.setReadOnly(True)
-        self.D6881.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
-        self.D6881.setKeyboardTracking(True)
-        self.D6881.setMaximum(600)
-        self.D6881.setSingleStep(1)
-        self.D6881.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
-        self.D6881.setValue(0)
         self.label_sm413 = QLabel(self.centralwidget)
         self.label_sm413.setObjectName(u"label_sm413")
         self.label_sm413.setEnabled(True)
@@ -1073,7 +988,7 @@ class Ui_MainWindow(object):
         self.SM413 = QLabel(self.centralwidget)
         self.SM413.setObjectName(u"SM413")
         self.SM413.setEnabled(True)
-        self.SM413.setGeometry(QRect(35, 675, 30, 30))
+        self.SM413.setGeometry(QRect(95, 635, 30, 30))
         self.SM413.setFont(font3)
         self.SM413.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.SM413.setStyleSheet(u"QLabel{\n"
@@ -1098,16 +1013,11 @@ class Ui_MainWindow(object):
         self.label_connect_status.raise_()
         self.Process.raise_()
         self.label_pc_ip.raise_()
-        self.step_setting_groupBox.raise_()
-        self.total_step_address.raise_()
-        self.step_length_address.raise_()
-        self.D680.raise_()
-        self.D6881.raise_()
         self.label_sm413.raise_()
         self.SM413.raise_()
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1020, 23))
+        self.menubar.setGeometry(QRect(0, 0, 944, 33))
         self.menubar.setFont(font)
         self.File = QMenu(self.menubar)
         self.File.setObjectName(u"File")
@@ -1167,10 +1077,6 @@ class Ui_MainWindow(object):
         self.response_sl_val.setText(QCoreApplication.translate("MainWindow", u"20", None))
         self.label_connect_status.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u9023\u7dda", None))
         self.label_pc_ip.setText(QCoreApplication.translate("MainWindow", u"PC IP:", None))
-        self.step_setting_groupBox.setTitle(QCoreApplication.translate("MainWindow", u"Step format settings", None))
-        self.start_address.setText(QCoreApplication.translate("MainWindow", u"D2000", None))
-        self.total_step_address.setText(QCoreApplication.translate("MainWindow", u"addr : D680", None))
-        self.step_length_address.setText(QCoreApplication.translate("MainWindow", u"D681", None))
         self.label_sm413.setText(QCoreApplication.translate("MainWindow", u"SM413", None))
         self.SM413.setText("")
         self.File.setTitle(QCoreApplication.translate("MainWindow", u"\u6a94\u6848", None))

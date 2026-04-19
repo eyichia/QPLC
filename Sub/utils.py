@@ -1,3 +1,4 @@
+import struct
 # utils.py
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import Qt
@@ -79,7 +80,7 @@ def show_prompt_window(parent, _title, _text, _icon=None, _buttons=None, _theme=
     
     return msg.exec()
 # 16bitTo32bit轉換
-def convert_16_to_32(parent, low, high):
+def convert_16_to_32(low, high):
     # 先轉16進制(無符號)
     low_u = low & 0xFFFF
     high_u = high & 0xFFFF
@@ -87,11 +88,18 @@ def convert_16_to_32(parent, low, high):
     combined = (high_u << 16) | low_u
     # 如果最高位是 1，表示這是一個負數，進行符號擴展
     if combined >= 0x80000000:
-        combined -= 0x10000000
+        combined -= 0x100000000
     return combined  
 # 16bit有符號轉換 (PLC裡的數字如果大於32767就代表是負數，要轉換成Python的負數表示法)      
-def convert_16bit_signed(parent, value):
+def convert_16bit_signed(value):
     # 如果大於 32767，代表在 PLC 裡是負數
     if value > 32767:
         return value - 65536
     return value    
+# 轉字串
+def to_str(_data, _start, _stop, encoding='ascii'):
+    label_words = _data[_start : _stop]
+    byte_data = struct.pack(f'<{len(label_words)}H', *label_words)   
+    # 增加 encoding 參數，預設還是 ascii 讀繁體中文 encoding='big5'
+    _string = byte_data.decode(encoding, errors='ignore').strip('\x00')
+    return _string    

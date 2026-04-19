@@ -2,7 +2,7 @@
     "Format": {
         "total_step" : ["D680", 400],
         "step_length" : ["D681", 20],
-        "start_address" : "D2000"
+        "start_address" : "D2100"
     }, 
     "TW": {
  	    "code": {

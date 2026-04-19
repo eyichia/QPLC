@@ -16,7 +16,7 @@ from PySide6.QtGui import (QIcon, QPixmap, QFont)
 
 from QPLC_StepConvertToCsv_GUI_ui import Ui_MainWindow
 from plc_worker import PLC1Worker # PLC通訊程式
-from Sub.utils import show_prompt_window, convert_16_to_32, convert_16bit_signed # 工具程式
+from Sub.utils import show_prompt_window, convert_16_to_32, convert_16bit_signed, to_str # 工具程式
 
 # """取得資源絕對路徑，兼容開發與 PyInstaller 打包模式"""
 def resource_path(relative_path):
@@ -45,33 +45,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.current_lang = "TW" # 開機語言
         self.current_model = "C1M" #預設機型
         self.worker = PLC1Worker() # 執行背景 PLC1 連線程
-        # 程式啟動時自動讀取 IP
-        pc_ip = self.get_local_ip()
-        self.label_pc_ip.setText(f"PC IP: {pc_ip}")
+        
         
         # 初始設定
         self.init_ui_settings() # 1.設定圖示與預設圖
         self.init_combobox_data() # 2.設定清單元件
         self.connect_signals() # 3.按鈕輸入訊號
         self.load_languages_json() # 4.載入語言json檔案
-        self.load_model_json() # 5.自動掃描 Model 資料夾並載入 JSON
-        self.set_default_value() # 6.預設值
-        self.translate() # 7.語言翻譯
+        self.translate() # 5.語言翻譯
+        self.load_model_json() # 6.自動掃描 Model 資料夾並載入 JSON
+        self.set_default_value() # 7.預設值
+        # 預設IP後 自動讀取 IP
+        pc_ip = self.get_local_ip()
+        self.label_pc_ip.setText(f"PC IP: {pc_ip}")
         
 
         
         
 # get pc ip        
     def get_local_ip(self):
-        import socket
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(("8.8.8.8", 80))
-            ip = s.getsockname()[0]
-            s.close()
-            return ip
+            # 獲取所有 IP 列表
+            hostname = socket.gethostname()
+            ips = [info[4][0] for info in socket.getaddrinfo(hostname, None, socket.AF_INET)]
+            plc_ip = f"{self.server_ip_1.value()}.{self.server_ip_2.value()}.{self.server_ip_3.value()}"
+            
+            # 優先尋找 192.168.2 開頭的 IP (配合你截圖中的設定)
+            for ip in ips:
+                if ip.startswith(plc_ip):
+                    return ip
+        
+            # 如果找不到，回傳第一個非迴路 IP
+            for ip in ips:
+                if ip != "127.0.0.1":
+                    return ip
+                
+            return "127.0.0.1"
         except:
-            return "127.0.0.1"    
+            return "127.0.0.1" 
 # 設定視窗圖示
     def init_ui_settings(self):
         self.setWindowIcon(QIcon(self.style_pixmap)) #設定視窗圖示
@@ -105,21 +116,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.language_sc.triggered.connect(lambda: self.switch_language("CN"))
         self.language_en.triggered.connect(lambda: self.switch_language("EN"))
         self.file_exit.triggered.connect(self.close)
-        # HMI PB
-        self.PB_connect_plc.clicked.connect(self.connect_plc)
-        self.PB_deconnect_plc.clicked.connect(self.deconnect_plc)
-        self.PB_read_step.clicked.connect(self.read_step_data)
-        self.PB_export_csv.clicked.connect(self.export_summary_csv)
-        self.model.currentIndexChanged.connect(self.load_model_json)
         # 變更HMI step no
         self.step_no.editingFinished.connect(self.step_no_enter)
         self.PB_step_up.clicked.connect(lambda: self.step_up_down(-10))
         self.PB_step_down.clicked.connect(lambda: self.step_up_down(10))
+        # HMI PB
+        self.PB_connect_plc.clicked.connect(self.connect_plc)
+        self.PB_deconnect_plc.clicked.connect(self.deconnect_plc)
+        self.PB_export_csv.clicked.connect(self.export_summary_csv)
+        self.model.currentIndexChanged.connect(self.load_model_json)
+
+
+        # PLC 相關
+        self.PB_read_step.clicked.connect(self.read_step_data) # 讀取步序
+        self.worker.steps_data.connect(self.display_steps_data) # 回應步序
         # 連接 Worker 的數據回傳信號
         self.worker.step_info.connect(self.update_step_info)
         self.worker.error_occurred.connect(self.handle_error)
         self.worker.sm413_status.connect(self.update_sm413_status)
-        self.worker.steps_data.connect(self.display_steps_data)
+        
 # --- 【多國語言切換】 ---
 # 自動掃描 Languages 資料夾並載入所有 JSON
     def load_languages_json(self):
@@ -235,6 +250,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.start_addr = target.get("start_address", "D2200")
         self.start_address_info.setText(f"[{self.start_addr}]")
+        # 讀取對應語言步序內容
+        self.format_dic = {}
+        self.format_dic = self.model_format.get(self.current_lang, {})
+        
+
+
 # 預設值
     def set_default_value(self):
         self.server_ip_1.setValue(192)
@@ -250,45 +271,46 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.step_no.setValue(1)
         for i in range(1, 11):
             self.findChild(QSpinBox, f"d15{i-1}_step_no{i}").setValue(i)
+# 連接PLC
+    def connect_plc(self):
+        self.PB_connect_plc.setEnabled(False)
+        self.PB_deconnect_plc.setEnabled(True)
+        self.label_connect_status.setText("--連線中--")
+        server_ip = f"{self.server_ip_1.value()}.{self.server_ip_2.value()}.{self.server_ip_3.value()}.{self.server_ip_4.value()}"
+        port_no = self.port_no.value()
+        # --- 【核心修改】將 UI 上的位址設定給 Worker ---
+        self.worker.ip = server_ip
+        self.worker.port = port_no
+        self.worker.addr_total = self.total_steps_addr.strip().upper() #去除無用字元,轉大寫
+        self.worker.addr_len = self.step_length_addr.strip().upper()
+        self.worker.start() # 呼叫 def run(self):
+# 斷開PLC
+    def deconnect_plc(self):
+        self.PB_connect_plc.setEnabled(True)
+        self.PB_deconnect_plc.setEnabled(False)
+        self.label_connect_status.setText("--離線中--")
+        self.worker.stop()
 
 
 
 
 
-# 從當前語言包抓取step文字 """
-    def get_step(self, code, key):
-        s_data = self.languages.get(self.current_lang, {})
-        step_info = s_data.get("step", {}).get(str(code), {})
-        default_val = "" if key == "text" else {} # 定義預設值：如果是拿 text 就給 ""，如果是拿 mode 就給 {}
-        return step_info.get(key, default_val)
+
+
+
+
+
+
+
+
+
+
 # get mode
-    def get_mode_name(self, type, mode):
-        mode_info = self.get_step(str(type), "mode")
-        return mode_info.get(str(mode), "未知模式")
-# 從當前語言包抓取step軸名稱
-    def get_ax_name(self, ax_no):
-        a_data = self.languages.get(self.current_lang, {})
-        return a_data.get("Axis", {}).get(str(ax_no)) # 預設回傳原名稱，如果找不到對應的翻譯  
-# 步序項目全部名稱
-    def get_item_list(self, key):
-        i_data = self.languages.get(self.current_lang, {})
-        # 直接回傳該 key 對應的整個列表，找不到就回傳空列表 []
-        return i_data.get("Item", {}).get(str(key), [])
-# 步序項目單一名稱
-    def get_item_name(self, key, idx=0):  
-        i_data = self.languages.get(self.current_lang, {})
-        item_list = i_data.get("Item", {}).get(str(key), [])
-        if 0 <= idx < len(item_list):
-            return item_list[idx]
-        # 如果找不到，回傳一個辨識用的字串（方便除錯）
-        return f"Unknown_{key}[{idx}]"   
-# 轉字串
-    def to_str(self, _data, _start, _stop, encoding='ascii'):
-        label_words = _data[_start : _stop]
-        byte_data = struct.pack(f'<{len(label_words)}H', *label_words)   
-        # 增加 encoding 參數，預設還是 ascii 讀繁體中文 encoding='big5'
-        _string = byte_data.decode(encoding, errors='ignore').strip('\x00')
-        return _string    
+    def get_mode(self, code, mode):
+        mode_info = self.format_dic.get("mode", {}).get(str(code), [])[mode]
+        return mode_info
+    
+   
 
 # 讀取step資料
     def read_step_data(self):
@@ -329,25 +351,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_connect_status.setText(f"錯誤: {err_msg}")
         self.PB_connect_plc.setEnabled(True)
         self.PB_deconnect_plc.setEnabled(False)        
-# 連接PLC
-    def connect_plc(self):
-        self.PB_connect_plc.setEnabled(False)
-        self.PB_deconnect_plc.setEnabled(True)
-        self.label_connect_status.setText("--連線中--")
-        server_ip = f"{self.server_ip_1.value()}.{self.server_ip_2.value()}.{self.server_ip_3.value()}.{self.server_ip_4.value()}"
-        port_no = self.port_no.value()
-        # --- 【核心修改】將 UI 上的位址設定給 Worker ---
-        self.worker.ip = server_ip
-        self.worker.port = port_no
-        self.worker.addr_total = self.total_steps_addr.strip().upper() #去除無用字元,轉大寫
-        self.worker.addr_len = self.step_length_addr.strip().upper()
-        self.worker.start() # 呼叫 def run(self):
-# 斷開PLC
-    def deconnect_plc(self):
-        self.PB_connect_plc.setEnabled(True)
-        self.PB_deconnect_plc.setEnabled(False)
-        self.label_connect_status.setText("--離線中--") 
-        self.worker.stop()   
+
 # step go up or down
     def step_up_down(self, offset):
         no = self.d150_step_no1.value() + offset
@@ -359,11 +363,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def change_step_no(self,offset):
         try:
             # 1. 取得總步數，並確保至少為 10 
-            total = self.d680_total_steps.value()
+            total = self.total_steps_val
             # 計算最大起始編號 (例如總共 100 步，最後一頁起點是 91)
             max_no = max(1, total - 9)
             # 2. 限制起始編號範圍：不可小於 1，也不可大於 max_no
-            first_no = max(1, offset if offset <= max_no else max_no)
+            if offset > max_no:
+                first_no = 1
+            elif offset < 1:
+                first_no = max_no
+            else:
+                first_no = offset   
+                   
+            #first_no = max(1, offset if offset <= max_no else max_no)
             # 3. 更新 UI 上的 10 個編號標籤 (QLabel)
             for i in range(1, 11):
                 current_spin = self.findChild(QSpinBox, f"d15{i-1}_step_no{i}")
@@ -374,7 +385,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # 4. 【重要】編號改變後，必須重新呼叫顯示函式來更新動作名稱
             # 假設你已經將讀回來的 PLC 資料存在 self.current_plc_data
             if hasattr(self, "current_plc_data"):
-                length = self.d681_step_length.value()
+                length = self.step_length_val
                 self.ui_display_steps(self.current_plc_data, length)
                 
         except ValueError:
@@ -385,7 +396,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 匯出csv時,每一行都必須是list[]格式,所以第一行也要放在list裡面["a","b",...]
         self.step_list = [["Step"]] 
         try:
-            length = self.d681_step_length.value()
+            length = self.step_length_val
             if length == 0: length = 20 # 防止除以 0
         except ValueError:
             length = 20 # 預設值，防止 UI 沒填數字當機
@@ -395,18 +406,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for i in range(0, len(data), length):
             step_num = (i // length) + 1 # 步序編號
             step_code = data[i] # 第1個字是動作類型
-            step_name = self.get_step(step_code, "text")
+            step_name = self.format_dic.get("code", {}).get(str(step_code))
             row = [f"{step_num}", step_name] # 先放入步驟編號和動作類型名稱
 
-            item = self.get_item_list(step_code) # 取得模式項目名稱列表
+            item = self.format_dic.get("item", {}).get(str(step_code), []) # 取得模式項目名稱列表
             item_data = [] # 用來存 數據
             # 1~4軸運動控制
             if step_code in range(1, 5): 
                 # 模式
-                item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
+                item_data.append(self.get_mode(step_code, data[i+1])) # ZR951
                 # 軸選項
                 for j in range(1, step_code + 1):
-                    ax_name = self.get_ax_name(data[i + j + 1]) # ZR952~ZR955
+                    ax_no = data[i + j + 1]
+                    ax_name = self.format_dic.get("axis", {}).get(str(ax_no)) # ZR952~ZR955
                     item_data.append(ax_name) 
                 # 位置設定
                 id = 6
@@ -417,7 +429,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # 5繞線     
             elif step_code == 5:
                 # 填入數據
-                item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
+                item_data.append(self.get_mode(step_code, data[i+1])) # ZR951
                 #item_data.append(str(data[i+2])) # ZR952
                 #item_data.append(str(data[i+3])) # ZR953
                 item_data.extend([str(data[i+2]), str(data[i+3])])
@@ -442,7 +454,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # 7飛叉     
             elif step_code == 7:
                 # 填入數據
-                item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
+                item_data.append(self.get_mode(step_code, data[i+1])) # ZR951
                 stop_angle = convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
                 item_data.append(f"{float(stop_angle) / 100:.2f}") # ZR956~ZR957
                 item_data.append(str(data[i+8])) # ZR958
@@ -455,13 +467,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # 9轉槽     
             elif step_code == 9:
                 # 填入數據
-                item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
+                item_data.append(self.get_mode(step_code, data[i+1])) # ZR951
                 d8_slot = convert_16_to_32(data[i+8], data[i+9]) #ZR958~ZR959
                 item_data.append(f"{d8_slot}") # ZR958~ZR959 
             # 10模寬     
             elif step_code == 10:
                 # 填入數據
-                item_data.append(self.get_mode_name(step_code, data[i+1])) # ZR951
+                item_data.append(self.get_mode(step_code, data[i+1])) # ZR951
                 d6_pos = convert_16_to_32(data[i+6], data[i+7]) #ZR956~ZR957
                 item_data.append(f"{float(d6_pos) / 100:.2f}") # ZR956~ZR957   
             # 11氣壓缸     
@@ -480,18 +492,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif step_code in range(20, 28):
                 # 填入數據
                 item_data.extend([str(data[i+3]), str(data[i+4])]) # ZR953~ZR954
-                label_string = self.to_str(data, i+6, i+16) # ZR956~ZR965 的數據切片[16-6=10個字]
+                label_string = to_str(data, i+6, i+16) # ZR956~ZR965 的數據切片[16-6=10個字]
                 item_data.append(label_string) # ZR956~ZR965 的標籤數
             # 28 GOTO
             elif step_code == 28:
-                label_string = self.to_str(data, i+6, i+16) # ZR956~ZR965 的數據切片[16-6=10個字]
+                label_string = to_str(data, i+6, i+16) # ZR956~ZR965 的數據切片[16-6=10個字]
                 item_data.append(label_string) # ZR956~ZR965 的標籤數
             # 29 RET   
             elif step_code == 29:
                 pass
             # 30~31副程式
             elif step_code in range(30, 32): 
-                file_name = self.to_str(data, i+2, i+12) # ZR952~ZR961
+                file_name = to_str(data, i+2, i+12) # ZR952~ZR961
                 item_data.append(file_name) # ZR952~ZR961 的標籤數
             # 32 速度參數1
             elif step_code == 32:
@@ -504,15 +516,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 item_data.extend(map(str, parameter_words)) 
             # 40 標籤
             elif step_code == 40:
-                label_string = self.to_str(data, i+2, i+12) # ZR952~ZR961 的數據切片[10個字]
+                label_string = to_str(data, i+2, i+12) # ZR952~ZR961 的數據切片[10個字]
                 # 【修改】直接加進 row，這樣就不會出現重複的標題
                 row.append(label_string)
                 # 確保 item_data 保持空清單 []，後面的 zip 就不會執行
                 item_data = []
             # 41 註釋
             elif step_code == 41:
-                comment_string = self.to_str(data, i+2, i+14) # ZR952~ZR963
-                row.append(label_string)
+                comment_string = to_str(data, i+2, i+14) # ZR952~ZR963
+                row.append(comment_string)
                 item_data = []
             # 99 End
             elif step_code == 99:
@@ -520,7 +532,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
             # 有氣壓缸選項的步序類型
             if str(step_code) in _cylinderMap:
-                item_name = self.get_item_list(11) # 氣缸選項名稱
+                item_name = self.format_dic.get("item", {}).get("11") # 氣缸選項名稱
                 item.append(item_name[0]) # 氣缸選項名稱
                 cylinder = convert_16_to_32(data[i+18], data[i+19])
                 item_data.append(str(cylinder)) # ZR968~ZR969 的氣缸數值
@@ -560,7 +572,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     # 取得動作代碼
                     step_code = data[current_idx] 
                     # 【核心修正】轉換為中文名稱，例如 "1軸運動控制"
-                    step_name = self.get_step(step_code, "text") 
+                    step_name = self.format_dic.get("code", {}).get(str(step_code)) 
                     
                     # 取得對應的 QLineEdit (step_1 ~ step_10)
                     line_edit = getattr(self, f"step_{i+1}", None)

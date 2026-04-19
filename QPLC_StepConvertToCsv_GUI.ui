@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1020</width>
+    <width>944</width>
     <height>760</height>
    </rect>
   </property>
@@ -775,6 +775,9 @@ QPushButton:pressed {
      </property>
      <property name="keyboardTracking">
       <bool>true</bool>
+     </property>
+     <property name="minimum">
+      <number>0</number>
      </property>
      <property name="maximum">
       <number>600</number>
@@ -2155,218 +2158,6 @@ QComboBox QAbstractItemView {
      <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QGroupBox" name="step_setting_groupBox">
-    <property name="geometry">
-     <rect>
-      <x>395</x>
-      <y>560</y>
-      <width>336</width>
-      <height>161</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QGroupBox{
-	background-color: transparent;
-}</string>
-    </property>
-    <property name="title">
-     <string>Step format settings</string>
-    </property>
-    <widget class="QLineEdit" name="start_address">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>115</y>
-       <width>100</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Microsoft YaHei</family>
-       <pointsize>14</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLineEdit{
-	border-style: solid; 
-	border-width: 1;
-	background-color: #FFFFFF;
-	border-top-color: white;
-	border-left-color: white;
-	border-bottom-color: black;
-	border-right-color: black;
-}</string>
-     </property>
-     <property name="text">
-      <string>D2000</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QLineEdit" name="total_step_address">
-    <property name="geometry">
-     <rect>
-      <x>155</x>
-      <y>635</y>
-      <width>100</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QLineEdit{
-	border-style: solid; 
-	border-width: 1;
-	background-color: #FFFFFF;
-	border-top-color: white;
-	border-left-color: white;
-	border-bottom-color: black;
-	border-right-color: black;
-}</string>
-    </property>
-    <property name="text">
-     <string>addr : D680</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="step_length_address">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>675</y>
-      <width>100</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QLineEdit{
-	border-style: solid; 
-	border-width: 1;
-	background-color: #FFFFFF;
-	border-top-color: white;
-	border-left-color: white;
-	border-bottom-color: black;
-	border-right-color: black;
-}</string>
-    </property>
-    <property name="text">
-     <string>D681</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="D680">
-    <property name="geometry">
-     <rect>
-      <x>275</x>
-      <y>630</y>
-      <width>60</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QSpinBox{
-		border-style: solid; 
-	border-width: 1;
-	background-color: #B5B5B5;
-	border-top-color: black;
-	border-left-color: black;
-	border-bottom-color: white;
-	border-right-color: white;
-}</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="buttonSymbols">
-     <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
-    </property>
-    <property name="keyboardTracking">
-     <bool>true</bool>
-    </property>
-    <property name="maximum">
-     <number>600</number>
-    </property>
-    <property name="singleStep">
-     <number>1</number>
-    </property>
-    <property name="stepType">
-     <enum>QAbstractSpinBox::StepType::DefaultStepType</enum>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="D6881">
-    <property name="geometry">
-     <rect>
-      <x>295</x>
-      <y>670</y>
-      <width>60</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QSpinBox{
-		border-style: solid; 
-	border-width: 1;
-	background-color: #B5B5B5;
-	border-top-color: black;
-	border-left-color: black;
-	border-bottom-color: white;
-	border-right-color: white;
-}</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="buttonSymbols">
-     <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
-    </property>
-    <property name="keyboardTracking">
-     <bool>true</bool>
-    </property>
-    <property name="maximum">
-     <number>600</number>
-    </property>
-    <property name="singleStep">
-     <number>1</number>
-    </property>
-    <property name="stepType">
-     <enum>QAbstractSpinBox::StepType::DefaultStepType</enum>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_sm413">
     <property name="enabled">
      <bool>true</bool>
@@ -2404,8 +2195,8 @@ QComboBox QAbstractItemView {
     </property>
     <property name="geometry">
      <rect>
-      <x>35</x>
-      <y>675</y>
+      <x>95</x>
+      <y>635</y>
       <width>30</width>
       <height>30</height>
      </rect>
@@ -2448,11 +2239,6 @@ QComboBox QAbstractItemView {
    <zorder>label_connect_status</zorder>
    <zorder>Process</zorder>
    <zorder>label_pc_ip</zorder>
-   <zorder>step_setting_groupBox</zorder>
-   <zorder>total_step_address</zorder>
-   <zorder>step_length_address</zorder>
-   <zorder>D680</zorder>
-   <zorder>D6881</zorder>
    <zorder>label_sm413</zorder>
    <zorder>SM413</zorder>
   </widget>
@@ -2461,8 +2247,8 @@ QComboBox QAbstractItemView {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1020</width>
-     <height>23</height>
+     <width>944</width>
+     <height>33</height>
     </rect>
    </property>
    <property name="font">
