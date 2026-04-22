@@ -462,11 +462,12 @@ class Ui_MainWindow(object):
         self.PB_step_down.setIcon(icon1)
         self.d150_step_no1 = QSpinBox(self.step_groupBox)
         self.d150_step_no1.setObjectName(u"d150_step_no1")
-        self.d150_step_no1.setGeometry(QRect(10, 55, 40, 30))
+        self.d150_step_no1.setGeometry(QRect(5, 55, 45, 30))
         self.d150_step_no1.setFont(font4)
         self.d150_step_no1.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid; \n"
 "}")
+        self.d150_step_no1.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.d150_step_no1.setReadOnly(True)
         self.d150_step_no1.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d150_step_no1.setKeyboardTracking(True)
@@ -477,11 +478,12 @@ class Ui_MainWindow(object):
         self.d150_step_no1.setValue(0)
         self.d151_step_no2 = QSpinBox(self.step_groupBox)
         self.d151_step_no2.setObjectName(u"d151_step_no2")
-        self.d151_step_no2.setGeometry(QRect(10, 95, 40, 30))
+        self.d151_step_no2.setGeometry(QRect(5, 95, 45, 30))
         self.d151_step_no2.setFont(font4)
         self.d151_step_no2.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid; \n"
 "}")
+        self.d151_step_no2.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.d151_step_no2.setReadOnly(True)
         self.d151_step_no2.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d151_step_no2.setKeyboardTracking(True)
@@ -490,11 +492,12 @@ class Ui_MainWindow(object):
         self.d151_step_no2.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
         self.d152_step_no3 = QSpinBox(self.step_groupBox)
         self.d152_step_no3.setObjectName(u"d152_step_no3")
-        self.d152_step_no3.setGeometry(QRect(10, 135, 40, 30))
+        self.d152_step_no3.setGeometry(QRect(5, 135, 45, 30))
         self.d152_step_no3.setFont(font4)
         self.d152_step_no3.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid; \n"
 "}")
+        self.d152_step_no3.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.d152_step_no3.setReadOnly(True)
         self.d152_step_no3.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d152_step_no3.setKeyboardTracking(True)
@@ -503,11 +506,12 @@ class Ui_MainWindow(object):
         self.d152_step_no3.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
         self.d153_step_no4 = QSpinBox(self.step_groupBox)
         self.d153_step_no4.setObjectName(u"d153_step_no4")
-        self.d153_step_no4.setGeometry(QRect(10, 175, 40, 30))
+        self.d153_step_no4.setGeometry(QRect(5, 175, 45, 30))
         self.d153_step_no4.setFont(font4)
         self.d153_step_no4.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid; \n"
 "}")
+        self.d153_step_no4.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.d153_step_no4.setReadOnly(True)
         self.d153_step_no4.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d153_step_no4.setKeyboardTracking(True)
@@ -516,11 +520,12 @@ class Ui_MainWindow(object):
         self.d153_step_no4.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
         self.d154_step_no5 = QSpinBox(self.step_groupBox)
         self.d154_step_no5.setObjectName(u"d154_step_no5")
-        self.d154_step_no5.setGeometry(QRect(10, 215, 40, 30))
+        self.d154_step_no5.setGeometry(QRect(5, 215, 45, 30))
         self.d154_step_no5.setFont(font4)
         self.d154_step_no5.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid; \n"
 "}")
+        self.d154_step_no5.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.d154_step_no5.setReadOnly(True)
         self.d154_step_no5.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d154_step_no5.setKeyboardTracking(True)
@@ -529,11 +534,12 @@ class Ui_MainWindow(object):
         self.d154_step_no5.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
         self.d155_step_no6 = QSpinBox(self.step_groupBox)
         self.d155_step_no6.setObjectName(u"d155_step_no6")
-        self.d155_step_no6.setGeometry(QRect(10, 255, 40, 30))
+        self.d155_step_no6.setGeometry(QRect(5, 255, 45, 30))
         self.d155_step_no6.setFont(font4)
         self.d155_step_no6.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid; \n"
 "}")
+        self.d155_step_no6.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.d155_step_no6.setReadOnly(True)
         self.d155_step_no6.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d155_step_no6.setKeyboardTracking(True)
@@ -542,11 +548,12 @@ class Ui_MainWindow(object):
         self.d155_step_no6.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
         self.d156_step_no7 = QSpinBox(self.step_groupBox)
         self.d156_step_no7.setObjectName(u"d156_step_no7")
-        self.d156_step_no7.setGeometry(QRect(10, 295, 40, 30))
+        self.d156_step_no7.setGeometry(QRect(5, 295, 45, 30))
         self.d156_step_no7.setFont(font4)
         self.d156_step_no7.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid; \n"
 "}")
+        self.d156_step_no7.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.d156_step_no7.setReadOnly(True)
         self.d156_step_no7.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d156_step_no7.setKeyboardTracking(True)
@@ -555,11 +562,12 @@ class Ui_MainWindow(object):
         self.d156_step_no7.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
         self.d157_step_no8 = QSpinBox(self.step_groupBox)
         self.d157_step_no8.setObjectName(u"d157_step_no8")
-        self.d157_step_no8.setGeometry(QRect(10, 335, 40, 30))
+        self.d157_step_no8.setGeometry(QRect(5, 335, 45, 30))
         self.d157_step_no8.setFont(font4)
         self.d157_step_no8.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid; \n"
 "}")
+        self.d157_step_no8.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.d157_step_no8.setReadOnly(True)
         self.d157_step_no8.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d157_step_no8.setKeyboardTracking(True)
@@ -568,11 +576,12 @@ class Ui_MainWindow(object):
         self.d157_step_no8.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
         self.d158_step_no9 = QSpinBox(self.step_groupBox)
         self.d158_step_no9.setObjectName(u"d158_step_no9")
-        self.d158_step_no9.setGeometry(QRect(10, 375, 40, 30))
+        self.d158_step_no9.setGeometry(QRect(5, 375, 45, 30))
         self.d158_step_no9.setFont(font4)
         self.d158_step_no9.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid; \n"
 "}")
+        self.d158_step_no9.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.d158_step_no9.setReadOnly(True)
         self.d158_step_no9.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d158_step_no9.setKeyboardTracking(True)
@@ -581,17 +590,19 @@ class Ui_MainWindow(object):
         self.d158_step_no9.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
         self.d159_step_no10 = QSpinBox(self.step_groupBox)
         self.d159_step_no10.setObjectName(u"d159_step_no10")
-        self.d159_step_no10.setGeometry(QRect(10, 415, 40, 30))
+        self.d159_step_no10.setGeometry(QRect(5, 415, 45, 30))
         self.d159_step_no10.setFont(font4)
         self.d159_step_no10.setStyleSheet(u"QSpinBox{\n"
 "	border-style: solid; \n"
 "}")
+        self.d159_step_no10.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.d159_step_no10.setReadOnly(True)
         self.d159_step_no10.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.d159_step_no10.setKeyboardTracking(True)
         self.d159_step_no10.setMaximum(600)
         self.d159_step_no10.setSingleStep(1)
         self.d159_step_no10.setStepType(QAbstractSpinBox.StepType.DefaultStepType)
+        self.d159_step_no10.setValue(0)
         self.line = QFrame(self.centralwidget)
         self.line.setObjectName(u"line")
         self.line.setGeometry(QRect(470, 50, 10, 525))
@@ -1017,7 +1028,7 @@ class Ui_MainWindow(object):
         self.SM413.raise_()
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 944, 33))
+        self.menubar.setGeometry(QRect(0, 0, 944, 23))
         self.menubar.setFont(font)
         self.File = QMenu(self.menubar)
         self.File.setObjectName(u"File")

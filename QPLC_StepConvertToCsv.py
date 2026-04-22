@@ -400,7 +400,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except ValueError:
             length = 20 # 預設值，防止 UI 沒填數字當機
 
-        _cylinderMap = ["1", "2", "3", "4"] # 有氣壓缸選項的步序類型
         # 開始解碼,每 length 個數據為一組，代表一個步序的完整資訊
         for i in range(0, len(data), length):
             step_num = (i // length) + 1 # 步序編號
@@ -412,71 +411,53 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             item_list = item[0] # 名稱列表
             item_format = item[1] # 數據格式
             item_data = [] # 用來存 數據
-            
-            # 拆解格式 json(["2;STR;20"])
-            item_idx = []
-            item_type = []
-            item_remark = []
-            for fmt in item_format:
-                parts = fmt.split(';') # 使用分號';'進行拆分
-                if parts[0] == "non":
-                    item_remark.append(parts[0])
-                    continue
-
-                if len(parts) > 1: # 處理註記 (["2;STR;20"])
-                    try:
-                        item_idx.append(int(parts[0])) # 取得位址偏移 (轉為整數)
-                        item_type.append(parts[1]) # 取得資料類型 (U, S, SD, STR 等)
-                        if len(parts) > 2: # 處理型態 (數值:小數點，字串:字數)
-                            item_remark.append(parts[2])
-                        else:
-                            item_remark.append("0")
-                    except ValueError:
-                        print(f"警告：格式中的數字無效 -> {fmt}")
-                else:
-                    print(f"警告：格式不完整，缺少分號分隔 -> {fmt}")        
-
+      
             for j in range(len(item_list)):
                 label = item_list[j]
+                fmt = item_format[j] if j < len(item_format) else "non"
                 parts = fmt.split(';') # 使用分號';'進行拆分
 
                 if label == "non" and parts[0] == "non":
                     continue
 
-                try:
-                    id = int(parts[0]) # 偏移量
-                    ty = parts[1]        # 型態 (U, S, UD, SD, STR)
-                    rmk = parts[2] if len(parts) > 2 else "0" # 備註或小數位
-                    
-                    val = 0
-                    result = ""
-                    if ty == "STR":
-                        str_len = math.ceil(int(rmk) / 2)
-                        result = to_str(data, i+id, i+id+str_len-1)
-                    elif rmk == "mode": # 模式參數
-                        item_data.append(self.get_mode(step_code, data[id]))
-                    elif rmk == "axis": # 軸選項參數                    
-                        item_data.append(self.format_dic.get("axis", {}).get(str(data[id])))    
-                    else: # 數值,字串等參數
-                        if ty == "S":
-                            val = convert_16bit_signed(data[id])
-                        elif ty == "U":
-                            val = data[id]                                                       
-                        elif ty == "UD":
-                            val = convert_16_to_32(data[id], data[id+1], signed=False)
-                        else:
-                            val = convert_16_to_32(data[id], data[id+1], signed=True)
+                try: # 拆解格式 json(["2;STR;20"])
+                    if parts[0] != "non":
+                        id = int(parts[0]) # 偏移量
+                        ty = parts[1]        # 型態 (U, S, UD, SD, STR)
+                        rmk = parts[2] if len(parts) > 2 else "0" # 備註或小數位
 
-                            # 2. 處理小數點 (rmk 此時為數字字串)
-                            if rmk.isdigit():
-                                prec = int(rmk)
-                                divisor = 10 ** prec
-                                result = f"{float(val) / divisor:.{prec}f}"
+                        val = 0
+                        result = ""
+                        if ty == "STR":
+                            str_len = math.ceil(int(rmk) / 2)
+                            result = to_str(data, i+id, i+id+str_len-1)
+                        elif rmk == "mode": # 模式參數
+                            item_data.append(self.get_mode(step_code, data[i+id]))
+                        elif rmk == "axis": # 軸選項參數                    
+                            item_data.append(self.format_dic.get("axis", {}).get(str(data[i+id])))    
+                        else: # 數值,字串等參數
+                            if ty == "S":
+                                val = convert_16bit_signed(data[i+id])
+                            elif ty == "U":
+                                val = data[i+id]                                                       
+                            elif ty == "UD":
+                                val = convert_16_to_32(data[i+id], data[i+id+1], signed=False)
                             else:
-                                result = str(val)
+                                val = convert_16_to_32(data[i+id], data[i+id+1], signed=True)
 
-                      
-                    row.extend([label, result])
+                                # 處理小數點 (rmk 此時為數字字串)
+                                if rmk.isdigit():
+                                    prec = int(rmk)
+                                    divisor = 10 ** prec
+                                    result = f"{float(val) / divisor:.{prec}f}"
+                                else:
+                                    result = str(val)
+
+                        if label == "non":
+                            row.append(result)
+                        else:
+                            row.extend([label, result])
+
                 except Exception as e:
                     print(f"解析步序 {step_num} 項目 {label} 失敗: {e}")
 
@@ -494,7 +475,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             start_no = self.d150_step_no1.value() # 從 UI 上的第一個步序編號開始 
             end_no = self.d159_step_no10.value() # 從 UI 上的第一個步序編號開始
-            for n in range(start_no, end_no+1):
+            for n in range(1, 11):
                 widget = getattr(self, f"step_{n}", None)
                 if widget: 
                     widget.clear()
@@ -514,7 +495,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     line_edit = getattr(self, f"step_{i+1}", None)
                     if line_edit:
                         line_edit.setText(step_name)
-                        if step_name and step_name != "":
+                        if len(data[current_idx]) >= 3 :
                             line_edit.setStyleSheet("background-color: #FFFFFF;") # 有數據就變白色 
         except Exception as e:
             print(f"UI 顯示失敗: {e}")                

@@ -749,9 +749,9 @@ QPushButton:pressed {
     <widget class="QSpinBox" name="d150_step_no1">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>55</y>
-       <width>40</width>
+       <width>45</width>
        <height>30</height>
       </rect>
      </property>
@@ -766,6 +766,9 @@ QPushButton:pressed {
       <string notr="true">QSpinBox{
 	border-style: solid; 
 }</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -795,9 +798,9 @@ QPushButton:pressed {
     <widget class="QSpinBox" name="d151_step_no2">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>95</y>
-       <width>40</width>
+       <width>45</width>
        <height>30</height>
       </rect>
      </property>
@@ -812,6 +815,9 @@ QPushButton:pressed {
       <string notr="true">QSpinBox{
 	border-style: solid; 
 }</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -835,9 +841,9 @@ QPushButton:pressed {
     <widget class="QSpinBox" name="d152_step_no3">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>135</y>
-       <width>40</width>
+       <width>45</width>
        <height>30</height>
       </rect>
      </property>
@@ -852,6 +858,9 @@ QPushButton:pressed {
       <string notr="true">QSpinBox{
 	border-style: solid; 
 }</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -875,9 +884,9 @@ QPushButton:pressed {
     <widget class="QSpinBox" name="d153_step_no4">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>175</y>
-       <width>40</width>
+       <width>45</width>
        <height>30</height>
       </rect>
      </property>
@@ -892,6 +901,9 @@ QPushButton:pressed {
       <string notr="true">QSpinBox{
 	border-style: solid; 
 }</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -915,9 +927,9 @@ QPushButton:pressed {
     <widget class="QSpinBox" name="d154_step_no5">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>215</y>
-       <width>40</width>
+       <width>45</width>
        <height>30</height>
       </rect>
      </property>
@@ -932,6 +944,9 @@ QPushButton:pressed {
       <string notr="true">QSpinBox{
 	border-style: solid; 
 }</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -955,9 +970,9 @@ QPushButton:pressed {
     <widget class="QSpinBox" name="d155_step_no6">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>255</y>
-       <width>40</width>
+       <width>45</width>
        <height>30</height>
       </rect>
      </property>
@@ -972,6 +987,9 @@ QPushButton:pressed {
       <string notr="true">QSpinBox{
 	border-style: solid; 
 }</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -995,9 +1013,9 @@ QPushButton:pressed {
     <widget class="QSpinBox" name="d156_step_no7">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>295</y>
-       <width>40</width>
+       <width>45</width>
        <height>30</height>
       </rect>
      </property>
@@ -1012,6 +1030,9 @@ QPushButton:pressed {
       <string notr="true">QSpinBox{
 	border-style: solid; 
 }</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -1035,9 +1056,9 @@ QPushButton:pressed {
     <widget class="QSpinBox" name="d157_step_no8">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>335</y>
-       <width>40</width>
+       <width>45</width>
        <height>30</height>
       </rect>
      </property>
@@ -1052,6 +1073,9 @@ QPushButton:pressed {
       <string notr="true">QSpinBox{
 	border-style: solid; 
 }</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -1075,9 +1099,9 @@ QPushButton:pressed {
     <widget class="QSpinBox" name="d158_step_no9">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>375</y>
-       <width>40</width>
+       <width>45</width>
        <height>30</height>
       </rect>
      </property>
@@ -1092,6 +1116,9 @@ QPushButton:pressed {
       <string notr="true">QSpinBox{
 	border-style: solid; 
 }</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -1115,9 +1142,9 @@ QPushButton:pressed {
     <widget class="QSpinBox" name="d159_step_no10">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>415</y>
-       <width>40</width>
+       <width>45</width>
        <height>30</height>
       </rect>
      </property>
@@ -1132,6 +1159,9 @@ QPushButton:pressed {
       <string notr="true">QSpinBox{
 	border-style: solid; 
 }</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -1150,6 +1180,9 @@ QPushButton:pressed {
      </property>
      <property name="stepType">
       <enum>QAbstractSpinBox::StepType::DefaultStepType</enum>
+     </property>
+     <property name="value">
+      <number>0</number>
      </property>
     </widget>
    </widget>
@@ -2248,7 +2281,7 @@ QComboBox QAbstractItemView {
      <x>0</x>
      <y>0</y>
      <width>944</width>
-     <height>33</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="font">
