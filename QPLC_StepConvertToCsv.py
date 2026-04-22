@@ -207,7 +207,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # 繁簡英切換                
     def switch_language(self, new_lan):
         self.current_lang = new_lan
-        self.translate()                                          
+        self.translate()   
+        self.format_dic = self.model_format.get(self.current_lang, {}) 
+        self.decode_step_data(self.current_plc_data)                                      
 # 從當前語言包抓取訊息文字
     def get_msg(self, key, default=""):
         lang = self.languages.get(self.current_lang, {})
@@ -410,8 +412,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             item = self.format_dic.get("item", {}).get(str(step_code), [[],[]]) # 取得模式項目
             item_list = item[0] # 名稱列表
             item_format = item[1] # 數據格式
-            item_data = [] # 用來存 數據
-      
+    
             for j in range(len(item_list)):
                 label = item_list[j]
                 fmt = item_format[j] if j < len(item_format) else "non"
@@ -430,11 +431,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         result = ""
                         if ty == "STR":
                             str_len = math.ceil(int(rmk) / 2)
-                            result = to_str(data, i+id, i+id+str_len-1)
+                            result = to_str(data, i+id, i+id+str_len)
                         elif rmk == "mode": # 模式參數
-                            item_data.append(self.get_mode(step_code, data[i+id]))
-                        elif rmk == "axis": # 軸選項參數                    
-                            item_data.append(self.format_dic.get("axis", {}).get(str(data[i+id])))    
+                            result = self.get_mode(step_code, data[i+id])
+                            #item_data.append(self.get_mode(step_code, data[i+id]))
+                        elif rmk == "axis": # 軸選項參數   
+                            result = self.format_dic.get("axis", {}).get(str(data[i+id]))
+                            #item_data.append(self.format_dic.get("axis", {}).get(str(data[i+id])))    
                         else: # 數值,字串等參數
                             if ty == "S":
                                 val = convert_16bit_signed(data[i+id])
@@ -445,13 +448,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             else:
                                 val = convert_16_to_32(data[i+id], data[i+id+1], signed=True)
 
-                                # 處理小數點 (rmk 此時為數字字串)
-                                if rmk.isdigit():
-                                    prec = int(rmk)
-                                    divisor = 10 ** prec
-                                    result = f"{float(val) / divisor:.{prec}f}"
-                                else:
-                                    result = str(val)
+                            # 處理小數點 (rmk 此時為數字字串)
+                            if rmk.isdigit():
+                                prec = int(rmk)
+                                divisor = 10 ** prec
+                                result = f"{float(val) / divisor:.{prec}f}"
+                            else:
+                                result = str(val)
 
                         if label == "non":
                             row.append(result)
@@ -495,7 +498,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     line_edit = getattr(self, f"step_{i+1}", None)
                     if line_edit:
                         line_edit.setText(step_name)
-                        if len(data[current_idx]) >= 3 :
+                        if step_code != 0 :
                             line_edit.setStyleSheet("background-color: #FFFFFF;") # 有數據就變白色 
         except Exception as e:
             print(f"UI 顯示失敗: {e}")                
@@ -540,12 +543,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 獲取存檔路徑 (利用你的萬用助手)
         file_path = self.data_processing("Reports", "Step_code", "csv", "report", "save")
         if not file_path: return
-        #data_to_save = []
-        #for item in self.step_list:
-            #if isinstance(item, list):
-                #data_to_save.append(item)
-            #else:
-                #data_to_save.append([item]) # 把 "Step" 變成 ["Step"]
 
         try:
             # newline='' 防止 Windows 存檔出現多餘空行
@@ -553,8 +550,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             with open(file_path, 'w', newline='', encoding='utf-8-sig') as f:
                 writer = csv.writer(f)
             
-                # 3. 寫入所有資料
-                writer.writerows(self.step_list)
+                # 寫入所有資料
+                processed_data = []
+                for row in self.step_list:
+                    new_row = []
+                    for cell in row:
+                        # CSV 檔案中看到超過 15 位的純數字時，會自動把它當成「數值」處理
+                        # 檢查是否為長度超過 12 位的純數字字串
+                        if isinstance(cell, str) and cell.isdigit() and len(cell) > 12:
+                            # 轉成 Excel 的文字公式格式： ="123456..."
+                            new_row.append(f'="{cell}"')
+                        else:
+                            new_row.append(cell)
+                    processed_data.append(new_row)
+                
+                    # 寫入處理過的資料
+                writer.writerows(processed_data)
             
             print(f"CSV 存檔成功！路徑：{file_path}")
         except Exception as e:
