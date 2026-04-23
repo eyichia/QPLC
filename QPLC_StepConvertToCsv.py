@@ -4,19 +4,19 @@ import time
 import csv
 import math
 import json
-import struct
+# import struct
 import socket
-import pymcprotocol
-import re
+# import pymcprotocol
+# import re
 
-from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QSpinBox, QMenuBar, QMenu, QComboBox, QFileDialog,
+from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QLabel, QSpinBox, QMenuBar, QMenu, QComboBox, QFileDialog,
                                QListView)
 from PySide6.QtCore import (Qt, QDateTime,QThread, Signal, Slot)
 from PySide6.QtGui import (QIcon, QPixmap, QFont)
 
 from QPLC_StepConvertToCsv_GUI_ui import Ui_MainWindow
 from plc_worker import PLC1Worker # PLC通訊程式
-from Sub.utils import show_prompt_window, convert_16_to_32, convert_16bit_signed, to_str # 工具程式
+from Sub.utils import data_processing, show_prompt_window, convert_16_to_32, convert_16bit_signed, to_str # 工具程式
 
 # """取得資源絕對路徑，兼容開發與 PyInstaller 打包模式"""
 def resource_path(relative_path):
@@ -45,8 +45,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.current_lang = "TW" # 開機語言
         self.current_model = "C1M" #預設機型
         self.worker = PLC1Worker() # 執行背景 PLC1 連線程
-        
-        
         # 初始設定
         self.init_ui_settings() # 1.設定圖示與預設圖
         self.init_combobox_data() # 2.設定清單元件
@@ -58,10 +56,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 預設IP後 自動讀取 IP
         pc_ip = self.get_local_ip()
         self.label_pc_ip.setText(f"PC IP: {pc_ip}")
-        
-
-        
-        
 # get pc ip        
     def get_local_ip(self):
         try:
@@ -69,12 +63,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             hostname = socket.gethostname()
             ips = [info[4][0] for info in socket.getaddrinfo(hostname, None, socket.AF_INET)]
             plc_ip = f"{self.server_ip_1.value()}.{self.server_ip_2.value()}.{self.server_ip_3.value()}"
-            
-            # 優先尋找 192.168.2 開頭的 IP (配合你截圖中的設定)
+            # 優先尋找 192.168.2 開頭的 IP
             for ip in ips:
                 if ip.startswith(plc_ip):
                     return ip
-        
             # 如果找不到，回傳第一個非迴路 IP
             for ip in ips:
                 if ip != "127.0.0.1":
@@ -125,8 +117,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.PB_deconnect_plc.clicked.connect(self.deconnect_plc)
         self.PB_export_csv.clicked.connect(self.export_summary_csv)
         self.model.currentIndexChanged.connect(self.load_model_json)
-
-
         # PLC 相關
         self.PB_read_step.clicked.connect(self.read_step_data) # 讀取步序
         self.worker.steps_data.connect(self.display_steps_data) # 回應步序
@@ -209,7 +199,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.current_lang = new_lan
         self.translate()   
         self.format_dic = self.model_format.get(self.current_lang, {}) 
-        self.decode_step_data(self.current_plc_data)                                      
+        self.decode_step_data(self.current_plc_data)
 # 從當前語言包抓取訊息文字
     def get_msg(self, key, default=""):
         lang = self.languages.get(self.current_lang, {})
@@ -255,8 +245,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 讀取對應語言步序內容
         self.format_dic = {}
         self.format_dic = self.model_format.get(self.current_lang, {})       
-
-
 # 預設值
     def set_default_value(self):
         self.server_ip_1.setValue(192)
@@ -272,87 +260,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.step_no.setValue(1)
         for i in range(1, 11):
             self.findChild(QSpinBox, f"d15{i-1}_step_no{i}").setValue(i)
-# 連接PLC
-    def connect_plc(self):
-        self.PB_connect_plc.setEnabled(False)
-        self.PB_deconnect_plc.setEnabled(True)
-        self.label_connect_status.setText("--連線中--")
-        server_ip = f"{self.server_ip_1.value()}.{self.server_ip_2.value()}.{self.server_ip_3.value()}.{self.server_ip_4.value()}"
-        port_no = self.port_no.value()
-        # --- 【核心修改】將 UI 上的位址設定給 Worker ---
-        self.worker.ip = server_ip
-        self.worker.port = port_no
-        self.worker.addr_total = self.total_steps_addr.strip().upper() #去除無用字元,轉大寫
-        self.worker.addr_len = self.step_length_addr.strip().upper()
-        self.worker.start() # 呼叫 def run(self):
-# 斷開PLC
-    def deconnect_plc(self):
-        self.PB_connect_plc.setEnabled(True)
-        self.PB_deconnect_plc.setEnabled(False)
-        self.label_connect_status.setText("--離線中--")
-        self.worker.stop()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # get mode
     def get_mode(self, code, mode):
         mode_info = self.format_dic.get("mode", {}).get(str(code), [])[mode]
         return mode_info
-    
-   
-
 # 讀取step資料
     def read_step_data(self):
         start_address = self.start_addr.strip().upper()
         total_step_length = self.total_steps_val * self.step_length_val
-        self.worker.trigger_read_steps(start_address, total_step_length) 
-
-
-
-
-# ----- PLC 連線與數據處理相關函式 -----        
-# --- 【新增】更新 UI 數值的函式 ---
-    @Slot(int, int)
-    def update_step_info(self, total, length):
-        self.response_ts_val.setText(str(total))
-        self.response_sl_val.setText(str(length))
-        self.label_connect_status.setText("--連線成功且讀取完成--")
-    @Slot(bool)
-    def update_sm413_status(self, status):
-        color = "green" if status else "yellow"
-        self.SM413.setStyleSheet(f"""
-            QLabel {{
-                background-color: {color};
-                border: 1px solid black;
-                border-radius: 15px;
-            }}
-        """)  
-    @Slot(list)
-    def display_steps_data(self, data):
-        # 這裡的 data 是從 Worker 傳回來的 PLC 數據列表
-        # 你可以根據實際需求來處理這些數據，例如顯示在 UI 上或存成 CSV
-        #self.step_data = data # 儲存到 MainWindow 的屬性，方便其他方法使用
-        self.current_plc_data = data
-        self.decode_step_data(data) # 呼叫解碼函式來處理數據
-        #print("收到步驟數據:", data)
-# --- 【新增】錯誤處理 ---
-    def handle_error(self, err_msg):
-        self.label_connect_status.setText(f"錯誤: {err_msg}")
-        self.PB_connect_plc.setEnabled(True)
-        self.PB_deconnect_plc.setEnabled(False)        
-
+        self.worker.trigger_read_steps(start_address, total_step_length)
 # step go up or down
     def step_up_down(self, offset):
         no = self.d150_step_no1.value() + offset
@@ -472,7 +388,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.Process.append(" | ".join(map(str, r)))
 
         self.ui_display_steps(data, length)    
-
 # UI單獨顯示步序            
     def ui_display_steps(self, data, length):   
         try:
@@ -501,47 +416,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         if step_code != 0 :
                             line_edit.setStyleSheet("background-color: #FFFFFF;") # 有數據就變白色 
         except Exception as e:
-            print(f"UI 顯示失敗: {e}")                
-
-
-   
-
-
-
-
-# """資料處理,路徑,資料夾,檔名,格式"""
-    def data_processing(self, folder, filename, format, title, mode):
-        # 1. 準備路徑與資料夾
-        default_dir = os.path.join(os.getcwd(), folder)
-        if not os.path.exists(default_dir): os.makedirs(default_dir)
-        # 2. 準備過濾器
-        filters = {
-            "csv": "CSV Files (*.csv)",
-            "xlsx": "xlsx Files (*.xlsx)",
-            "txt": "Text Files (*.txt)",
-            "pdf": "PDF Files (*.pdf)",
-            "png": "Png Files (*.png)",
-            "json": "JSON Files (*.json)"
-        }
-        file_filter = filters.get(format, "All Files (*)")
-        # 3. 根據模式執行不同的對話框
-        if mode == "save":
-            # 儲存模式：自動生成帶時間戳的預設檔名
-            default_filename = f"{filename}_{QDateTime.currentDateTime().toString('yyyyMMdd_HHmmss')}.{format}"
-            initial_path = os.path.join(default_dir, default_filename)
-            file_path, _ = QFileDialog.getSaveFileName(self, self.get_msg(title), initial_path, file_filter)
-        else:
-            # 開啟模式：直接打開資料夾，不需要預設檔名
-            file_path, _ = QFileDialog.getOpenFileName(self, self.get_msg(title), default_dir, file_filter)
-        # 4. 統一回傳檢查
-        return file_path if file_path else None   
+            print(f"UI 顯示失敗: {e}") 
 # """ 輸出橫向對比報表 (CSV 格式) """
     def export_summary_csv(self):
         if not hasattr(self, "step_list") or len(self.step_list) <= 1:
             print("沒有步驟數據可供匯出")
             return
         # 獲取存檔路徑 (利用你的萬用助手)
-        file_path = self.data_processing("Reports", "Step_code", "csv", "report", "save")
+        file_path = data_processing(
+            parent=self,
+            folder="Reports",
+            filename="Step_code",
+            format="csv",
+            title=self.get_msg("report"),
+            mode="save"
+        )
         if not file_path: return
 
         try:
@@ -566,21 +455,85 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 
                     # 寫入處理過的資料
                 writer.writerows(processed_data)
-            
-            print(f"CSV 存檔成功！路徑：{file_path}")
+
+            title, text = self.get_msg("success"), f"{self.get_msg('csv_save_ok', 'CSV 數據已存至：')}{file_path}"
+            icon, buttons = self.logo_pixmap, QMessageBox.StandardButton.Ok
+            theme, font_size, icon_size = "default", 12, 64
+            show_prompt_window(self, title, text, icon, buttons, theme, font_size, icon_size)
         except Exception as e:
-            print(f"存檔時發生錯誤: {e}")
+            title, text = self.get_msg("fail"), f"{self.get_msg('csv_save_fail', 'CSV 儲存失敗')}{str(e)}"
+            icon, buttons = QMessageBox.Icon.Warning, QMessageBox.StandardButton.Close
+            theme, font_size, icon_size = "default", 12, 64
+            show_prompt_window(self, title, text, icon, buttons, theme, font_size, icon_size)
            
 
         
         
-      
-
+# ----- PLC 連線與數據處理相關函式 -----
+# 連接PLC
+    def connect_plc(self):
+        self.PB_connect_plc.setEnabled(False)
+        self.PB_deconnect_plc.setEnabled(True)
+        self.label_connect_status.setText("--連線中--")
+        server_ip = f"{self.server_ip_1.value()}.{self.server_ip_2.value()}.{self.server_ip_3.value()}.{self.server_ip_4.value()}"
+        port_no = self.port_no.value()
+        # --- 【核心修改】將 UI 上的位址設定給 Worker ---
+        self.worker.ip = server_ip
+        self.worker.port = port_no
+        self.worker.addr_total = self.total_steps_addr.strip().upper() #去除無用字元,轉大寫
+        self.worker.addr_len = self.step_length_addr.strip().upper()
+        self.worker.start() # 呼叫 def run(self):
+# 斷開PLC
+    def deconnect_plc(self):
+        self.PB_connect_plc.setEnabled(True)
+        self.PB_deconnect_plc.setEnabled(False)
+        self.label_connect_status.setText("--離線中--")
+        self.worker.stop()         
+# --- 【新增】更新 UI 數值的函式 ---
+    @Slot(int, int)
+    def update_step_info(self, total, length):
+        self.response_ts_val.setText(str(total))
+        self.response_sl_val.setText(str(length))
+        self.label_connect_status.setText("--連線成功且讀取完成--")
+    @Slot(bool)
+    def update_sm413_status(self, status):
+        color = "green" if status else "yellow"
+        self.SM413.setStyleSheet(f"""
+            QLabel {{
+                background-color: {color};
+                border: 1px solid black;
+                border-radius: 15px;
+            }}
+        """)  
+    @Slot(list)
+    def display_steps_data(self, data):
+        # 這裡的 data 是從 Worker 傳回來的 PLC 數據列表
+        # 你可以根據實際需求來處理這些數據，例如顯示在 UI 上或存成 CSV
+        #self.step_data = data # 儲存到 MainWindow 的屬性，方便其他方法使用
+        self.current_plc_data = data
+        self.decode_step_data(data) # 呼叫解碼函式來處理數據
+        #print("收到步驟數據:", data)
+# --- 【新增】錯誤處理 ---
+    def handle_error(self, err_msg):
+        self.label_connect_status.setText(f"錯誤: {err_msg}")
+        self.PB_connect_plc.setEnabled(True)
+        self.PB_deconnect_plc.setEnabled(False)              
 # 關閉程式
     def closeEvent(self, event):
-        # 關閉視窗時也要記得停止背景執行緒，避免程式卡在背景
-        self.worker.stop() # 確保背景執行緒被正確停止
-        event.accept()
+        title = self.get_msg("close_title", "警告: 關閉程式")
+        text = self.get_msg("close_text", "您確定要關閉程式嗎？")
+        icon = QMessageBox.Icon.Question
+        buttons = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        theme = "default"
+        font_size = 14
+        icon_size = 80
+        result = show_prompt_window(self, title, text, icon, buttons, theme, font_size, icon_size)
+        if result == QMessageBox.StandardButton.Yes or result == QMessageBox.StandardButton.Ok:
+            # 關閉視窗時也要記得停止背景執行緒，避免程式卡在背景
+            self.worker.stop() # 確保背景執行緒被正確停止
+            event.accept()
+        else:
+            event.ignore()  # 忽略關閉事件，回到程式    
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -1,9 +1,36 @@
 import struct
+import os
 # utils.py
-from PySide6.QtWidgets import QMessageBox
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QMessageBox,QFileDialog
+from PySide6.QtCore import Qt, QDateTime
 from PySide6.QtGui import QPixmap
 
+# """資料處理,路徑,資料夾,檔名,格式"""
+def data_processing(parent, folder, filename, format, title, mode="save"):
+    # 1. 準備路徑與資料夾
+    default_dir = os.path.join(os.getcwd(), folder)
+    if not os.path.exists(default_dir): os.makedirs(default_dir)
+    # 2. 準備過濾器
+    filters = {
+        "csv": "CSV Files (*.csv)",
+        "xlsx": "xlsx Files (*.xlsx)",
+        "txt": "Text Files (*.txt)",
+        "pdf": "PDF Files (*.pdf)",
+        "png": "Png Files (*.png)",
+        "json": "JSON Files (*.json)"
+    }
+    file_filter = filters.get(format, "All Files (*)")
+    # 3. 根據模式執行不同的對話框
+    if mode == "save":
+        # 儲存模式：自動生成帶時間戳的預設檔名
+        default_filename = f"{filename}_{QDateTime.currentDateTime().toString('yyyyMMdd_HHmmss')}.{format}"
+        initial_path = os.path.join(default_dir, default_filename)
+        file_path, _ = QFileDialog.getSaveFileName(parent, title, initial_path, file_filter)
+    else:
+        # 開啟模式：直接打開資料夾，不需要預設檔名
+        file_path, _ = QFileDialog.getOpenFileName(parent, title, default_dir, file_filter)
+    # 4. 統一回傳檢查
+    return file_path if file_path else None 
 # 自訂視窗
 def show_prompt_window(parent, _title, _text, _icon=None, _buttons=None, _theme="default", _font_size=14, _icon_size=80):
     """

@@ -8,6 +8,7 @@ class PLC1Worker(QThread):
     step_info = Signal(int, int)
     steps_data = Signal(list) # 如果需要傳回更多數據，可以使用 list 或 dict
     sm413_status = Signal(bool)
+    plc1_status = Signal(list)
     error_occurred = Signal(str)
 
     def __init__(self):
@@ -20,6 +21,9 @@ class PLC1Worker(QThread):
         self.batch_read_trigger = False 
         self.batch_start_addr = ""
         self.batch_size = 0
+        self.status = []
+        self.status.clear
+
 
     def trigger_read_steps(self, start_addr, total_length):
         self.batch_start_addr = start_addr
@@ -55,6 +59,7 @@ class PLC1Worker(QThread):
                         self.step_info.emit(res_total[0], res_len[0])
                         # --- 【關鍵修正 A】：連線成功且讀取完成，才設為 True ---
                         is_connected = True
+                        self.status[0] = self.status[0] | 0x0001
 
                 # 2. 正常讀取循環 (只有連線成功才執行)
                 if is_connected:

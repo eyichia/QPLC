@@ -49,8 +49,15 @@
         "step_setting_groupBox": { "text": "步序地址設定", "font_size": 14, "font_family": "Microsoft YaHei" }
     },
     "Messages": {
+        "close_title": "警告: 關閉程式",
+        "close_text": "您確定要關閉程式嗎？",
+        "success": "成功",
+        "fail": "失敗",
         "csv_save_title": "儲存 CSV 數據",
         "csv_save_ok": "CSV 數據已存至：",
+        "csv_save_fail": "CSV 儲存失敗",
+        
+
         "csv_open_title": "開啟 CSV 數據",
         "txt_save_title": "儲存文字紀錄",
         "txt_save_ok": "TXT 數據已存至：",
@@ -58,8 +65,7 @@
         "header_item": "項目",
         "header_value": "數值",
         "header_unit": "單位",
-        "success": "成功",
-        "fail": "失敗",
+        
         "save_fail": "儲存失敗：",
         "error": "錯誤",
         "updated": "成功讀取並更新",
@@ -81,8 +87,6 @@
         "pdf_save_ok": "PDF 報告已存至：",
         "clear_title": "警告: 清除紀錄",
         "clear_text": "您確定要清除紀錄嗎？",
-        "close_title": "警告: 關閉程式",
-        "close_text": "您確定要關閉程式嗎？",
         "about_title": "關於排線計算程式",
         "soft_name": "排線計算工具",
         "dev_label": "開發者 ：",
@@ -116,7 +120,7 @@
         "diagram": "示意圖",
         "...": "..."
     },
-    "step": {
+    "plc_status": {
     	"1": { "text": "1軸運動控制", "mode": { "0": "單動", "2": "復歸" } },
         "2": { "text": "2軸運動控制", "mode": { "0": "單動", "1": "補間", "2": "復歸" } },
         "3": { "text": "3軸運動控制", "mode": { "0": "單動", "1": "補間", "2": "復歸" } },
