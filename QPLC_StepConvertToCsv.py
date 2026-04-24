@@ -61,16 +61,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             # 獲取所有 IP 列表
             hostname = socket.gethostname()
-            ips = [info[4][0] for info in socket.getaddrinfo(hostname, None, socket.AF_INET)]
+            ip_list = [info[4][0] for info in socket.getaddrinfo(hostname, None, socket.AF_INET)]
+            ips = " | ".join(ip_list)
             plc_ip = f"{self.server_ip_1.value()}.{self.server_ip_2.value()}.{self.server_ip_3.value()}"
             # 優先尋找 192.168.2 開頭的 IP
-            for ip in ips:
+            for ip in ip_list:
                 if ip.startswith(plc_ip):
-                    return ip
+                    return ips
             # 如果找不到，回傳第一個非迴路 IP
-            for ip in ips:
+            for ip in ip_list:
                 if ip != "127.0.0.1":
-                    return ip
+                    return ips
                 
             return "127.0.0.1"
         except:
@@ -124,6 +125,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.worker.step_info.connect(self.update_step_info)
         self.worker.error_occurred.connect(self.handle_error)
         self.worker.sm413_status.connect(self.update_sm413_status)
+        self.worker.plc1_status.connect(self.display_plc_status)
         
 # --- 【多國語言切換】 ---
 # 自動掃描 Languages 資料夾並載入所有 JSON
@@ -204,6 +206,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def get_msg(self, key, default=""):
         lang = self.languages.get(self.current_lang, {})
         return lang.get("Messages", {}).get(key, default)
+# 抓取PLC訊息文字
+    def get_plc_status_msg(self, key, default=""):
+        lang = self.languages.get(self.current_lang, {})
+        return lang.get("plc_status", {}).get(key, default)    
 # 自動掃描 Model 資料夾並載入 JSON
     def load_model_json(self):
         #self.model_format = {}
@@ -254,9 +260,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.port_no.setValue(1025)
         self.response_ts_val.clear()
         self.response_sl_val.clear()
-        self.PB_connect_plc.setEnabled(True)
-        self.PB_deconnect_plc.setEnabled(False)
-        self.label_connect_status.setText("--離線中--")
+        #self.PB_connect_plc.setEnabled(True)
+        #self.PB_deconnect_plc.setEnabled(False)
+        self.display_plc_status(-1)
         self.step_no.setValue(1)
         for i in range(1, 11):
             self.findChild(QSpinBox, f"d15{i-1}_step_no{i}").setValue(i)
@@ -485,9 +491,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.worker.start() # 呼叫 def run(self):
 # 斷開PLC
     def deconnect_plc(self):
-        self.PB_connect_plc.setEnabled(True)
-        self.PB_deconnect_plc.setEnabled(False)
-        self.label_connect_status.setText("--離線中--")
+        #self.PB_connect_plc.setEnabled(True)
+        #self.PB_deconnect_plc.setEnabled(False)
+        #self.label_connect_status.setText("--離線中--")
         self.worker.stop()         
 # --- 【新增】更新 UI 數值的函式 ---
     @Slot(int, int)
@@ -513,6 +519,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.current_plc_data = data
         self.decode_step_data(data) # 呼叫解碼函式來處理數據
         #print("收到步驟數據:", data)
+    @Slot(int)
+    def display_plc_status(self,status):
+        if status == 0:
+            status_text = self.get_plc_status_msg(str(status), "離線中")
+            self.PB_connect_plc.setEnabled(True)
+            self.PB_deconnect_plc.setEnabled(False)
+        elif status == 1:
+            status_text = self.get_plc_status_msg(str(status), "連線中")    
+            self.PB_connect_plc.setEnabled(False)
+            self.PB_deconnect_plc.setEnabled(True)
+        elif status == 2:
+            status_text = self.get_plc_status_msg(str(status), "已連線")    
+            self.PB_connect_plc.setEnabled(False)
+            self.PB_deconnect_plc.setEnabled(True)    
+        else:
+            status_text = self.get_plc_status_msg("non", "")
+            self.PB_connect_plc.setEnabled(True)
+            self.PB_deconnect_plc.setEnabled(False)    
+
+        self.label_connect_status.setText(status_text)
 # --- 【新增】錯誤處理 ---
     def handle_error(self, err_msg):
         self.label_connect_status.setText(f"錯誤: {err_msg}")

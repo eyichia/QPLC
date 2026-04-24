@@ -8,7 +8,7 @@ class PLC1Worker(QThread):
     step_info = Signal(int, int)
     steps_data = Signal(list) # 如果需要傳回更多數據，可以使用 list 或 dict
     sm413_status = Signal(bool)
-    plc1_status = Signal(list)
+    plc1_status = Signal(int)
     error_occurred = Signal(str)
 
     def __init__(self):
@@ -21,8 +21,8 @@ class PLC1Worker(QThread):
         self.batch_read_trigger = False 
         self.batch_start_addr = ""
         self.batch_size = 0
-        self.status = []
-        self.status.clear
+        self.status = -1
+        
 
 
     def trigger_read_steps(self, start_addr, total_length):
@@ -51,15 +51,15 @@ class PLC1Worker(QThread):
             try:
                 # 如果尚未連線，則嘗試連線
                 if not is_connected: # 假設有連線檢查
+                    self.status = 1 # 連線中
                     plc.connect(self.ip, self.port)
                     # 只讀取一次參數
                     res_total = plc.batchread_wordunits(headdevice=self.addr_total, readsize=1) #ZR是用16進制
                     res_len = plc.batchread_wordunits(headdevice=self.addr_len, readsize=1)
                     if res_total and res_len:
                         self.step_info.emit(res_total[0], res_len[0])
-                        # --- 【關鍵修正 A】：連線成功且讀取完成，才設為 True ---
-                        is_connected = True
-                        self.status[0] = self.status[0] | 0x0001
+                        is_connected = True # 連線成功且讀取完成，才設為 True
+                        self.status = 2 # 已連線
 
                 # 2. 正常讀取循環 (只有連線成功才執行)
                 if is_connected:
@@ -107,13 +107,17 @@ class PLC1Worker(QThread):
                     friendly_msg = f"通訊失敗: {error_msg}"
                 print(friendly_msg) # 先在控制台印出錯誤訊息，方便除錯
                 self.error_occurred.emit(friendly_msg)
-                try: plc.close() # 發生錯誤先關閉舊連線
+                try: 
+                    plc.close() # 發生錯誤先關閉舊連線
+                    self.status = 0 # 離線中
                 except: pass
                 time.sleep(2) # 等待 2 秒再重試，避免過度頻繁攻擊 PLC   
-            
+            self.plc1_status.emit(self.status)
+
         # 只有當 self.running 變成 False (按下斷開按鈕) 才會跑到這裡
         try:
             plc.close()
+            self.status = 0 # 離線中
             print("PLC 連線已安全關閉")
         except:
             pass
