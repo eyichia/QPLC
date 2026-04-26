@@ -126,7 +126,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.worker.error_occurred.connect(self.handle_error)
         self.worker.sm413_status.connect(self.update_sm413_status)
         self.worker.plc1_status.connect(self.display_plc_status)
-        
 # --- 【多國語言切換】 ---
 # 自動掃描 Languages 資料夾並載入所有 JSON
     def load_languages_json(self):
@@ -260,8 +259,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.port_no.setValue(1025)
         self.response_ts_val.clear()
         self.response_sl_val.clear()
-        #self.PB_connect_plc.setEnabled(True)
-        #self.PB_deconnect_plc.setEnabled(False)
         self.display_plc_status(-1)
         self.step_no.setValue(1)
         for i in range(1, 11):
@@ -478,9 +475,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # ----- PLC 連線與數據處理相關函式 -----
 # 連接PLC
     def connect_plc(self):
-        self.PB_connect_plc.setEnabled(False)
-        self.PB_deconnect_plc.setEnabled(True)
-        self.label_connect_status.setText("--連線中--")
         server_ip = f"{self.server_ip_1.value()}.{self.server_ip_2.value()}.{self.server_ip_3.value()}.{self.server_ip_4.value()}"
         port_no = self.port_no.value()
         # --- 【核心修改】將 UI 上的位址設定給 Worker ---
@@ -491,16 +485,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.worker.start() # 呼叫 def run(self):
 # 斷開PLC
     def deconnect_plc(self):
-        #self.PB_connect_plc.setEnabled(True)
-        #self.PB_deconnect_plc.setEnabled(False)
-        #self.label_connect_status.setText("--離線中--")
-        self.worker.stop()         
+        self.worker.stop() 
+        self.display_plc_status(0)        
 # --- 【新增】更新 UI 數值的函式 ---
     @Slot(int, int)
     def update_step_info(self, total, length):
         self.response_ts_val.setText(str(total))
         self.response_sl_val.setText(str(length))
-        self.label_connect_status.setText("--連線成功且讀取完成--")
     @Slot(bool)
     def update_sm413_status(self, status):
         color = "green" if status else "yellow"
@@ -526,13 +517,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.PB_connect_plc.setEnabled(True)
             self.PB_deconnect_plc.setEnabled(False)
         elif status == 1:
-            status_text = self.get_plc_status_msg(str(status), "連線中")    
+              
             self.PB_connect_plc.setEnabled(False)
             self.PB_deconnect_plc.setEnabled(True)
         elif status == 2:
             status_text = self.get_plc_status_msg(str(status), "已連線")    
             self.PB_connect_plc.setEnabled(False)
-            self.PB_deconnect_plc.setEnabled(True)    
+            self.PB_deconnect_plc.setEnabled(True)   
+        elif status in range(800, 900):
+            status_text = self.get_plc_status_msg(str(status), "錯誤:")
+            self.PB_connect_plc.setEnabled(True)
+            self.PB_deconnect_plc.setEnabled(False)   
         else:
             status_text = self.get_plc_status_msg("non", "")
             self.PB_connect_plc.setEnabled(True)
@@ -541,9 +536,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_connect_status.setText(status_text)
 # --- 【新增】錯誤處理 ---
     def handle_error(self, err_msg):
-        self.label_connect_status.setText(f"錯誤: {err_msg}")
-        self.PB_connect_plc.setEnabled(True)
-        self.PB_deconnect_plc.setEnabled(False)              
+        self.plc_error_status.setText(err_msg)             
 # 關閉程式
     def closeEvent(self, event):
         title = self.get_msg("close_title", "警告: 關閉程式")

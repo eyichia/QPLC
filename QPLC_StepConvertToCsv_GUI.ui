@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>944</width>
+    <width>1020</width>
     <height>760</height>
    </rect>
   </property>
@@ -2102,7 +2102,7 @@ QComboBox QAbstractItemView {
      <rect>
       <x>20</x>
       <y>580</y>
-      <width>365</width>
+      <width>366</width>
       <height>30</height>
      </rect>
     </property>
@@ -2197,8 +2197,8 @@ QComboBox QAbstractItemView {
     </property>
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>635</y>
+      <x>25</x>
+      <y>680</y>
       <width>70</width>
       <height>30</height>
      </rect>
@@ -2228,8 +2228,8 @@ QComboBox QAbstractItemView {
     </property>
     <property name="geometry">
      <rect>
-      <x>95</x>
-      <y>635</y>
+      <x>100</x>
+      <y>680</y>
       <width>30</width>
       <height>30</height>
      </rect>
@@ -2262,6 +2262,45 @@ QComboBox QAbstractItemView {
      <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
+   <widget class="QLabel" name="plc_error_status">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>610</y>
+      <width>365</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Microsoft YaHei</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LayoutDirection::LeftToRight</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel{
+	border-style: solid; 
+	border-width: 1;
+	background-color: #B5B5B5;
+	border-top-color: black;
+	border-left-color: black;
+	border-bottom-color: white;
+	border-right-color: white;
+}</string>
+    </property>
+    <property name="text">
+     <string>已連線</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
    <zorder>setting_groupBox</zorder>
    <zorder>line</zorder>
    <zorder>PB_read_step</zorder>
@@ -2274,14 +2313,15 @@ QComboBox QAbstractItemView {
    <zorder>label_pc_ip</zorder>
    <zorder>label_sm413</zorder>
    <zorder>SM413</zorder>
+   <zorder>plc_error_status</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>944</width>
-     <height>23</height>
+     <width>1020</width>
+     <height>33</height>
     </rect>
    </property>
    <property name="font">

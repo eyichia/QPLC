@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(944, 760)
+        MainWindow.resize(1020, 760)
         MainWindow.setStyleSheet(u"background-color: #B5B5B5;")
         self.file_exit = QAction(MainWindow)
         self.file_exit.setObjectName(u"file_exit")
@@ -951,7 +951,7 @@ class Ui_MainWindow(object):
         self.label_connect_status = QLabel(self.centralwidget)
         self.label_connect_status.setObjectName(u"label_connect_status")
         self.label_connect_status.setEnabled(True)
-        self.label_connect_status.setGeometry(QRect(20, 580, 365, 30))
+        self.label_connect_status.setGeometry(QRect(20, 580, 366, 30))
         font5 = QFont()
         font5.setFamilies([u"Microsoft YaHei"])
         font5.setPointSize(8)
@@ -991,7 +991,7 @@ class Ui_MainWindow(object):
         self.label_sm413 = QLabel(self.centralwidget)
         self.label_sm413.setObjectName(u"label_sm413")
         self.label_sm413.setEnabled(True)
-        self.label_sm413.setGeometry(QRect(20, 635, 70, 30))
+        self.label_sm413.setGeometry(QRect(25, 680, 70, 30))
         self.label_sm413.setFont(font3)
         self.label_sm413.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.label_sm413.setStyleSheet(u"background-color: transparent;")
@@ -999,7 +999,7 @@ class Ui_MainWindow(object):
         self.SM413 = QLabel(self.centralwidget)
         self.SM413.setObjectName(u"SM413")
         self.SM413.setEnabled(True)
-        self.SM413.setGeometry(QRect(95, 635, 30, 30))
+        self.SM413.setGeometry(QRect(100, 680, 30, 30))
         self.SM413.setFont(font3)
         self.SM413.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.SM413.setStyleSheet(u"QLabel{\n"
@@ -1013,6 +1013,22 @@ class Ui_MainWindow(object):
 "	border-right-color: white;\n"
 "}")
         self.SM413.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.plc_error_status = QLabel(self.centralwidget)
+        self.plc_error_status.setObjectName(u"plc_error_status")
+        self.plc_error_status.setEnabled(True)
+        self.plc_error_status.setGeometry(QRect(20, 610, 365, 30))
+        self.plc_error_status.setFont(font5)
+        self.plc_error_status.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.plc_error_status.setStyleSheet(u"QLabel{\n"
+"	border-style: solid; \n"
+"	border-width: 1;\n"
+"	background-color: #B5B5B5;\n"
+"	border-top-color: black;\n"
+"	border-left-color: black;\n"
+"	border-bottom-color: white;\n"
+"	border-right-color: white;\n"
+"}")
+        self.plc_error_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.setting_groupBox.raise_()
         self.line.raise_()
@@ -1026,9 +1042,10 @@ class Ui_MainWindow(object):
         self.label_pc_ip.raise_()
         self.label_sm413.raise_()
         self.SM413.raise_()
+        self.plc_error_status.raise_()
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 944, 23))
+        self.menubar.setGeometry(QRect(0, 0, 1020, 33))
         self.menubar.setFont(font)
         self.File = QMenu(self.menubar)
         self.File.setObjectName(u"File")
@@ -1090,6 +1107,7 @@ class Ui_MainWindow(object):
         self.label_pc_ip.setText(QCoreApplication.translate("MainWindow", u"PC IP:", None))
         self.label_sm413.setText(QCoreApplication.translate("MainWindow", u"SM413", None))
         self.SM413.setText("")
+        self.plc_error_status.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u9023\u7dda", None))
         self.File.setTitle(QCoreApplication.translate("MainWindow", u"\u6a94\u6848", None))
         self.Language.setTitle(QCoreApplication.translate("MainWindow", u"\u8a9e\u8a00", None))
     # retranslateUi

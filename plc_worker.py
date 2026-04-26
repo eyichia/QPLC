@@ -22,6 +22,7 @@ class PLC1Worker(QThread):
         self.batch_start_addr = ""
         self.batch_size = 0
         self.status = -1
+        current_status = -1
         
 
 
@@ -92,7 +93,8 @@ class PLC1Worker(QThread):
                         if all_results:
                             self.steps_data.emit(all_results) # 全部讀完後一次發送給 UI
                     except Exception as e:
-                        self.error_occurred.emit(f"讀取失敗: {str(e)}")
+                        self.plc1_status = 800 # 異常
+                        self.error_occurred.emit(str(e))
                     finally:
                         self.batch_read_trigger = False
                 
@@ -102,8 +104,10 @@ class PLC1Worker(QThread):
                 # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
                 error_msg = str(e)
                 if "command error" in error_msg.lower() or "device" in error_msg.lower():
+                    self.plc1_status = 801 # 異常
                     friendly_msg = f"位址無效或超出範圍: {self.addr_total}"
                 else:
+                    self.plc1_status = 802 # 異常
                     friendly_msg = f"通訊失敗: {error_msg}"
                 print(friendly_msg) # 先在控制台印出錯誤訊息，方便除錯
                 self.error_occurred.emit(friendly_msg)
@@ -111,9 +115,11 @@ class PLC1Worker(QThread):
                     plc.close() # 發生錯誤先關閉舊連線
                     self.status = 0 # 離線中
                 except: pass
-                time.sleep(2) # 等待 2 秒再重試，避免過度頻繁攻擊 PLC   
-            self.plc1_status.emit(self.status)
+                time.sleep(2) # 等待 2 秒再重試，避免過度頻繁攻擊 PLC 
 
+            if self.status != current_status:
+                current_status = self.status
+                self.plc1_status.emit(self.status)
         # 只有當 self.running 變成 False (按下斷開按鈕) 才會跑到這裡
         try:
             plc.close()
