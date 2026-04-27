@@ -610,7 +610,7 @@ class Ui_MainWindow(object):
         self.line.setFrameShadow(QFrame.Shadow.Sunken)
         self.setting_groupBox = QGroupBox(self.centralwidget)
         self.setting_groupBox.setObjectName(u"setting_groupBox")
-        self.setting_groupBox.setGeometry(QRect(20, 50, 365, 525))
+        self.setting_groupBox.setGeometry(QRect(20, 50, 365, 560))
         self.setting_groupBox.setStyleSheet(u"QGroupBox{\n"
 "	background-color: transparent;\n"
 "}")
@@ -948,10 +948,10 @@ class Ui_MainWindow(object):
 "	background-color: transparent;\n"
 "}")
         self.response_sl_val.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label_connect_status = QLabel(self.centralwidget)
+        self.label_connect_status = QLabel(self.setting_groupBox)
         self.label_connect_status.setObjectName(u"label_connect_status")
         self.label_connect_status.setEnabled(True)
-        self.label_connect_status.setGeometry(QRect(20, 580, 366, 30))
+        self.label_connect_status.setGeometry(QRect(25, 515, 315, 30))
         font5 = QFont()
         font5.setFamilies([u"Microsoft YaHei"])
         font5.setPointSize(8)
@@ -1013,22 +1013,6 @@ class Ui_MainWindow(object):
 "	border-right-color: white;\n"
 "}")
         self.SM413.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.plc_error_status = QLabel(self.centralwidget)
-        self.plc_error_status.setObjectName(u"plc_error_status")
-        self.plc_error_status.setEnabled(True)
-        self.plc_error_status.setGeometry(QRect(20, 610, 365, 30))
-        self.plc_error_status.setFont(font5)
-        self.plc_error_status.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.plc_error_status.setStyleSheet(u"QLabel{\n"
-"	border-style: solid; \n"
-"	border-width: 1;\n"
-"	background-color: #B5B5B5;\n"
-"	border-top-color: black;\n"
-"	border-left-color: black;\n"
-"	border-bottom-color: white;\n"
-"	border-right-color: white;\n"
-"}")
-        self.plc_error_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.setting_groupBox.raise_()
         self.line.raise_()
@@ -1037,12 +1021,10 @@ class Ui_MainWindow(object):
         self.PB_write_step.raise_()
         self.PB_import_csv.raise_()
         self.step_groupBox.raise_()
-        self.label_connect_status.raise_()
         self.Process.raise_()
         self.label_pc_ip.raise_()
         self.label_sm413.raise_()
         self.SM413.raise_()
-        self.plc_error_status.raise_()
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 1020, 33))
@@ -1107,7 +1089,6 @@ class Ui_MainWindow(object):
         self.label_pc_ip.setText(QCoreApplication.translate("MainWindow", u"PC IP:", None))
         self.label_sm413.setText(QCoreApplication.translate("MainWindow", u"SM413", None))
         self.SM413.setText("")
-        self.plc_error_status.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u9023\u7dda", None))
         self.File.setTitle(QCoreApplication.translate("MainWindow", u"\u6a94\u6848", None))
         self.Language.setTitle(QCoreApplication.translate("MainWindow", u"\u8a9e\u8a00", None))
     # retranslateUi

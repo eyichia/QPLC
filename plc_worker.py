@@ -8,9 +8,8 @@ class PLC1Worker(QThread):
     step_info = Signal(int, int)
     steps_data = Signal(list) # 如果需要傳回更多數據，可以使用 list 或 dict
     sm413_status = Signal(bool)
-    plc1_status = Signal(int)
-    error_occurred = Signal(str)
-
+    plc1_status = Signal(int, int, str)
+# initial
     def __init__(self):
         super().__init__()
         self.ip = ""
@@ -21,18 +20,17 @@ class PLC1Worker(QThread):
         self.batch_read_trigger = False 
         self.batch_start_addr = ""
         self.batch_size = 0
-        self.status = -1
-        current_status = -1
-        
-
-
+        self.status = 0
+        self.status_error = 0
+        self.status_msg = ""
+# 觸發讀取step        
     def trigger_read_steps(self, start_addr, total_length):
         self.batch_start_addr = start_addr
         self.batch_size = total_length
         self.batch_read_trigger = True    
+        self.status = 10 # 正在讀取步驟數據
         print(f"已觸發讀取步驟數據: 起始位址={start_addr}, 總長度={total_length}") # 這行可以幫助確認觸發是否成功
-
-    # 【新增】必須加入這個位址遞增工具，否則分段讀取會當機
+# 【新增】必須加入這個位址遞增工具，否則分段讀取會當機
     def increment_address(self, addr, offset):
         # 拆分 D2100 -> prefix="D", number=2100
         match = re.match(r"([a-zA-Z]+)([0-9]+)", addr)
@@ -41,17 +39,22 @@ class PLC1Worker(QThread):
             number = int(match.group(2))
             return f"{prefix}{number + offset}"
         return addr
-        
+# PLC 連線與讀取主迴圈        
     def run(self):
         self.running = True # 確保每次 run 都從 True 開始
-        plc = pymcprotocol.Type3E()
-        plc.setaccessopt(commtype="binary")
         is_connected = False # 自定義一個旗標來紀錄連線狀態
+        current_status = -1
+        current_error = -1
+        current_text = ""
+        retry_count = 0
+        max_retries = 10
         
         while self.running:
             try:
                 # 如果尚未連線，則嘗試連線
                 if not is_connected: # 假設有連線檢查
+                    plc = pymcprotocol.Type3E()
+                    plc.setaccessopt(commtype="binary")
                     self.status = 1 # 連線中
                     plc.connect(self.ip, self.port)
                     # 只讀取一次參數
@@ -61,7 +64,7 @@ class PLC1Worker(QThread):
                         self.step_info.emit(res_total[0], res_len[0])
                         is_connected = True # 連線成功且讀取完成，才設為 True
                         self.status = 2 # 已連線
-
+                        retry_count = 0
                 # 2. 正常讀取循環 (只有連線成功才執行)
                 if is_connected:
                     _sm413_data = plc.batchread_bitunits(headdevice="SM413", readsize=1)
@@ -78,7 +81,7 @@ class PLC1Worker(QThread):
                         MAX_CHUNK = 900 # 設定單次讀取上限為 900，保留一點安全邊際
                         while remaining_size > 0:
                             read_now = min(MAX_CHUNK, remaining_size)
-                            print(f"正在讀取位址: {current_addr}, 長度: {read_now}")
+                            #print(f"正在讀取位址: {current_addr}, 長度: {read_now}")
                             chunk_results = plc.batchread_wordunits(
                                 headdevice = current_addr, 
                                 readsize = read_now
@@ -92,38 +95,48 @@ class PLC1Worker(QThread):
                                 raise Exception("PLC 回傳空數據")
                         if all_results:
                             self.steps_data.emit(all_results) # 全部讀完後一次發送給 UI
+                            self.status = 11 # 讀取完成
                     except Exception as e:
-                        self.plc1_status = 800 # 異常
-                        self.error_occurred.emit(str(e))
+                        self.status_error = 1 # 讀取失敗
+                        self.status_msg = str(e) # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
                     finally:
                         self.batch_read_trigger = False
                 
                 time.sleep(0.5) # 正常每 500ms 讀一次      
             except Exception as e:
                 is_connected = False # 發生任何錯誤都視為連線失敗，重置旗標
-                # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
-                error_msg = str(e)
-                if "command error" in error_msg.lower() or "device" in error_msg.lower():
-                    self.plc1_status = 801 # 異常
-                    friendly_msg = f"位址無效或超出範圍: {self.addr_total}"
+                retry_count += 1
+                error_msg = str(e) # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
+                # 判斷是否超過最大重試次數
+                if retry_count >= max_retries:
+                    self.status_error = 2 # 超過重試次數上限
+                    self.status_msg = ""
+                    self.running = False # 強制停止 while 迴圈，執行緒將結束
                 else:
-                    self.plc1_status = 802 # 異常
-                    friendly_msg = f"通訊失敗: {error_msg}"
-                print(friendly_msg) # 先在控制台印出錯誤訊息，方便除錯
-                self.error_occurred.emit(friendly_msg)
+                    if "command error" in error_msg.lower() or "device" in error_msg.lower():
+                        self.status_error = 3 # 位址無效或超出範圍
+                        self.status_msg = ""
+                    else:
+                        self.status_error = 4 # 其他通訊失敗
+                        self.status_msg = str(error_msg)
+                      
                 try: 
                     plc.close() # 發生錯誤先關閉舊連線
-                    self.status = 0 # 離線中
                 except: pass
-                time.sleep(2) # 等待 2 秒再重試，避免過度頻繁攻擊 PLC 
 
-            if self.status != current_status:
+                if self.running: # 如果還沒到 5 次，才等待 2 秒
+                    self.status = 3 # 正在重新連線
+                    self.status_msg = str(retry_count)
+                    time.sleep(3)
+
+            if self.status != current_status or self.status_error != current_error or self.status_msg != current_text:
                 current_status = self.status
-                self.plc1_status.emit(self.status)
+                current_error = self.status_error
+                current_text = self.status_msg
+                self.plc1_status.emit(self.status, self.status_error, self.status_msg)
         # 只有當 self.running 變成 False (按下斷開按鈕) 才會跑到這裡
         try:
             plc.close()
-            self.status = 0 # 離線中
             print("PLC 連線已安全關閉")
         except:
             pass

@@ -1205,7 +1205,7 @@ QPushButton:pressed {
       <x>20</x>
       <y>50</y>
       <width>365</width>
-      <height>525</height>
+      <height>560</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -2093,30 +2093,29 @@ QComboBox QAbstractItemView {
       </property>
      </widget>
     </widget>
-   </widget>
-   <widget class="QLabel" name="label_connect_status">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>580</y>
-      <width>366</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="layoutDirection">
-     <enum>Qt::LayoutDirection::LeftToRight</enum>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QLabel{
+    <widget class="QLabel" name="label_connect_status">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>25</x>
+       <y>515</y>
+       <width>315</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LayoutDirection::LeftToRight</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel{
 	border-style: solid; 
 	border-width: 1;
 	background-color: #B5B5B5;
@@ -2125,13 +2124,14 @@ QComboBox QAbstractItemView {
 	border-bottom-color: white;
 	border-right-color: white;
 }</string>
-    </property>
-    <property name="text">
-     <string>已連線</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignmentFlag::AlignCenter</set>
-    </property>
+     </property>
+     <property name="text">
+      <string>已連線</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+    </widget>
    </widget>
    <widget class="QTextEdit" name="Process">
     <property name="geometry">
@@ -2262,45 +2262,6 @@ QComboBox QAbstractItemView {
      <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="plc_error_status">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>610</y>
-      <width>365</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="layoutDirection">
-     <enum>Qt::LayoutDirection::LeftToRight</enum>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QLabel{
-	border-style: solid; 
-	border-width: 1;
-	background-color: #B5B5B5;
-	border-top-color: black;
-	border-left-color: black;
-	border-bottom-color: white;
-	border-right-color: white;
-}</string>
-    </property>
-    <property name="text">
-     <string>已連線</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignmentFlag::AlignCenter</set>
-    </property>
-   </widget>
    <zorder>setting_groupBox</zorder>
    <zorder>line</zorder>
    <zorder>PB_read_step</zorder>
@@ -2308,12 +2269,10 @@ QComboBox QAbstractItemView {
    <zorder>PB_write_step</zorder>
    <zorder>PB_import_csv</zorder>
    <zorder>step_groupBox</zorder>
-   <zorder>label_connect_status</zorder>
    <zorder>Process</zorder>
    <zorder>label_pc_ip</zorder>
    <zorder>label_sm413</zorder>
    <zorder>SM413</zorder>
-   <zorder>plc_error_status</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

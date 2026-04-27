@@ -123,7 +123,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.worker.steps_data.connect(self.display_steps_data) # 回應步序
         # 連接 Worker 的數據回傳信號
         self.worker.step_info.connect(self.update_step_info)
-        self.worker.error_occurred.connect(self.handle_error)
         self.worker.sm413_status.connect(self.update_sm413_status)
         self.worker.plc1_status.connect(self.display_plc_status)
 # --- 【多國語言切換】 ---
@@ -259,7 +258,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.port_no.setValue(1025)
         self.response_ts_val.clear()
         self.response_sl_val.clear()
-        self.display_plc_status(-1)
+        self.display_plc_status(-1, "")
         self.step_no.setValue(1)
         for i in range(1, 11):
             self.findChild(QSpinBox, f"d15{i-1}_step_no{i}").setValue(i)
@@ -486,7 +485,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # 斷開PLC
     def deconnect_plc(self):
         self.worker.stop() 
-        self.display_plc_status(0)        
+        self.display_plc_status(0, "")        
 # --- 【新增】更新 UI 數值的函式 ---
     @Slot(int, int)
     def update_step_info(self, total, length):
@@ -510,33 +509,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.current_plc_data = data
         self.decode_step_data(data) # 呼叫解碼函式來處理數據
         #print("收到步驟數據:", data)
-    @Slot(int)
-    def display_plc_status(self,status):
+    @Slot(int, int, str)
+    def display_plc_status(self,status, error, text=""):
+        status_text = f"{self.get_plc_status_msg(str(status), '')} ({text})"
         if status == 0:
-            status_text = self.get_plc_status_msg(str(status), "離線中")
             self.PB_connect_plc.setEnabled(True)
             self.PB_deconnect_plc.setEnabled(False)
-        elif status == 1:
-              
-            self.PB_connect_plc.setEnabled(False)
-            self.PB_deconnect_plc.setEnabled(True)
-        elif status == 2:
-            status_text = self.get_plc_status_msg(str(status), "已連線")    
-            self.PB_connect_plc.setEnabled(False)
-            self.PB_deconnect_plc.setEnabled(True)   
-        elif status in range(800, 900):
-            status_text = self.get_plc_status_msg(str(status), "錯誤:")
-            self.PB_connect_plc.setEnabled(True)
-            self.PB_deconnect_plc.setEnabled(False)   
         else:
-            status_text = self.get_plc_status_msg("non", "")
-            self.PB_connect_plc.setEnabled(True)
-            self.PB_deconnect_plc.setEnabled(False)    
+            self.PB_connect_plc.setEnabled(False)
+            self.PB_deconnect_plc.setEnabled(True)    
+   
 
         self.label_connect_status.setText(status_text)
-# --- 【新增】錯誤處理 ---
-    def handle_error(self, err_msg):
-        self.plc_error_status.setText(err_msg)             
+           
 # 關閉程式
     def closeEvent(self, event):
         title = self.get_msg("close_title", "警告: 關閉程式")
