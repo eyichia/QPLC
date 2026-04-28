@@ -120,8 +120,15 @@
     },
     "plc_status": {
         "non": "",
-        "0": "Offline",
-        "1": "Connecting...",
-        "2": "Connected"
+        "s0": "Offline...",
+        "s1": "Connecting",
+        "s2": "Connected",
+        "s3": "Reconnecting",
+        "s10": "Reading",
+        "s11": "Reading complete",
+        "e800": "Read failed",
+        "e801": "Exceeded maximum number of retries",
+        "e802": "Invalid address or out of range",
+        "e803": "Communication failed"
     }
 }

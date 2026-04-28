@@ -44,6 +44,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.style_pixmap = QPixmap(resource_path("Assets/Mystyle.png"))
         self.current_lang = "TW" # 開機語言
         self.current_model = "C1M" #預設機型
+        self.current_status = "non" #PLC連線狀態
+        self.current_error = "non" #PLC錯誤狀態
+        self.current_status_msg = "" #PLC狀態訊息
         self.worker = PLC1Worker() # 執行背景 PLC1 連線程
         # 初始設定
         self.init_ui_settings() # 1.設定圖示與預設圖
@@ -200,6 +203,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.translate()   
         self.format_dic = self.model_format.get(self.current_lang, {}) 
         self.decode_step_data(self.current_plc_data)
+        self.display_plc_status(self.current_status, self.current_error, self.current_status_msg)
 # 從當前語言包抓取訊息文字
     def get_msg(self, key, default=""):
         lang = self.languages.get(self.current_lang, {})
@@ -258,10 +262,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.port_no.setValue(1025)
         self.response_ts_val.clear()
         self.response_sl_val.clear()
-        self.display_plc_status(-1, "")
+        self.current_plc_data = []
+        self.display_plc_status("s0", "non", "")
         self.step_no.setValue(1)
         for i in range(1, 11):
             self.findChild(QSpinBox, f"d15{i-1}_step_no{i}").setValue(i)
+            widget = getattr(self, f"step_{i}", None)
+            if widget: 
+                widget.clear()
+                widget.setStyleSheet("background-color: #B5B5B5;")
 # get mode
     def get_mode(self, code, mode):
         mode_info = self.format_dic.get("mode", {}).get(str(code), [])[mode]
@@ -309,7 +318,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 
         except ValueError:
             pass # 防止總步數還沒讀到時出錯                    
-
 # step data解碼        
     def decode_step_data(self, data):
         # 匯出csv時,每一行都必須是list[]格式,所以第一行也要放在list裡面["a","b",...]
@@ -485,7 +493,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # 斷開PLC
     def deconnect_plc(self):
         self.worker.stop() 
-        self.display_plc_status(0, "")        
+        self.display_plc_status("s0", "non", "")        
 # --- 【新增】更新 UI 數值的函式 ---
     @Slot(int, int)
     def update_step_info(self, total, length):
@@ -509,17 +517,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.current_plc_data = data
         self.decode_step_data(data) # 呼叫解碼函式來處理數據
         #print("收到步驟數據:", data)
-    @Slot(int, int, str)
+    @Slot(str, str, str)
     def display_plc_status(self,status, error, text=""):
-        status_text = f"{self.get_plc_status_msg(str(status), '')} ({text})"
-        if status == 0:
+        status_text = f"{self.get_plc_status_msg(status)}{self.get_plc_status_msg(error)}{text}"
+        if status == "s0":
             self.PB_connect_plc.setEnabled(True)
             self.PB_deconnect_plc.setEnabled(False)
+            self.PB_read_step.setEnabled(False)
         else:
             self.PB_connect_plc.setEnabled(False)
-            self.PB_deconnect_plc.setEnabled(True)    
-   
+            self.PB_deconnect_plc.setEnabled(True)
+            self.PB_read_step.setEnabled(True)
 
+        if status == "s11" or self.current_plc_data != []: 
+            self.PB_export_csv.setEnabled(True)    
+        else:
+            self.PB_export_csv.setEnabled(False)
+            
+        self.current_status = status
+        self.current_error = error      
+        self.current_status_msg = text
         self.label_connect_status.setText(status_text)
            
 # 關閉程式

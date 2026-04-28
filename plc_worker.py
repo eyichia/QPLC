@@ -8,7 +8,7 @@ class PLC1Worker(QThread):
     step_info = Signal(int, int)
     steps_data = Signal(list) # 如果需要傳回更多數據，可以使用 list 或 dict
     sm413_status = Signal(bool)
-    plc1_status = Signal(int, int, str)
+    plc1_status = Signal(str, str, str)
 # initial
     def __init__(self):
         super().__init__()
@@ -20,15 +20,15 @@ class PLC1Worker(QThread):
         self.batch_read_trigger = False 
         self.batch_start_addr = ""
         self.batch_size = 0
-        self.status = 0
-        self.status_error = 0
+        self.status = "non"
+        self.status_error = "non"
         self.status_msg = ""
 # 觸發讀取step        
     def trigger_read_steps(self, start_addr, total_length):
         self.batch_start_addr = start_addr
         self.batch_size = total_length
         self.batch_read_trigger = True    
-        self.status = 10 # 正在讀取步驟數據
+        self.status = "s10" # 正在讀取步驟數據
         print(f"已觸發讀取步驟數據: 起始位址={start_addr}, 總長度={total_length}") # 這行可以幫助確認觸發是否成功
 # 【新增】必須加入這個位址遞增工具，否則分段讀取會當機
     def increment_address(self, addr, offset):
@@ -43,8 +43,8 @@ class PLC1Worker(QThread):
     def run(self):
         self.running = True # 確保每次 run 都從 True 開始
         is_connected = False # 自定義一個旗標來紀錄連線狀態
-        current_status = -1
-        current_error = -1
+        current_status = "non"
+        current_error = "non"
         current_text = ""
         retry_count = 0
         max_retries = 10
@@ -55,7 +55,7 @@ class PLC1Worker(QThread):
                 if not is_connected: # 假設有連線檢查
                     plc = pymcprotocol.Type3E()
                     plc.setaccessopt(commtype="binary")
-                    self.status = 1 # 連線中
+                    self.status = "s1" # 連線中
                     plc.connect(self.ip, self.port)
                     # 只讀取一次參數
                     res_total = plc.batchread_wordunits(headdevice=self.addr_total, readsize=1) #ZR是用16進制
@@ -63,7 +63,7 @@ class PLC1Worker(QThread):
                     if res_total and res_len:
                         self.step_info.emit(res_total[0], res_len[0])
                         is_connected = True # 連線成功且讀取完成，才設為 True
-                        self.status = 2 # 已連線
+                        self.status = "s2" # 已連線
                         retry_count = 0
                 # 2. 正常讀取循環 (只有連線成功才執行)
                 if is_connected:
@@ -95,9 +95,9 @@ class PLC1Worker(QThread):
                                 raise Exception("PLC 回傳空數據")
                         if all_results:
                             self.steps_data.emit(all_results) # 全部讀完後一次發送給 UI
-                            self.status = 11 # 讀取完成
+                            self.status = "s11" # 讀取完成
                     except Exception as e:
-                        self.status_error = 1 # 讀取失敗
+                        self.status_error = "e800" # 讀取失敗
                         self.status_msg = str(e) # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
                     finally:
                         self.batch_read_trigger = False
@@ -109,15 +109,15 @@ class PLC1Worker(QThread):
                 error_msg = str(e) # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
                 # 判斷是否超過最大重試次數
                 if retry_count >= max_retries:
-                    self.status_error = 2 # 超過重試次數上限
+                    self.status_error = "e801" # 超過重試次數上限
                     self.status_msg = ""
                     self.running = False # 強制停止 while 迴圈，執行緒將結束
                 else:
                     if "command error" in error_msg.lower() or "device" in error_msg.lower():
-                        self.status_error = 3 # 位址無效或超出範圍
+                        self.status_error = "e802" # 位址無效或超出範圍
                         self.status_msg = ""
                     else:
-                        self.status_error = 4 # 其他通訊失敗
+                        self.status_error = "e803" # 其他通訊失敗
                         self.status_msg = str(error_msg)
                       
                 try: 
@@ -125,7 +125,7 @@ class PLC1Worker(QThread):
                 except: pass
 
                 if self.running: # 如果還沒到 5 次，才等待 2 秒
-                    self.status = 3 # 正在重新連線
+                    self.status = "s3" # 正在重新連線
                     self.status_msg = str(retry_count)
                     time.sleep(3)
 
