@@ -56,7 +56,13 @@
         "csv_save_title": "儲存 CSV 數據",
         "csv_save_ok": "CSV 數據已存至：",
         "csv_save_fail": "CSV 儲存失敗",
-        
+        "about_title": "關於繞線步序解碼程式",
+        "soft_name": "繞線步序解碼工具",
+        "dev_label": "開發者 ：",
+        "date_label": "發布日期 ：",
+        "about_desc": "本程式適用機型 :",
+        "copyright": "版權所有 ©",
+
         "csv_open_title": "開啟 CSV 數據",
         "txt_save_title": "儲存文字紀錄",
         "txt_save_ok": "TXT 數據已存至：",
@@ -85,12 +91,7 @@
         "pdf_save_ok": "PDF 報告已存至：",
         "clear_title": "警告: 清除紀錄",
         "clear_text": "您確定要清除紀錄嗎？",
-        "about_title": "關於排線計算程式",
-        "soft_name": "排線計算工具",
-        "dev_label": "開發者 ：",
-        "date_label": "發布日期 ：",
-        "about_desc": "本程式用於輔助繞線排線計算，提供最佳排線方式建議。",
-        "copyright": "版權所有 ©",
+        
         "end_calculation_title": "最優方案推薦 : ",
         "end_calculation_row1": "🏆 計算完成！最優排列建議 : 方式 ",
         "end_calculation_row2": "總圈數 : ",

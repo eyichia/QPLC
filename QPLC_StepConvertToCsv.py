@@ -28,12 +28,15 @@ def resource_path(relative_path):
 
 # 主畫面
 class MainWindow(QMainWindow, Ui_MainWindow):
+    # 格式檔名
+    FORMAT_NAME_LIST = ["C1M", "C1K", "C1J", "SW7B"]
+    # 軟體資訊
     VERSION = " v1.1"
     DEVELOPER = " 江乙加 Eric Chiang"
     VER_DATE = " 2026-03-31"
     COPYRIGHT = f" 2026 {DEVELOPER}" #" 2026 " + DEVELOPER
-    # 格式檔名
-    FORMAT_NAME_LIST = ["C1M", "C1K", "C1J", "SW7B"]
+    MODELS = ",".join(FORMAT_NAME_LIST)
+    
 
 # initial
     def __init__(self, parent=None):
@@ -111,6 +114,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.language_tc.triggered.connect(lambda: self.switch_language("TW"))
         self.language_sc.triggered.connect(lambda: self.switch_language("CN"))
         self.language_en.triggered.connect(lambda: self.switch_language("EN"))
+        self.about_version.triggered.connect(self.show_version)
         self.file_exit.triggered.connect(self.close)
         # 變更HMI step no
         self.step_no.editingFinished.connect(self.step_no_enter)
@@ -538,7 +542,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.current_error = error      
         self.current_status_msg = text
         self.label_connect_status.setText(status_text)
-           
+# """顯示軟體資訊視窗，且只改變此視窗的字型"""
+    def show_version(self):
+        title = self.get_msg("about_title", "關於排線計算程式")
+        # 使用 HTML 語法設定內容
+        text = (
+            f"<h3>{self.get_msg('soft_name')}{self.VERSION}</h3>"
+            f"<p>{self.get_msg('dev_label')}{self.DEVELOPER}</p>"
+            f"<p>{self.get_msg('date_label')}{self.VER_DATE}</p>"
+            "<hr>"
+            f"<p><i>{self.get_msg('about_desc')} {self.MODELS}</i></p>"
+            f"<p><i>{self.get_msg('copyright')}{self.COPYRIGHT}</i></p>"
+        )
+        icon = self.logo_pixmap
+        buttons = QMessageBox.StandardButton.Close
+        theme = "default"
+        font_size = 14
+        icon_size = 64
+        show_prompt_window(self, title, text, icon, buttons, theme, font_size, icon_size)  
+
 # 關閉程式
     def closeEvent(self, event):
         title = self.get_msg("close_title", "警告: 關閉程式")

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1020</width>
-    <height>760</height>
+    <width>1024</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,253 +17,13 @@
    <string notr="true">background-color: #B5B5B5;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="PB_read_step">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>80</y>
-      <width>110</width>
-      <height>40</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-      <stylestrategy>PreferDefault</stylestrategy>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">/*border-width	邊框粗細	1px, 5px
-border-style	邊框樣式	solid (實線), dashed (虛線), dotted (點線)
-border-top-width	只設定上方邊框	2px
-border-radius	圓角程度	15px (半徑)
-font-family: &quot;Microsoft YaHei&quot;;
-font-size: 10; */ 
-/* 平時的樣式 */
-QPushButton {
-	border-style: solid; 
-	border-width: 1;
-	background-color: #B5B5B5;
-	border-top-color: white;
-	border-left-color: white;
-	border-bottom-color: black;
-	border-right-color: black;
-}
-
-/* 滑鼠移上去時 (:hover) */
-/*QPushButton:hover {
-    background-color: #e1f5fe;
-}*/
-
-/* 按下去的瞬間 (:pressed) */
-QPushButton:pressed {
-	border-style: solid; 
-	border-width: 1;
-	background-color: #999999;
-	border-top-color: black;
-	border-left-color: black;
-	border-bottom-color: white;
-	border-right-color: white;
-}</string>
-    </property>
-    <property name="text">
-     <string>讀取</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="PB_export_csv">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>460</y>
-      <width>110</width>
-      <height>40</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-      <stylestrategy>PreferDefault</stylestrategy>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">/*border-width	邊框粗細	1px, 5px
-border-style	邊框樣式	solid (實線), dashed (虛線), dotted (點線)
-border-top-width	只設定上方邊框	2px
-border-radius	圓角程度	15px (半徑)
-font-family: &quot;Microsoft YaHei&quot;;
-font-size: 10; */ 
-/* 平時的樣式 */
-QPushButton {
-	border-style: solid; 
-	border-width: 1;
-	background-color: #B5B5B5;
-	border-top-color: white;
-	border-left-color: white;
-	border-bottom-color: black;
-	border-right-color: black;
-}
-
-/* 滑鼠移上去時 (:hover) */
-/*QPushButton:hover {
-    background-color: #e1f5fe;
-}*/
-
-/* 按下去的瞬間 (:pressed) */
-QPushButton:pressed {
-	border-style: solid; 
-	border-width: 1;
-	background-color: #999999;
-	border-top-color: black;
-	border-left-color: black;
-	border-bottom-color: white;
-	border-right-color: white;
-}</string>
-    </property>
-    <property name="text">
-     <string>Export .csv</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="PB_write_step">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>125</y>
-      <width>110</width>
-      <height>40</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-      <stylestrategy>PreferDefault</stylestrategy>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">/*border-width	邊框粗細	1px, 5px
-border-style	邊框樣式	solid (實線), dashed (虛線), dotted (點線)
-border-top-width	只設定上方邊框	2px
-border-radius	圓角程度	15px (半徑)
-font-family: &quot;Microsoft YaHei&quot;;
-font-size: 10; */ 
-/* 平時的樣式 */
-QPushButton {
-	border-style: solid; 
-	border-width: 1;
-	background-color: #B5B5B5;
-	border-top-color: white;
-	border-left-color: white;
-	border-bottom-color: black;
-	border-right-color: black;
-}
-
-/* 滑鼠移上去時 (:hover) */
-/*QPushButton:hover {
-    background-color: #e1f5fe;
-}*/
-
-/* 按下去的瞬間 (:pressed) */
-QPushButton:pressed {
-	border-style: solid; 
-	border-width: 1;
-	background-color: #999999;
-	border-top-color: black;
-	border-left-color: black;
-	border-bottom-color: white;
-	border-right-color: white;
-}</string>
-    </property>
-    <property name="text">
-     <string>寫入</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="PB_import_csv">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>505</y>
-      <width>110</width>
-      <height>40</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-      <stylestrategy>PreferDefault</stylestrategy>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">/*border-width	邊框粗細	1px, 5px
-border-style	邊框樣式	solid (實線), dashed (虛線), dotted (點線)
-border-top-width	只設定上方邊框	2px
-border-radius	圓角程度	15px (半徑)
-font-family: &quot;Microsoft YaHei&quot;;
-font-size: 10; */ 
-/* 平時的樣式 */
-QPushButton {
-	border-style: solid; 
-	border-width: 1;
-	background-color: #B5B5B5;
-	border-top-color: white;
-	border-left-color: white;
-	border-bottom-color: black;
-	border-right-color: black;
-}
-
-/* 滑鼠移上去時 (:hover) */
-/*QPushButton:hover {
-    background-color: #e1f5fe;
-}*/
-
-/* 按下去的瞬間 (:pressed) */
-QPushButton:pressed {
-	border-style: solid; 
-	border-width: 1;
-	background-color: #999999;
-	border-top-color: black;
-	border-left-color: black;
-	border-bottom-color: white;
-	border-right-color: white;
-}</string>
-    </property>
-    <property name="text">
-     <string>Import .csv</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="step_groupBox">
     <property name="geometry">
      <rect>
-      <x>565</x>
-      <y>80</y>
-      <width>336</width>
-      <height>466</height>
+      <x>480</x>
+      <y>50</y>
+      <width>470</width>
+      <height>625</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -1185,27 +945,161 @@ QPushButton:pressed {
       <number>0</number>
      </property>
     </widget>
-   </widget>
-   <widget class="Line" name="line">
-    <property name="geometry">
-     <rect>
-      <x>470</x>
-      <y>50</y>
-      <width>10</width>
-      <height>525</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Orientation::Vertical</enum>
-    </property>
+    <widget class="QPushButton" name="PB_read_step">
+     <property name="geometry">
+      <rect>
+       <x>335</x>
+       <y>55</y>
+       <width>110</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>14</pointsize>
+       <stylestrategy>PreferDefault</stylestrategy>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">/*border-width	邊框粗細	1px, 5px
+border-style	邊框樣式	solid (實線), dashed (虛線), dotted (點線)
+border-top-width	只設定上方邊框	2px
+border-radius	圓角程度	15px (半徑)
+font-family: &quot;Microsoft YaHei&quot;;
+font-size: 10; */ 
+/* 平時的樣式 */
+QPushButton {
+	border-style: solid; 
+	border-width: 1;
+	background-color: #B5B5B5;
+	border-top-color: white;
+	border-left-color: white;
+	border-bottom-color: black;
+	border-right-color: black;
+}
+
+/* 滑鼠移上去時 (:hover) */
+/*QPushButton:hover {
+    background-color: #e1f5fe;
+}*/
+
+/* 按下去的瞬間 (:pressed) */
+QPushButton:pressed {
+	border-style: solid; 
+	border-width: 1;
+	background-color: #999999;
+	border-top-color: black;
+	border-left-color: black;
+	border-bottom-color: white;
+	border-right-color: white;
+}</string>
+     </property>
+     <property name="text">
+      <string>讀取</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="PB_export_csv">
+     <property name="geometry">
+      <rect>
+       <x>335</x>
+       <y>100</y>
+       <width>110</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>14</pointsize>
+       <stylestrategy>PreferDefault</stylestrategy>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">/*border-width	邊框粗細	1px, 5px
+border-style	邊框樣式	solid (實線), dashed (虛線), dotted (點線)
+border-top-width	只設定上方邊框	2px
+border-radius	圓角程度	15px (半徑)
+font-family: &quot;Microsoft YaHei&quot;;
+font-size: 10; */ 
+/* 平時的樣式 */
+QPushButton {
+	border-style: solid; 
+	border-width: 1;
+	background-color: #B5B5B5;
+	border-top-color: white;
+	border-left-color: white;
+	border-bottom-color: black;
+	border-right-color: black;
+}
+
+/* 滑鼠移上去時 (:hover) */
+/*QPushButton:hover {
+    background-color: #e1f5fe;
+}*/
+
+/* 按下去的瞬間 (:pressed) */
+QPushButton:pressed {
+	border-style: solid; 
+	border-width: 1;
+	background-color: #999999;
+	border-top-color: black;
+	border-left-color: black;
+	border-bottom-color: white;
+	border-right-color: white;
+}</string>
+     </property>
+     <property name="text">
+      <string>Export .csv</string>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="Process">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>455</y>
+       <width>440</width>
+       <height>156</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QTextEdit{
+	border-style: solid; 
+	border-width: 1;
+	background-color: #B5B5B5;
+	border-top-color: black;
+	border-left-color: black;
+	border-bottom-color: white;
+	border-right-color: white;
+}</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="setting_groupBox">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>75</x>
       <y>50</y>
       <width>365</width>
-      <height>560</height>
+      <height>625</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -2092,6 +1986,46 @@ QComboBox QAbstractItemView {
        <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
+     <widget class="QLabel" name="SM413">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>295</x>
+        <y>160</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Microsoft YaHei</family>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LayoutDirection::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+	border-style: solid; 
+	border-radius: 15px;       /* 關鍵：半徑設為邊長的一半 */
+	border-width: 1;
+	background-color: #B5B5B5;
+	border-top-color: black;
+	border-left-color: black;
+	border-bottom-color: white;
+	border-right-color: white;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
     </widget>
     <widget class="QLabel" name="label_connect_status">
      <property name="enabled">
@@ -2100,15 +2034,15 @@ QComboBox QAbstractItemView {
      <property name="geometry">
       <rect>
        <x>25</x>
-       <y>515</y>
+       <y>520</y>
        <width>315</width>
-       <height>30</height>
+       <height>91</height>
       </rect>
      </property>
      <property name="font">
       <font>
        <family>Microsoft YaHei</family>
-       <pointsize>8</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="layoutDirection">
@@ -2133,40 +2067,13 @@ QComboBox QAbstractItemView {
      </property>
     </widget>
    </widget>
-   <widget class="QTextEdit" name="Process">
-    <property name="geometry">
-     <rect>
-      <x>565</x>
-      <y>550</y>
-      <width>336</width>
-      <height>170</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QTextEdit{
-	border-style: solid; 
-	border-width: 1;
-	background-color: #B5B5B5;
-	border-top-color: black;
-	border-left-color: black;
-	border-bottom-color: white;
-	border-right-color: white;
-}</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_pc_ip">
     <property name="enabled">
      <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>75</x>
       <y>10</y>
       <width>365</width>
       <height>30</height>
@@ -2191,96 +2098,17 @@ QComboBox QAbstractItemView {
      <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label_sm413">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>25</x>
-      <y>680</y>
-      <width>70</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="layoutDirection">
-     <enum>Qt::LayoutDirection::LeftToRight</enum>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: transparent;</string>
-    </property>
-    <property name="text">
-     <string>SM413</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="SM413">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>680</y>
-      <width>30</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Microsoft YaHei</family>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="layoutDirection">
-     <enum>Qt::LayoutDirection::LeftToRight</enum>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QLabel{
-	border-style: solid; 
-	border-radius: 15px;       /* 關鍵：半徑設為邊長的一半 */
-	border-width: 1;
-	background-color: #B5B5B5;
-	border-top-color: black;
-	border-left-color: black;
-	border-bottom-color: white;
-	border-right-color: white;
-}</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignmentFlag::AlignCenter</set>
-    </property>
-   </widget>
    <zorder>setting_groupBox</zorder>
-   <zorder>line</zorder>
-   <zorder>PB_read_step</zorder>
-   <zorder>PB_export_csv</zorder>
-   <zorder>PB_write_step</zorder>
-   <zorder>PB_import_csv</zorder>
    <zorder>step_groupBox</zorder>
-   <zorder>Process</zorder>
    <zorder>label_pc_ip</zorder>
-   <zorder>label_sm413</zorder>
-   <zorder>SM413</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1020</width>
-     <height>33</height>
+     <width>1024</width>
+     <height>23</height>
     </rect>
    </property>
    <property name="font">
@@ -2302,6 +2130,12 @@ QComboBox QAbstractItemView {
     <addaction name="file_exit"/>
    </widget>
    <widget class="QMenu" name="Language">
+    <property name="font">
+     <font>
+      <family>Microsoft YaHei</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>語言</string>
     </property>
@@ -2309,7 +2143,20 @@ QComboBox QAbstractItemView {
     <addaction name="language_sc"/>
     <addaction name="language_en"/>
    </widget>
+   <widget class="QMenu" name="About">
+    <property name="font">
+     <font>
+      <family>Microsoft YaHei</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>關於</string>
+    </property>
+    <addaction name="about_version"/>
+   </widget>
    <addaction name="File"/>
+   <addaction name="About"/>
    <addaction name="Language"/>
   </widget>
   <action name="file_exit">
@@ -2330,15 +2177,47 @@ QComboBox QAbstractItemView {
    <property name="text">
     <string>繁體中文</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Microsoft YaHei</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
   </action>
   <action name="language_sc">
    <property name="text">
     <string>简体中文</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Microsoft YaHei</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
   </action>
   <action name="language_en">
    <property name="text">
     <string>English</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Microsoft YaHei</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="about_version">
+   <property name="text">
+    <string>版本(&amp;V)</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Microsoft YaHei</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string>Alt+V</string>
    </property>
   </action>
  </widget>
