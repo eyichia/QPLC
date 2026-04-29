@@ -1138,7 +1138,7 @@
             "1": [
                 [
                     "Mode",
-                    "Axis Options",
+                    "Axis options",
                     "Position",
                     "Cylinder"
                 ],
@@ -1152,8 +1152,8 @@
             "2": [
                 [
                     "Mode",
-                    "Axis Options 1",
-                    "Axis Options 2",
+                    "Axis options 1",
+                    "Axis options 2",
                     "Position 1",
                     "Position 2",
                     "Cylinder"
@@ -1170,9 +1170,9 @@
             "3": [
                 [
                     "Mode",
-                    "Axis Options 1",
-                    "Axis Options 2",
-                    "Axis Options 3",
+                    "Axis options 1",
+                    "Axis options 2",
+                    "Axis options 3",
                     "Position 1",
                     "Position 2",
                     "Position 3",
@@ -1192,10 +1192,10 @@
             "4": [
                 [
                     "Mode",
-                    "Axis Options 1",
-                    "Axis Options 2",
-                    "Axis Options 3",
-                    "Axis Options 4",
+                    "Axis options 1",
+                    "Axis options 2",
+                    "Axis options 3",
+                    "Axis options 4",
                     "Position 1",
                     "Position 2",
                     "Position 3",
@@ -1218,12 +1218,12 @@
             "5": [
                 [
                     "Mode",
-                    "Arrange Cam",
+                    "Arrange cam",
                     "Mold trigger",
-                    "Stop Angle",
-                    "Total Turns",
-                    "Start Slow Turns",
-                    "End Slow Turns"
+                    "Stop angle",
+                    "Total turns",
+                    "Start slow turns",
+                    "End slow turns"
                 ],
                 [
                     "1;U",
@@ -1237,11 +1237,11 @@
             ],
             "6": [
                 [
-                    "Arrange Turns",
+                    "Arrange turns",
                     "Distance",
-                    "Mold Turns",
+                    "Mold turns",
                     "Distance",
-                    "Cam Mode",
+                    "Cam mode",
                     "Interval A",
                     "Interval B",
                     "Interval C",
@@ -1262,7 +1262,7 @@
             "7": [
                 [
                     "Mode",
-                    "Stop Angle",
+                    "Stop angle",
                     "Turns"
                 ],
                 [
@@ -1282,7 +1282,7 @@
             "9": [
                 [
                     "Mode",
-                    "Number of Slots"
+                    "Number of slots"
                 ],
                 [
                     "1;U",
@@ -1345,7 +1345,7 @@
             ],
             "21": [
                 [
-                    "Number of Times",
+                    "Number of times",
                     "Repeat",
                     "Label"
                 ],
@@ -1357,7 +1357,7 @@
             ],
             "22": [
                 [
-                    "Number of Times",
+                    "Number of times",
                     "Repeat",
                     "Label"
                 ],
@@ -1369,7 +1369,7 @@
             ],
             "23": [
                 [
-                    "Number of Times",
+                    "Number of times",
                     "Repeat",
                     "Label"
                 ],
@@ -1381,7 +1381,7 @@
             ],
             "24": [
                 [
-                    "Number of Times",
+                    "Number of times",
                     "Repeat",
                     "Label"
                 ],
@@ -1393,7 +1393,7 @@
             ],
             "25": [
                 [
-                    "Number of Times",
+                    "Number of times",
                     "Repeat",
                     "Label"
                 ],
@@ -1405,7 +1405,7 @@
             ],
             "26": [
                 [
-                    "Number of Times",
+                    "Number of times",
                     "Repeat",
                     "Label"
                 ],
@@ -1417,7 +1417,7 @@
             ],
             "27": [
                 [
-                    "Number of Times",
+                    "Number of times",
                     "Repeat",
                     "Label"
                 ],
@@ -1481,10 +1481,10 @@
             ],
             "33": [
                 [
-                    "​​Winding High-Speed",
-                    "Slow Speed",
+                    "​​Winding high-speed",
+                    "Slow speed",
                     "Mold width",
-                    "Single Axis Flyer",
+                    "Single axis flyer",
                     "Arrange",
                     "Index",
                     "Mold width"

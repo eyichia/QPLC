@@ -368,6 +368,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         elif rmk == "axis": # 軸選項參數   
                             result = self.format_dic.get("axis", {}).get(str(data[i+id]))
                             #item_data.append(self.format_dic.get("axis", {}).get(str(data[i+id])))    
+                        elif rmk == "cylinder": # 氣壓缸參數   
+                            _result = ""
+                            logic = 0x0001
+                            if ty == "S" or ty == "U":
+                                cyl_data = data[i+id]
+                                _bit = 16
+                            else:
+                                cyl_data = convert_16_to_32(data[i+id], data[i+id+1], signed=False)
+                                _bit = 32
+                            
+                            for k in range(_bit):
+                                if cyl_data & logic: # 判斷第 k 位是否為 1
+                                    _result += self.format_dic.get("cylinder", {}).get(str(k))
+                                logic << 1
+
+                            result = _result                           
                         else: # 數值,字串等參數
                             if ty == "S":
                                 val = convert_16bit_signed(data[i+id])
