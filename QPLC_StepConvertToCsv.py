@@ -369,7 +369,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             result = self.format_dic.get("axis", {}).get(str(data[i+id]))
                             #item_data.append(self.format_dic.get("axis", {}).get(str(data[i+id])))    
                         elif rmk == "cylinder": # 氣壓缸參數   
-                            _result = ""
+                            _result = []
                             logic = 0x0001
                             if ty == "S" or ty == "U":
                                 cyl_data = data[i+id]
@@ -380,10 +380,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             
                             for k in range(_bit):
                                 if cyl_data & logic: # 判斷第 k 位是否為 1
-                                    _result += self.format_dic.get("cylinder", {}).get(str(k))
-                                logic << 1
-
-                            result = _result                           
+                                    name = self.format_dic.get("cylinder", {}).get(str(k))
+                                    if name: # 確保名稱不是空的
+                                        _result.append(name) # 【修改 2】將名稱加入列表
+                                logic = logic << 1
+                            print(cyl_data,logic,_bit,_result)    
+                            result = ";".join(_result)
                         else: # 數值,字串等參數
                             if ty == "S":
                                 val = convert_16bit_signed(data[i+id])
@@ -540,14 +542,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @Slot(str, str, str)
     def display_plc_status(self,status, error, text=""):
         status_text = f"{self.get_plc_status_msg(status)}{self.get_plc_status_msg(error)}{text}"
+        PB_enab = [False, False, False, False] # 預設所有按鈕都不可用
         if status == "s0":
-            self.PB_connect_plc.setEnabled(True)
-            self.PB_deconnect_plc.setEnabled(False)
-            self.PB_read_step.setEnabled(False)
-        else:
-            self.PB_connect_plc.setEnabled(False)
-            self.PB_deconnect_plc.setEnabled(True)
-            self.PB_read_step.setEnabled(True)
+            PB_enab = [True, False, False]
+        elif status == "s1":
+            PB_enab = [False, True, False]
+        elif status == "s2":    
+            PB_enab = [False, True, True]
+        elif status == "s3":    
+            PB_enab = [False, True, False]
+        elif status == "s10":    
+            PB_enab = [False, True, False]
+        elif status == "s11":    
+            PB_enab = [False, True, True]    
+
+        self.PB_connect_plc.setEnabled(PB_enab[0])
+        self.PB_deconnect_plc.setEnabled(PB_enab[1])
+        self.PB_read_step.setEnabled(PB_enab[2])
+        
+            
+        
+         
 
         if status == "s11" or self.current_plc_data != []: 
             self.PB_export_csv.setEnabled(True)    
