@@ -201,6 +201,7 @@
         "s3": "Reconnecting",
         "s10": "Reading",
         "s11": "Reading complete",
+        "s12": "Model mismatch",
         "e800": "Read failed",
         "e801": "Exceeded maximum number of retries",
         "e802": "Invalid address or out of range",

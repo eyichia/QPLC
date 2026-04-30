@@ -26,6 +26,16 @@ def resource_path(relative_path):
     # 開啟開發模式下的路徑
     return os.path.join(os.path.abspath("."), relative_path)
 
+# """取得外部檔案絕對路徑 (打包後放在 exe 同目錄的資料夾)"""
+def external_path(relative_path):
+    if getattr(sys, 'frozen', False):
+        # PyInstaller 打包後的執行檔所在目錄
+        base_path = os.path.dirname(sys.executable)
+    else:
+        # 開發模式下的路徑
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 # 主畫面
 class MainWindow(QMainWindow, Ui_MainWindow):
     # 軟體資訊
@@ -42,7 +52,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # --- 動態讀取 Model 資料夾取得機型 ---
         self.FORMAT_NAME_LIST = []
-        model_dir = resource_path("Model")
+        model_dir = external_path("Model")
         if os.path.exists(model_dir):
             for f in os.listdir(model_dir):
                 if f.endswith(".json"):
@@ -227,7 +237,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # 自動掃描 Model 資料夾並載入 JSON
     def load_model_json(self):
         #self.model_format = {}
-        model_dir = resource_path("Model") # 你的語言包資料夾
+        model_dir = external_path("Model") # 外部的 Model 資料夾
         model_key = self.model.currentText()
         model_name = f"{model_key}.json"
         if not os.path.exists(model_dir):
@@ -529,6 +539,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def update_step_info(self, total, length):
         self.response_ts_val.setText(str(total))
         self.response_sl_val.setText(str(length))
+        if total != self.total_steps_val or length != self.step_length_val:
+            self.display_plc_status("s12", "non", "")
     @Slot(bool)
     def update_sm413_status(self, status):
         color = "green" if status else "yellow"
@@ -552,18 +564,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         status_text = f"{self.get_plc_status_msg(status)} {self.get_plc_status_msg(error)} {text}"
         print(status_text)
         PB_enab = [False, False, False, False] # 預設所有按鈕都不可用
-        if status == "s0":
+        if status == "s0": # 離線
             PB_enab = [True, False, False]
-        elif status == "s1":
+        elif status == "s1": # 連線中
             PB_enab = [False, True, False]
-        elif status == "s2":    
+        elif status == "s2": # 已連線    
             PB_enab = [False, True, True]
-        elif status == "s3":    
+        elif status == "s3": # 重新連線中    
             PB_enab = [False, True, False]
-        elif status == "s10":    
+        elif status == "s10": # 正在讀取    
             PB_enab = [False, True, False]
-        elif status == "s11":    
-            PB_enab = [False, True, True]   
+        elif status == "s11": # 讀取完成    
+            PB_enab = [False, True, True]
+            QTimer.singleShot(2000, lambda: self.display_plc_status("s2", "non", ""))   
+        elif status == "s12": # 機型不匹配    
+            PB_enab = [False, False, False] 
+            QTimer.singleShot(2000, lambda: self.deconnect_plc()) 
         elif status == "non":    
             if error == "e801":
                 PB_enab = [True, False, False]
@@ -576,7 +592,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         if status == "s11" or self.current_plc_data != []: 
             self.PB_export_csv.setEnabled(True)  
-            QTimer.singleShot(2000, lambda: self.display_plc_status("s2", "non", ""))  
         else:
             self.PB_export_csv.setEnabled(False)
             
