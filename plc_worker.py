@@ -113,8 +113,10 @@ class PLC1Worker(QThread):
                 error_msg = str(e) # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
                 # 判斷是否超過最大重試次數
                 if retry_count >= max_retries:
+                    self.status = "non" # 正常顯示離線
                     self.status_error = "e801" # 超過重試次數上限
                     self.status_msg = ""
+                    retry_count = 0
                     self.running = False # 強制停止 while 迴圈，執行緒將結束
                 else:
                     if "command error" in error_msg.lower() or "device" in error_msg.lower():
