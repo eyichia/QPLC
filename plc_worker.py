@@ -64,6 +64,8 @@ class PLC1Worker(QThread):
                         self.step_info.emit(res_total[0], res_len[0])
                         is_connected = True # 連線成功且讀取完成，才設為 True
                         self.status = "s2" # 已連線
+                        self.status_error = "non"
+                        self.status_msg = ""    
                         retry_count = 0
                 # 2. 正常讀取循環 (只有連線成功才執行)
                 if is_connected:
@@ -104,6 +106,8 @@ class PLC1Worker(QThread):
                 
                 time.sleep(0.5) # 正常每 500ms 讀一次      
             except Exception as e:
+                if not self.running: 
+                    break # 如果已經按下斷開，就直接結束，不要再廣播「timed out」的錯誤訊息
                 is_connected = False # 發生任何錯誤都視為連線失敗，重置旗標
                 retry_count += 1
                 error_msg = str(e) # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
@@ -143,4 +147,4 @@ class PLC1Worker(QThread):
 
     def stop(self):
         self.running = False # 讓 run 裡的 while 迴圈結束
-        self.wait()          # 等待執行緒完全停止
+        # 注意：不要在這裡呼叫 self.wait()，否則會導致主畫面(UI)卡死

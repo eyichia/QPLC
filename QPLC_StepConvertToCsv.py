@@ -11,7 +11,7 @@ import socket
 
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QLabel, QSpinBox, QMenuBar, QMenu, QComboBox, QFileDialog,
                                QListView)
-from PySide6.QtCore import (Qt, QDateTime,QThread, Signal, Slot)
+from PySide6.QtCore import (Qt, QDateTime,QThread, Signal, Slot, QTimer)
 from PySide6.QtGui import (QIcon, QPixmap, QFont)
 
 from QPLC_StepConvertToCsv_GUI_ui import Ui_MainWindow
@@ -29,9 +29,9 @@ def resource_path(relative_path):
 # 主畫面
 class MainWindow(QMainWindow, Ui_MainWindow):
     # 格式檔名
-    FORMAT_NAME_LIST = ["C1M", "C1K", "C1J", "SW7B"]
+    FORMAT_NAME_LIST = ["C1M", "C1K"]#, "C1J", "SW7B"]
     # 軟體資訊
-    VERSION = " v1.1"
+    VERSION = " v1.1.2"
     DEVELOPER = " 江乙加 Eric Chiang"
     VER_DATE = " 2026-03-31"
     COPYRIGHT = f" 2026 {DEVELOPER}" #" 2026 " + DEVELOPER
@@ -541,7 +541,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #print("收到步驟數據:", data)
     @Slot(str, str, str)
     def display_plc_status(self,status, error, text=""):
-        status_text = f"{self.get_plc_status_msg(status)}{self.get_plc_status_msg(error)}{text}"
+        status_text = f"{self.get_plc_status_msg(status)} {self.get_plc_status_msg(error)} {text}"
+        print(status_text)
         PB_enab = [False, False, False, False] # 預設所有按鈕都不可用
         if status == "s0":
             PB_enab = [True, False, False]
@@ -554,18 +555,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif status == "s10":    
             PB_enab = [False, True, False]
         elif status == "s11":    
-            PB_enab = [False, True, True]    
+            PB_enab = [False, True, True]   
+        elif status == "non":    
+            if error == "e801":
+                PB_enab = [True, False, False]
+                # 使用 QTimer.singleShot 延遲 2 秒後再呼叫自己，避免 time.sleep 卡住 UI 畫面
+                QTimer.singleShot(2000, lambda: self.display_plc_status("s0", "non", ""))
 
         self.PB_connect_plc.setEnabled(PB_enab[0])
         self.PB_deconnect_plc.setEnabled(PB_enab[1])
         self.PB_read_step.setEnabled(PB_enab[2])
         
-            
-        
-         
-
         if status == "s11" or self.current_plc_data != []: 
-            self.PB_export_csv.setEnabled(True)    
+            self.PB_export_csv.setEnabled(True)  
+            QTimer.singleShot(2000, lambda: self.display_plc_status("s2", "non", ""))  
         else:
             self.PB_export_csv.setEnabled(False)
             
