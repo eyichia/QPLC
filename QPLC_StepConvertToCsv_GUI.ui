@@ -1633,7 +1633,7 @@ QPushButton:pressed {
       <string>Disconnect</string>
      </property>
     </widget>
-    <widget class="QGroupBox" name="format_groupBox">
+    <widget class="QGroupBox" name="model_groupBox">
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -2108,7 +2108,7 @@ QComboBox QAbstractItemView {
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>23</height>
+     <height>33</height>
     </rect>
    </property>
    <property name="font">
@@ -2153,6 +2153,7 @@ QComboBox QAbstractItemView {
     <property name="title">
      <string>關於</string>
     </property>
+    <addaction name="about_manual"/>
     <addaction name="about_version"/>
    </widget>
    <addaction name="File"/>
@@ -2218,6 +2219,11 @@ QComboBox QAbstractItemView {
    </property>
    <property name="shortcut">
     <string>Alt+V</string>
+   </property>
+  </action>
+  <action name="about_manual">
+   <property name="text">
+    <string>說明</string>
    </property>
   </action>
  </widget>

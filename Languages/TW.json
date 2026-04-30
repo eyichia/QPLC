@@ -3,7 +3,10 @@
         "Main": "編程編輯工具"
     },
     "Menubar": {
-        "menubarFont": { "font_size": 10, "font_family": "Microsoft YaHei" },
+        "menubarFont": {
+            "font_size": 10,
+            "font_family": "Microsoft YaHei"
+        },
         "File": "檔案",
         "Save": "儲存參數",
         "file_save_csv": "CSV(逗号分隔)(*.csv)",
@@ -19,34 +22,106 @@
         "file_reset": "恢復出廠設定",
         "About": "關於",
         "about_version": "版本",
+        "about_manual": "操作手冊",
         "Language": "語言",
         "languagea_tc": "繁體中文",
         "languagea_sc": "简体中文",
         "languagea_en": "English"
     },
     "QLabel": {
-        "textFont": { "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_ip1": { "text": "IP 地址1", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_ip2": { "text": "IP 地址2", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_ip3": { "text": "IP 地址3", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_ip4": { "text": "IP 地址4", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_port": { "text": "本地埠號", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_model": { "text": "型號", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_total_step": { "text": "總步序", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_step_length": { "text": "單步長度", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_start_address": { "text": "起始地址", "font_size": 14, "font_family": "Microsoft YaHei" }
+        "textFont": {
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_ip1": {
+            "text": "IP 地址1",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_ip2": {
+            "text": "IP 地址2",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_ip3": {
+            "text": "IP 地址3",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_ip4": {
+            "text": "IP 地址4",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_port": {
+            "text": "本地埠號",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_model": {
+            "text": "型號",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_total_step": {
+            "text": "總步序",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_step_length": {
+            "text": "單步長度",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_start_address": {
+            "text": "起始地址",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        }
     },
     "QPushButton": {
-        "PB_connect_plc": { "text": "連線", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_deconnect_plc": { "text": "離線", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_read_step": { "text": "讀取", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_write_step": { "text": "寫入", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_export_csv": { "text": "匯出.csv", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_import_csv": { "text": "匯入.csv", "font_size": 14, "font_family": "Microsoft YaHei" }
+        "PB_connect_plc": {
+            "text": "連線",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "PB_deconnect_plc": {
+            "text": "離線",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "PB_read_step": {
+            "text": "讀取",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "PB_write_step": {
+            "text": "寫入",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "PB_export_csv": {
+            "text": "匯出.csv",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "PB_import_csv": {
+            "text": "匯入.csv",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        }
     },
     "QGroupBox": {
-        "plc_setting_groupBox": { "text": "PLC連線設定", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "step_setting_groupBox": { "text": "步序地址設定", "font_size": 14, "font_family": "Microsoft YaHei" }
+        "plc_setting_groupBox": {
+            "text": "PLC連線設定",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "model_groupBox": {
+            "text": "機型設定",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        }
     },
     "Messages": {
         "close_title": "警告: 關閉程式",
@@ -62,7 +137,7 @@
         "date_label": "發布日期 ：",
         "about_desc": "本程式適用機型 :",
         "copyright": "版權所有 ©",
-
+        "manual_title": "操作手冊",
         "csv_open_title": "開啟 CSV 數據",
         "txt_save_title": "儲存文字紀錄",
         "txt_save_ok": "TXT 數據已存至：",
@@ -91,7 +166,6 @@
         "pdf_save_ok": "PDF 報告已存至：",
         "clear_title": "警告: 清除紀錄",
         "clear_text": "您確定要清除紀錄嗎？",
-        
         "end_calculation_title": "最優方案推薦 : ",
         "end_calculation_row1": "🏆 計算完成！最優排列建議 : 方式 ",
         "end_calculation_row2": "總圈數 : ",
@@ -121,7 +195,7 @@
     },
     "plc_status": {
         "non": "",
-    	"s0": "離線中...",
+        "s0": "離線中...",
         "s1": "連線中",
         "s2": "已連線",
         "s3": "重新連線中",
@@ -131,5 +205,5 @@
         "e801": "超過重試次數上限",
         "e802": "位址無效或超出範圍",
         "e803": "通訊失敗"
-	}
-}    
+    }
+}

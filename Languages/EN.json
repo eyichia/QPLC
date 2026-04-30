@@ -3,7 +3,10 @@
         "Main": "Step Editing Tools"
     },
     "Menubar": {
-        "menubarFont": { "font_size": 10, "font_family": "Microsoft YaHei" },
+        "menubarFont": {
+            "font_size": 10,
+            "font_family": "Microsoft YaHei"
+        },
         "File": "File",
         "Save": "Save Parameters",
         "file_save_csv": "CSV(*.csv)",
@@ -15,38 +18,110 @@
         "file_export_csv": ".csv",
         "file_export_pdf": ".pdf",
         "file_export_xlsx": ".xlsx",
-        "file_exit": "End", 
+        "file_exit": "End",
         "file_reset": "Restore factory settings",
         "About": "About",
         "about_version": "Version",
+        "about_manual": "Manual",
         "Language": "Language",
         "languagea_tc": "繁體中文",
         "languagea_sc": "简体中文",
         "languagea_en": "English"
     },
     "QLabel": {
-        "textFont": { "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_ip1": { "text": "IP address 1", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_ip2": { "text": "IP address 2", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_ip3": { "text": "IP address 3", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_ip4": { "text": "IP address 4", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_port": { "text": "Port number", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_model": { "text": "Model", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_total_step": { "text": "Total steps", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_step_length": { "text": "Step length", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "label_start_address": { "text": "Start address", "font_size": 14, "font_family": "Microsoft YaHei" }
+        "textFont": {
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_ip1": {
+            "text": "IP address 1",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_ip2": {
+            "text": "IP address 2",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_ip3": {
+            "text": "IP address 3",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_ip4": {
+            "text": "IP address 4",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_port": {
+            "text": "Port number",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_model": {
+            "text": "Model",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_total_step": {
+            "text": "Total steps",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_step_length": {
+            "text": "Step length",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "label_start_address": {
+            "text": "Start address",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        }
     },
     "QPushButton": {
-        "PB_connect_plc": { "text": "Connection", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_deconnect_plc": { "text": "Disconnection", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_read_step": { "text": "Read", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_write_step": { "text": "Write", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_export_csv": { "text": "Export.csv", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "PB_import_csv": { "text": "Import.csv", "font_size": 14, "font_family": "Microsoft YaHei" }
+        "PB_connect_plc": {
+            "text": "Connection",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "PB_deconnect_plc": {
+            "text": "Disconnection",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "PB_read_step": {
+            "text": "Read",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "PB_write_step": {
+            "text": "Write",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "PB_export_csv": {
+            "text": "Export.csv",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "PB_import_csv": {
+            "text": "Import.csv",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        }
     },
     "QGroupBox": {
-        "plc_setting_groupBox": { "text": "PLC connection settings", "font_size": 14, "font_family": "Microsoft YaHei" },
-        "step_setting_groupBox": { "text": "Step address settings", "font_size": 14, "font_family": "Microsoft YaHei" }
+        "plc_setting_groupBox": {
+            "text": "PLC connection settings",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        },
+        "model_groupBox": {
+            "text": "Model settings",
+            "font_size": 14,
+            "font_family": "Microsoft YaHei"
+        }
     },
     "Messages": {
         "close_title": "Warning: Close program",
@@ -62,7 +137,7 @@
         "date_label": "Release Date:",
         "about_desc": "Compatible Models:",
         "copyright": "Copyright ©",
-
+        "manual_title": "Manual",
         "csv_open_title": "Opening CSV Data",
         "txt_save_title": "Saving Text Records",
         "txt_save_ok": "TXT Data Saved to:",

@@ -10,7 +10,7 @@ import socket
 # import re
 
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QLabel, QSpinBox, QMenuBar, QMenu, QComboBox, QFileDialog,
-                               QListView)
+                               QListView, QDialog, QTextBrowser, QVBoxLayout)
 from PySide6.QtCore import (Qt, QDateTime,QThread, Signal, Slot, QTimer)
 from PySide6.QtGui import (QIcon, QPixmap, QFont)
 
@@ -28,25 +28,32 @@ def resource_path(relative_path):
 
 # 主畫面
 class MainWindow(QMainWindow, Ui_MainWindow):
-    # 格式檔名
-    FORMAT_NAME_LIST = ["C1M", "C1K"]#, "C1J", "SW7B"]
     # 軟體資訊
     VERSION = " v1.1.2"
     DEVELOPER = " 江乙加 Eric Chiang"
     VER_DATE = " 2026-03-31"
     COPYRIGHT = f" 2026 {DEVELOPER}" #" 2026 " + DEVELOPER
-    MODELS = ",".join(FORMAT_NAME_LIST)
     
 
 # initial
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
+        
+        # --- 動態讀取 Model 資料夾取得機型 ---
+        self.FORMAT_NAME_LIST = []
+        model_dir = resource_path("Model")
+        if os.path.exists(model_dir):
+            for f in os.listdir(model_dir):
+                if f.endswith(".json"):
+                    self.FORMAT_NAME_LIST.append(f.replace(".json", ""))
+        self.MODELS = ",".join(self.FORMAT_NAME_LIST)
+
         # --- 【核心修改】預載入 Logo 資源 ---
         self.logo_pixmap = QPixmap(resource_path("Assets/Mylogo.png"))
         self.style_pixmap = QPixmap(resource_path("Assets/Mystyle.png"))
         self.current_lang = "TW" # 開機語言
-        self.current_model = "C1M" #預設機型
+        self.current_model = self.FORMAT_NAME_LIST[0] if self.FORMAT_NAME_LIST else "C1M" #預設機型
         self.current_status = "non" #PLC連線狀態
         self.current_error = "non" #PLC錯誤狀態
         self.current_status_msg = "" #PLC狀態訊息
@@ -115,6 +122,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.language_sc.triggered.connect(lambda: self.switch_language("CN"))
         self.language_en.triggered.connect(lambda: self.switch_language("EN"))
         self.about_version.triggered.connect(self.show_version)
+        self.about_manual.triggered.connect(self.show_manual)
         self.file_exit.triggered.connect(self.close)
         # 變更HMI step no
         self.step_no.editingFinished.connect(self.step_no_enter)
@@ -576,6 +584,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.current_error = error      
         self.current_status_msg = text
         self.label_connect_status.setText(status_text)
+# 顯示操作手冊
+    def show_manual(self):
+        try:
+            # 根據當前選擇的語言，載入對應的手冊檔案
+            manual_file = f"Manual_{self.current_lang}.md"
+            manual_path = resource_path(manual_file)
+            
+            # 避免檔案遺失時發生錯誤，加入備用判斷
+            if not os.path.exists(manual_path):
+                manual_path = resource_path("Manual.md")
+                
+            with open(manual_path, 'r', encoding='utf-8') as f:
+                md_content = f.read()
+            dialog = QDialog(self)
+            dialog.setWindowTitle(self.get_msg("manual_title", "操作手冊"))
+            dialog.setWindowIcon(QIcon(self.style_pixmap))
+            dialog.resize(800, 600)
+            layout = QVBoxLayout(dialog)
+            browser = QTextBrowser()
+            browser.setMarkdown(md_content)
+            font = browser.font()
+            font.setPointSize(12)
+            browser.setFont(font)
+            layout.addWidget(browser)
+            dialog.exec()
+        except Exception as e:
+            QMessageBox.warning(self, "錯誤", f"無法載入手冊檔案: {e}")
+
 # """顯示軟體資訊視窗，且只改變此視窗的字型"""
     def show_version(self):
         title = self.get_msg("about_title", "關於排線計算程式")
