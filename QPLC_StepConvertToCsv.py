@@ -39,9 +39,9 @@ def external_path(relative_path):
 # 主畫面
 class MainWindow(QMainWindow, Ui_MainWindow):
     # 軟體資訊
-    VERSION = " v1.1.2"
+    VERSION = " v1.1.3"
     DEVELOPER = " 江乙加 Eric Chiang"
-    VER_DATE = " 2026-03-31"
+    VER_DATE = " 2026-05-04"
     COPYRIGHT = f" 2026 {DEVELOPER}" #" 2026 " + DEVELOPER
     
 
@@ -142,6 +142,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.PB_connect_plc.clicked.connect(self.connect_plc)
         self.PB_deconnect_plc.clicked.connect(self.deconnect_plc)
         self.PB_export_csv.clicked.connect(self.export_summary_csv)
+        self.PB_import_csv.clicked.connect(self.import_summary_csv)
+        self.PB_Clear_process.clicked.connect(self.clear_process)
         self.model.currentIndexChanged.connect(self.load_model_json)
         # PLC 相關
         self.PB_read_step.clicked.connect(self.read_step_data) # 讀取步序
@@ -402,7 +404,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                     if name: # 確保名稱不是空的
                                         _result.append(name) # 【修改 2】將名稱加入列表
                                 logic = logic << 1
-                            print(cyl_data,logic,_bit,_result)    
+                            #print(cyl_data,logic,_bit,_result)    
                             result = ";".join(_result)
                         else: # 數值,字串等參數
                             if ty == "S":
@@ -478,7 +480,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             folder="Reports",
             filename="Step_code",
             format="csv",
-            title=self.get_msg("report"),
+            title=self.get_msg("csv_save_title"),
             mode="save"
         )
         if not file_path: return
@@ -486,7 +488,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             # newline='' 防止 Windows 存檔出現多餘空行
             # utf-8-sig 確保 Excel 開啟中文不會亂碼
-            with open(file_path, 'w', newline='', encoding='utf-8-sig') as f:
+            with open(file_path, mode='w', newline='', encoding='utf-8-sig') as f:
                 writer = csv.writer(f)
             
                 # 寫入所有資料
@@ -515,8 +517,55 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             icon, buttons = QMessageBox.Icon.Warning, QMessageBox.StandardButton.Close
             theme, font_size, icon_size = "default", 12, 64
             show_prompt_window(self, title, text, icon, buttons, theme, font_size, icon_size)
-           
 
+# """ 輸入橫向對比報表 (CSV 格式) """
+    def import_summary_csv(self):
+        file_path = data_processing(
+            parent=self,
+            folder="Reports",
+            filename="Step_code",
+            format="csv",
+            title=self.get_msg("csv_open_title"),
+            mode="open"
+        )
+        if not file_path: return
+
+        try:
+            # newline='' 防止 Windows 存檔出現多餘空行
+            # utf-8-sig 確保 Excel 開啟中文不會亂碼
+            with open(file_path, mode='r', encoding='utf-8-sig') as f:
+                reader = csv.reader(f)
+                for row in reader:
+                    print(row)
+            title, text = self.get_msg("success", "成功"), self.get_msg("updated", "成功讀取並更新")
+            icon, buttons = self.logo_pixmap, QMessageBox.StandardButton.Ok
+            theme, font_size, icon_size = "default", 12, 64
+            show_prompt_window(self, title, text, icon, buttons, theme, font_size, icon_size) 
+        except Exception as e:
+            title, text = self.get_msg("fail"), f"{self.get_msg('csv_load_fail', 'CSV 載入失敗')}{str(e)}"
+            icon, buttons = QMessageBox.Icon.Warning, QMessageBox.StandardButton.Close
+            theme, font_size, icon_size = "default", 12, 64
+            show_prompt_window(self, title, text, icon, buttons, theme, font_size, icon_size)
+
+# """清除紀錄"""
+    def clear_process(self):
+        title = self.get_msg("clear_title", "警告: 清除紀錄")
+        text = self.get_msg("clear_text", "您確定要清除紀錄嗎？")
+        icon = QMessageBox.Icon.Warning
+        buttons = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        theme = "alarm"
+        font_size = 14
+        icon_size = 80
+        result = show_prompt_window(self, title, text, icon, buttons, theme, font_size, icon_size)
+        if result == QMessageBox.StandardButton.Yes or result == QMessageBox.StandardButton.Ok:
+            self.PB_export_csv.setEnabled(False)
+            self.Process.clear()
+            self.current_plc_data = []  #清除所有PLC資料
+            for i in range(1, 11):
+                widget = getattr(self, f"step_{i}", None)
+                widget.clear()
+                widget.setStyleSheet("background-color: #B5B5B5;")
+            
         
         
 # ----- PLC 連線與數據處理相關函式 -----

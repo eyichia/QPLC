@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>768</height>
+    <width>1020</width>
+    <height>760</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1092,6 +1092,126 @@ QPushButton:pressed {
 }</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="PB_Clear_process">
+     <property name="geometry">
+      <rect>
+       <x>335</x>
+       <y>405</y>
+       <width>110</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>14</pointsize>
+       <stylestrategy>PreferDefault</stylestrategy>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">/*border-width	邊框粗細	1px, 5px
+border-style	邊框樣式	solid (實線), dashed (虛線), dotted (點線)
+border-top-width	只設定上方邊框	2px
+border-radius	圓角程度	15px (半徑)
+font-family: &quot;Microsoft YaHei&quot;;
+font-size: 10; */ 
+/* 平時的樣式 */
+QPushButton {
+	border-style: solid; 
+	border-width: 1;
+	background-color: #B5B5B5;
+	border-top-color: white;
+	border-left-color: white;
+	border-bottom-color: black;
+	border-right-color: black;
+}
+
+/* 滑鼠移上去時 (:hover) */
+/*QPushButton:hover {
+    background-color: #e1f5fe;
+}*/
+
+/* 按下去的瞬間 (:pressed) */
+QPushButton:pressed {
+	border-style: solid; 
+	border-width: 1;
+	background-color: #999999;
+	border-top-color: black;
+	border-left-color: black;
+	border-bottom-color: white;
+	border-right-color: white;
+}</string>
+     </property>
+     <property name="text">
+      <string>清除資料</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="PB_import_csv">
+     <property name="geometry">
+      <rect>
+       <x>335</x>
+       <y>255</y>
+       <width>110</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <family>Microsoft YaHei</family>
+       <pointsize>14</pointsize>
+       <stylestrategy>PreferDefault</stylestrategy>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">/*border-width	邊框粗細	1px, 5px
+border-style	邊框樣式	solid (實線), dashed (虛線), dotted (點線)
+border-top-width	只設定上方邊框	2px
+border-radius	圓角程度	15px (半徑)
+font-family: &quot;Microsoft YaHei&quot;;
+font-size: 10; */ 
+/* 平時的樣式 */
+QPushButton {
+	border-style: solid; 
+	border-width: 1;
+	background-color: #B5B5B5;
+	border-top-color: white;
+	border-left-color: white;
+	border-bottom-color: black;
+	border-right-color: black;
+}
+
+/* 滑鼠移上去時 (:hover) */
+/*QPushButton:hover {
+    background-color: #e1f5fe;
+}*/
+
+/* 按下去的瞬間 (:pressed) */
+QPushButton:pressed {
+	border-style: solid; 
+	border-width: 1;
+	background-color: #999999;
+	border-top-color: black;
+	border-left-color: black;
+	border-bottom-color: white;
+	border-right-color: white;
+}</string>
+     </property>
+     <property name="text">
+      <string>Import .csv</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="setting_groupBox">
     <property name="geometry">
@@ -2107,7 +2227,7 @@ QComboBox QAbstractItemView {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1024</width>
+     <width>1020</width>
      <height>33</height>
     </rect>
    </property>
@@ -2227,6 +2347,43 @@ QComboBox QAbstractItemView {
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>server_ip_1</tabstop>
+  <tabstop>server_ip_2</tabstop>
+  <tabstop>server_ip_3</tabstop>
+  <tabstop>server_ip_4</tabstop>
+  <tabstop>port_no</tabstop>
+  <tabstop>model</tabstop>
+  <tabstop>PB_connect_plc</tabstop>
+  <tabstop>PB_deconnect_plc</tabstop>
+  <tabstop>PB_read_step</tabstop>
+  <tabstop>PB_export_csv</tabstop>
+  <tabstop>PB_Clear_process</tabstop>
+  <tabstop>PB_step_up</tabstop>
+  <tabstop>PB_step_down</tabstop>
+  <tabstop>step_no</tabstop>
+  <tabstop>step_1</tabstop>
+  <tabstop>step_2</tabstop>
+  <tabstop>step_3</tabstop>
+  <tabstop>step_4</tabstop>
+  <tabstop>step_5</tabstop>
+  <tabstop>step_6</tabstop>
+  <tabstop>step_7</tabstop>
+  <tabstop>step_8</tabstop>
+  <tabstop>step_9</tabstop>
+  <tabstop>step_10</tabstop>
+  <tabstop>d150_step_no1</tabstop>
+  <tabstop>d151_step_no2</tabstop>
+  <tabstop>d152_step_no3</tabstop>
+  <tabstop>d153_step_no4</tabstop>
+  <tabstop>d154_step_no5</tabstop>
+  <tabstop>d155_step_no6</tabstop>
+  <tabstop>d156_step_no7</tabstop>
+  <tabstop>d157_step_no8</tabstop>
+  <tabstop>d158_step_no9</tabstop>
+  <tabstop>d159_step_no10</tabstop>
+  <tabstop>Process</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
