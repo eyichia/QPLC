@@ -287,6 +287,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.response_ts_val.clear()
         self.response_sl_val.clear()
         self.current_plc_data = []
+        self.step_list = []
         self.display_plc_status("s0", "non", "")
         self.step_no.setValue(1)
         for i in range(1, 11):
@@ -336,13 +337,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             # 4. 【重要】編號改變後，必須重新呼叫顯示函式來更新動作名稱
             # 假設你已經將讀回來的 PLC 資料存在 self.current_plc_data
-            if hasattr(self, "current_plc_data"):
-                length = self.step_length_val
-                self.ui_display_steps(self.current_plc_data, length)
+            #if hasattr(self, "current_plc_data"):
+                #length = self.step_length_val
+                #self.ui_display_steps(self.current_plc_data, length)
+            self.ui_display_steps()
                 
         except ValueError:
-            pass # 防止總步數還沒讀到時出錯                    
-# step data解碼        
+            pass # 防止總步數還沒讀到時出錯     
+# step list to step data編碼
+    def encode_step_list(self, list):
+        data = []
+        for i in range(len(list)):
+            # 判斷是否為數字
+            if not list[i][0].isdigit():
+                continue
+            # 取得動作代碼
+            step_code = list[i][1]
+            # 判斷動作代碼是否為空
+            if step_code == "":
+                data.extend([0] * self.step_length_val)
+            else:
+                # 取得動作代碼的值
+                val = int(step_code.split(";")[0])
+                data.append(val)
+                
+                
+            
+            
+        
+# step data to step list解碼        
     def decode_step_data(self, data):
         # 匯出csv時,每一行都必須是list[]格式,所以第一行也要放在list裡面["a","b",...]
         self.step_list = [["Step"]] 
@@ -356,7 +379,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for i in range(0, len(data), length):
             step_num = (i // length) + 1 # 步序編號
             step_code = data[i] # 第1個字是動作類型
-            step_name = self.format_dic.get("code", {}).get(str(step_code))
+            step_name = self.format_dic.get("code", {}).get(str(step_code), "")
             row = [f"{step_num}", step_name] # 先放入步驟編號和動作類型名稱
 
             item = self.format_dic.get("item", {}).get(str(step_code), [[],[]]) # 取得模式項目
@@ -439,34 +462,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for r in self.step_list:
             self.Process.append(" | ".join(map(str, r)))
 
-        self.ui_display_steps(data, length)    
+        self.ui_display_steps()    
 # UI單獨顯示步序            
-    def ui_display_steps(self, data, length):   
+    def ui_display_steps(self):   
         try:
-            start_no = self.d150_step_no1.value() # 從 UI 上的第一個步序編號開始 
-            end_no = self.d159_step_no10.value() # 從 UI 上的第一個步序編號開始
             for n in range(1, 11):
                 widget = getattr(self, f"step_{n}", None)
                 if widget: 
                     widget.clear()
                     widget.setStyleSheet("background-color: #B5B5B5;")
 
-            base_idx = (start_no - 1) * length
-            for i in range(10):
-                current_idx = base_idx + (i * length)
-                # 防呆：確保 index 沒超出 data 長度
-                if current_idx < len(data):
-                    # 取得動作代碼
-                    step_code = data[current_idx] 
-                    # 【核心修正】轉換為中文名稱，例如 "1軸運動控制"
-                    step_name = self.format_dic.get("code", {}).get(str(step_code)) 
-                    
-                    # 取得對應的 QLineEdit (step_1 ~ step_10)
-                    line_edit = getattr(self, f"step_{i+1}", None)
-                    if line_edit:
-                        line_edit.setText(step_name)
-                        if step_code != 0 :
-                            line_edit.setStyleSheet("background-color: #FFFFFF;") # 有數據就變白色 
+            for nn in range(1,11):
+                no = getattr(self, f"d15{nn-1}_step_no{nn}", None)
+                line_edit = getattr(self, f"step_{nn}", None)
+
+                if no and line_edit:
+                    idx = no.value()
+                    # 【防呆 1】確保 idx 不會超過 step_list 的長度
+                    if idx < len(self.step_list):
+                        code = self.step_list[idx][1]
+                        # 【防呆 2】確保 code 是字串，且裡面包含分號 ';' 才去 split
+                        if isinstance(code, str) and ";" in code:
+                            code_no = code.split(';')[0]
+                            code_name = code.split(';')[1]
+                        else:
+                            code_no = 0
+                            code_name = "" if not code or code == "None" else code
+                        
+                        line_edit.setText(code_name)
+                        if code_no != 0 :
+                            line_edit.setStyleSheet("background-color: #FFFFFF;") # 有數據就變白色
         except Exception as e:
             print(f"UI 顯示失敗: {e}") 
 # """ 輸出橫向對比報表 (CSV 格式) """
@@ -478,7 +503,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         file_path = data_processing(
             parent=self,
             folder="Reports",
-            filename="Step_code",
+            filename=f"Step_code_{self.current_lang}",
             format="csv",
             title=self.get_msg("csv_save_title"),
             mode="save"
@@ -523,7 +548,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         file_path = data_processing(
             parent=self,
             folder="Reports",
-            filename="Step_code",
+            filename=f"Step_code_{self.current_lang}",
             format="csv",
             title=self.get_msg("csv_open_title"),
             mode="open"
@@ -535,8 +560,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # utf-8-sig 確保 Excel 開啟中文不會亂碼
             with open(file_path, mode='r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)
+                self.step_list = []
                 for row in reader:
-                    print(row)
+                    self.step_list.append(row)
+
+            self.Process.clear()
+            for r in self.step_list:
+                self.Process.append(" | ".join(map(str, r)))  
+            
+            self.ui_display_steps()  
+            self.PB_export_csv.setEnabled(True)
+            
             title, text = self.get_msg("success", "成功"), self.get_msg("updated", "成功讀取並更新")
             icon, buttons = self.logo_pixmap, QMessageBox.StandardButton.Ok
             theme, font_size, icon_size = "default", 12, 64
@@ -607,7 +641,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.step_data = data # 儲存到 MainWindow 的屬性，方便其他方法使用
         self.current_plc_data = data
         self.decode_step_data(data) # 呼叫解碼函式來處理數據
-        #print("收到步驟數據:", data)
+        #print("收到步驟數據:", data) # 數值list
     @Slot(str, str, str)
     def display_plc_status(self,status, error, text=""):
         status_text = f"{self.get_plc_status_msg(status)} {self.get_plc_status_msg(error)} {text}"
