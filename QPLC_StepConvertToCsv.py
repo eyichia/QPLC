@@ -16,7 +16,10 @@ from PySide6.QtGui import (QIcon, QPixmap, QFont)
 
 from QPLC_StepConvertToCsv_GUI_ui import Ui_MainWindow
 from plc_worker import PLC1Worker # PLC通訊程式
-from Sub.utils import data_processing, show_prompt_window, convert_16_to_32, convert_16bit_signed, to_str # 工具程式
+from Sub.utils import (data_processing, show_prompt_window, 
+                        convert_16_to_32, convert_16bit_signed, 
+                        convert_32_to_DW16, to_str, 
+                        convert_float_to_unsigned, str_to_ascii) # 工具程式
 
 # """取得資源絕對路徑，兼容開發與 PyInstaller 打包模式"""
 def resource_path(relative_path):
@@ -347,23 +350,86 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # step list to step data編碼
     def encode_step_list(self, list):
         data = []
+        print(f"csv長度 {len(list)}")
         for i in range(len(list)):
-            # 判斷是否為數字
-            if not list[i][0].isdigit():
+            # 1. 每一行都要重置緩存，避免舊資料干擾
+            _data = [0] * self.step_length_val
+            # 判斷是否為數字 跳過第一行Step
+            if not list[i] or not str(list[i][0]).isdigit():
                 continue
-            # 取得動作代碼
-            step_code = list[i][1]
+            # 取得單一步序 [1,1;1軸運動控制,模式,0;單動,軸選項,0;飛叉,...]
+            single_step = list[i]
+            # 取得動作代碼 [1;1軸運動控制,0;單動,0;飛叉,...]
+            step_code = [val for ii, val in enumerate(single_step) if ii % 2 != 0]
+            print(f"內容{step_code}")
             # 判斷動作代碼是否為空
-            if step_code == "":
-                data.extend([0] * self.step_length_val)
-            else:
+            if not step_code or ";" not in str(step_code[0]):
+                continue
+            try:
                 # 取得動作代碼的值
-                val = int(step_code.split(";")[0])
-                data.append(val)
-                
-                
-            
-            
+                code_val = int(step_code[0].split(";")[0])
+                _data[0] = code_val
+                print(f"動作代碼 {code_val}")
+                # 取得模式項目
+                item = self.format_dic.get("item", {}).get(str(code_val), [[],[]])
+                # 名稱列表 [item_list] 數據格式 [item_format]
+                item_list, item_format = item[0], item[1]
+
+                for j in range(len(item_list)):
+                    # 安全檢查：確保 step_code 有對應的輸入資料
+                    if j >= len(step_code) or not item_format[j]:
+                        continue
+                    label = item_list[j]
+                    parts = item_format[j].split(';')
+                    # 跳過空欄位
+                    if label == "non" or parts[0] == "non":
+                        continue
+
+                    id = int(parts[0]) # 偏移量
+                    ty = parts[1]        # 型態 (U, S, UD, SD, STR)
+                    rmk = parts[2] if len(parts) > 2 else "0" # 備註或小數位
+                        
+                    raw_input = str(step_code[j+1]).split(";")[0] # 安全取得輸入值
+                    if rmk == "cylinder":
+                        # 氣壓缸位元處理
+                        bit_list = [b for b in step_code[j+1].split(";") if b.isdigit()]
+                        val = sum(1 << int(b) for b in bit_list)
+                        if ty in ["SD", "UD"]:
+                            _data[id], _data[id+1] = convert_32_to_DW16(val)
+                        else:
+                            _data[id] = val
+                        print(f"{rmk} {_data[id]} {_data[id+1]}") 
+                    elif ty == "STR":
+                        # 字串轉 ASCII 列表
+                        print(f"正在處理字串: {step_code[j+1]}")
+                        ascii_list = str_to_ascii(step_code[j+1])
+                        for k, ascii_val in enumerate(ascii_list):
+                            if id + k < len(_data):
+                                _data[id + k] = ascii_val
+                                print(f"{ty} {_data[id+k]}")
+                    else:
+                        # 數值與小數位處理
+                        if not raw_input: raw_input = "0"
+                        val = float(raw_input)
+                        prec = int(rmk) if rmk.isdigit() else 0
+                        multiplier = 10 ** prec
+                    
+                        final_val = int(val * multiplier)
+                        if ty in ["SD", "UD"]:
+                            _data[id], _data[id+1] = convert_32_to_DW16(final_val)
+                        else:
+                            _data[id] = final_val & 0xFFFF # 確保符合 16 位元
+
+                data.extend(_data) # 將這一列的結果加入總表
+                print(data)
+            except Exception as e:
+                print(f"解析第 {i} 行時出錯: {e}")
+                continue
+                            
+                    
+
+
+
         
 # step data to step list解碼        
     def decode_step_data(self, data):
@@ -563,6 +629,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.step_list = []
                 for row in reader:
                     self.step_list.append(row)
+                #print(self.step_list)
 
             self.Process.clear()
             for r in self.step_list:
@@ -570,6 +637,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             self.ui_display_steps()  
             self.PB_export_csv.setEnabled(True)
+            self.encode_step_list(self.step_list)
             
             title, text = self.get_msg("success", "成功"), self.get_msg("updated", "成功讀取並更新")
             icon, buttons = self.logo_pixmap, QMessageBox.StandardButton.Ok
@@ -641,7 +709,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.step_data = data # 儲存到 MainWindow 的屬性，方便其他方法使用
         self.current_plc_data = data
         self.decode_step_data(data) # 呼叫解碼函式來處理數據
-        #print("收到步驟數據:", data) # 數值list
+        #print(data) # 數值list
     @Slot(str, str, str)
     def display_plc_status(self,status, error, text=""):
         status_text = f"{self.get_plc_status_msg(status)} {self.get_plc_status_msg(error)} {text}"

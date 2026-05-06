@@ -124,6 +124,25 @@ def convert_16bit_signed(value):
     if value > 32767:
         return value - 65536
     return value
+# float轉16bit有符號轉換 (PLC裡的數字如果大於32767就代表是負數，要轉換成Python的負數表示法)      
+def convert_float_to_unsigned(value, bit):
+    # 如果大於 32767，代表在 PLC 裡是負數
+    if value < 0:
+        if bit == 16:
+            return value & 0xFFFF
+        elif bit == 32:
+            return value & 0xFFFFFFFF
+    return value    
+# 32bitToDW16bit轉換
+def convert_32_to_DW16(value):
+    # 取出低 16 位元：使用位元遮罩 (AND 0xFFFF)
+    low = value & 0xFFFF
+    # 取出高 16 位元：向右位移 16 位
+    high = value >> 16
+    # 等同於 divmod
+    # 32 位整數除以 65536，商就是高 16 位，餘數就是低 16 位
+    # high, low = divmod(value, 65536)
+    return (low, high)
 # 轉字串
 def to_str(_data, _start, _stop, encoding='ascii'):
     label_words = _data[_start : _stop]
@@ -131,3 +150,15 @@ def to_str(_data, _start, _stop, encoding='ascii'):
     # 增加 encoding 參數，預設還是 ascii 讀繁體中文 encoding='big5'
     _string = byte_data.decode(encoding, errors='ignore').strip('\x00')
     return _string    
+# 字串轉ASCII
+def str_to_ascii(text):
+    # 1. 檢查是否為奇數，如果是，就補上一個 Null Byte
+    if len(text) % 2 != 0:
+        text += "\x00"
+    # 2. 轉換為 Byte 格式
+    byte_data = text.encode('ascii')
+
+    # 3. 打包 (現在長度一定是偶數，可以直接除以 2)
+    num_registers = len(text) // 2
+    registers = list(struct.unpack(f'<{num_registers}H', byte_data))
+    return registers
