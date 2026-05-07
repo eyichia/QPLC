@@ -150,7 +150,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.model.currentIndexChanged.connect(self.load_model_json)
         # PLC 相關
         self.PB_read_step.clicked.connect(self.read_step_data) # 讀取步序
-        self.worker.steps_data.connect(self.display_steps_data) # 回應步序
+        self.worker.read_steps_data.connect(self.display_steps_data) # 回應步序
+        self.PB_write_step.clicked.connect(self.write_step_data) # 寫入步序
+        self.worker.write_steps_data.connect(self.data_write_plc) # 回應寫入
         # 連接 Worker 的數據回傳信號
         self.worker.step_info.connect(self.update_step_info)
         self.worker.sm413_status.connect(self.update_sm413_status)
@@ -308,6 +310,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         start_address = self.start_addr.strip().upper()
         total_step_length = self.total_steps_val * self.step_length_val
         self.worker.trigger_read_steps(start_address, total_step_length)
+# 寫入step資料
+    def write_step_data(self):
+        data = self.encode_step_list(self.step_list)
+        start_address = self.start_addr.strip().upper()
+        total_step_length = self.total_steps_val * self.step_length_val
+        if data == []:
+            title, text = self.get_msg("fail"), f"{self.get_msg('write_fail')}"
+            icon, buttons = QMessageBox.Icon.Warning, QMessageBox.StandardButton.Close
+            theme, font_size, icon_size = "default", 14, 80
+            show_prompt_window(self, title, text, icon, buttons, theme, font_size, icon_size)
+        else:
+            self.worker.trigger_write_steps(data, start_address, total_step_length)
 # step go up or down
     def step_up_down(self, offset):
         no = self.d150_step_no1.value() + offset
@@ -350,7 +364,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # step list to step data編碼
     def encode_step_list(self, list):
         data = []
-        print(f"csv長度 {len(list)}")
+        #print(f"csv長度 {len(list)}")
         for i in range(len(list)):
             # 1. 每一行都要重置緩存，避免舊資料干擾
             _data = [0] * self.step_length_val
@@ -361,15 +375,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             single_step = list[i]
             # 取得動作代碼 [1;1軸運動控制,0;單動,0;飛叉,...]
             step_code = [val for ii, val in enumerate(single_step) if ii % 2 != 0]
-            print(f"內容{step_code}")
+            #print(f"內容{step_code}")
             # 判斷動作代碼是否為空
             if not step_code or ";" not in str(step_code[0]):
+                data.extend(_data) # 補足空白步序
+                #print(f"空白 {data}")
                 continue
             try:
                 # 取得動作代碼的值
                 code_val = int(step_code[0].split(";")[0])
                 _data[0] = code_val
-                print(f"動作代碼 {code_val}")
+                #print(f"動作代碼 {code_val}")
                 # 取得模式項目
                 item = self.format_dic.get("item", {}).get(str(code_val), [[],[]])
                 # 名稱列表 [item_list] 數據格式 [item_format]
@@ -397,16 +413,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         if ty in ["SD", "UD"]:
                             _data[id], _data[id+1] = convert_32_to_DW16(val)
                         else:
-                            _data[id] = val
-                        print(f"{rmk} {_data[id]} {_data[id+1]}") 
+                            _data[id] = val & 0xFFFF
+                        #print(f"{rmk} {_data[id]} {_data[id+1]}") 
                     elif ty == "STR":
                         # 字串轉 ASCII 列表
-                        print(f"正在處理字串: {step_code[j+1]}")
+                        #print(f"正在處理字串: {step_code[j+1]}")
                         ascii_list = str_to_ascii(step_code[j+1])
                         for k, ascii_val in enumerate(ascii_list):
                             if id + k < len(_data):
-                                _data[id + k] = ascii_val
-                                print(f"{ty} {_data[id+k]}")
+                                _data[id + k] = ascii_val & 0xFFFF
+                                #print(f"{ty} {_data[id+k]}")
                     else:
                         # 數值與小數位處理
                         if not raw_input: raw_input = "0"
@@ -421,16 +437,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             _data[id] = final_val & 0xFFFF # 確保符合 16 位元
 
                 data.extend(_data) # 將這一列的結果加入總表
-                print(data)
+                #print(data)
+           
             except Exception as e:
                 print(f"解析第 {i} 行時出錯: {e}")
                 continue
-                            
-                    
-
-
-
-        
+        print(f"data: {data[:900]}")
+        return data      
 # step data to step list解碼        
     def decode_step_data(self, data):
         # 匯出csv時,每一行都必須是list[]格式,所以第一行也要放在list裡面["a","b",...]
@@ -691,7 +704,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.response_ts_val.setText(str(total))
         self.response_sl_val.setText(str(length))
         if total != self.total_steps_val or length != self.step_length_val:
-            self.display_plc_status("s12", "non", "")
+            self.display_plc_status("s20", "non", "")
     @Slot(bool)
     def update_sm413_status(self, status):
         color = "green" if status else "yellow"
@@ -710,36 +723,46 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.current_plc_data = data
         self.decode_step_data(data) # 呼叫解碼函式來處理數據
         #print(data) # 數值list
+    @Slot(list)
+    def data_write_plc(self):
+        pass    
+
     @Slot(str, str, str)
     def display_plc_status(self,status, error, text=""):
         status_text = f"{self.get_plc_status_msg(status)} {self.get_plc_status_msg(error)} {text}"
         print(status_text)
         PB_enab = [False, False, False, False] # 預設所有按鈕都不可用
         if status == "s0": # 離線
-            PB_enab = [True, False, False]
+            PB_enab = [True, False, False, False]
         elif status == "s1": # 連線中
-            PB_enab = [False, True, False]
+            PB_enab = [False, True, False, False]
         elif status == "s2": # 已連線    
-            PB_enab = [False, True, True]
+            PB_enab = [False, True, True, True]
         elif status == "s3": # 重新連線中    
-            PB_enab = [False, True, False]
+            PB_enab = [False, True, False, False]
         elif status == "s10": # 正在讀取    
-            PB_enab = [False, True, False]
+            PB_enab = [False, True, False, False]
         elif status == "s11": # 讀取完成    
-            PB_enab = [False, True, True]
+            PB_enab = [False, True, True, True]
             QTimer.singleShot(2000, lambda: self.display_plc_status("s2", "non", ""))   
-        elif status == "s12": # 機型不匹配    
-            PB_enab = [False, False, False] 
+        elif status =="s12": # 正在寫入    
+            PB_enab = [False, True, False, False]
+        elif status == "s13": # 寫入完成    
+            PB_enab = [False, True, True, True]
+            QTimer.singleShot(2000, lambda: self.display_plc_status("s2", "non", ""))       
+        elif status == "s20": # 機型不匹配    
+            PB_enab = [False, False, False, False] 
             QTimer.singleShot(2000, lambda: self.deconnect_plc()) 
         elif status == "non":    
             if error == "e801":
-                PB_enab = [True, False, False]
+                PB_enab = [True, False, False, False]
                 # 使用 QTimer.singleShot 延遲 2 秒後再呼叫自己，避免 time.sleep 卡住 UI 畫面
                 QTimer.singleShot(2000, lambda: self.display_plc_status("s0", "non", ""))
 
         self.PB_connect_plc.setEnabled(PB_enab[0])
         self.PB_deconnect_plc.setEnabled(PB_enab[1])
         self.PB_read_step.setEnabled(PB_enab[2])
+        self.PB_write_step.setEnabled(PB_enab[3])
         
         if status == "s11" or self.current_plc_data != []: 
             self.PB_export_csv.setEnabled(True)  

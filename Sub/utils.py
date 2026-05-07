@@ -135,13 +135,17 @@ def convert_float_to_unsigned(value, bit):
     return value    
 # 32bitToDW16bit轉換
 def convert_32_to_DW16(value):
-    # 取出低 16 位元：使用位元遮罩 (AND 0xFFFF)
-    low = value & 0xFFFF
-    # 取出高 16 位元：向右位移 16 位
-    high = value >> 16
-    # 等同於 divmod
-    # 32 位整數除以 65536，商就是高 16 位，餘數就是低 16 位
-    # high, low = divmod(value, 65536)
+    # 1. 取得 32 位元的無號數 (處理傳入負數的情況)
+    value_32 = value & 0xFFFFFFFF
+    # 2. 拆分低位與高位
+    low = value_32 & 0xFFFF
+    high = (value_32 >> 16) & 0xFFFF
+    # 3. 關鍵修正：將 0~65535 轉為 -32768~32767
+    # 這是為了符合 pymcprotocol 的寫入規範
+    if low > 32767:
+        low -= 65536
+    if high > 32767:
+        high -= 65536
     return (low, high)
 # 轉字串
 def to_str(_data, _start, _stop, encoding='ascii'):
@@ -152,6 +156,9 @@ def to_str(_data, _start, _stop, encoding='ascii'):
     return _string    
 # 字串轉ASCII
 def str_to_ascii(text):
+    # 檢查是否符合 Excel 的公式包裝格式： ="..."
+    if isinstance(text, str) and text.startswith('="') and text.endswith('"'):
+        text = text[2:-1]
     # 1. 檢查是否為奇數，如果是，就補上一個 Null Byte
     if len(text) % 2 != 0:
         text += "\x00"

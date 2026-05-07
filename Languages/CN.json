@@ -91,12 +91,12 @@
             "font_family": "Microsoft YaHei"
         },
         "PB_read_step": {
-            "text": "读取",
+            "text": "读取PLC",
             "font_size": 14,
             "font_family": "Microsoft YaHei"
         },
         "PB_write_step": {
-            "text": "写入",
+            "text": "写入PLC",
             "font_size": 14,
             "font_family": "Microsoft YaHei"
         },
@@ -133,6 +133,7 @@
         "csv_save_fail": "CSV 储存失败",
         "csv_open_title": "开启 CSV 数据",
         "updated": "成功读取并更新",
+        "write_fail": "写入失败，请确认是否有资料？",
         "about_title": "关于绕线步序解码程式",
         "soft_name": "绕线步序解码工具",
         "dev_label": "开发者 ：",
@@ -201,10 +202,13 @@
         "s3": "重新连线中",
         "s10": "正在读取",
         "s11": "读取完成",
-        "s12": "机型不匹配",
+        "s12": "正在写入",
+        "s13": "写入完成",
+        "s20": "机型不匹配",
         "e800": "读取失败",
         "e801": "超过重试次数上限",
         "e802": "位址无效或超出范围",
-        "e803": "通讯失败"
+        "e803": "通讯失败",
+        "e810": "写入失败"
     }
 }

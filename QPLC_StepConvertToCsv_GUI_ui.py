@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'QPLC_StepConvertToCsv_GUI.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1020, 760)
+        MainWindow.resize(1016, 752)
         MainWindow.setStyleSheet(u"background-color: #B5B5B5;")
         self.file_exit = QAction(MainWindow)
         self.file_exit.setObjectName(u"file_exit")
@@ -496,7 +496,7 @@ class Ui_MainWindow(object):
 "}")
         self.PB_export_csv = QPushButton(self.step_groupBox)
         self.PB_export_csv.setObjectName(u"PB_export_csv")
-        self.PB_export_csv.setGeometry(QRect(335, 100, 110, 40))
+        self.PB_export_csv.setGeometry(QRect(335, 190, 110, 40))
         sizePolicy.setHeightForWidth(self.PB_export_csv.sizePolicy().hasHeightForWidth())
         self.PB_export_csv.setSizePolicy(sizePolicy)
         self.PB_export_csv.setFont(font4)
@@ -587,11 +587,50 @@ class Ui_MainWindow(object):
 "}")
         self.PB_import_csv = QPushButton(self.step_groupBox)
         self.PB_import_csv.setObjectName(u"PB_import_csv")
-        self.PB_import_csv.setGeometry(QRect(335, 255, 110, 40))
+        self.PB_import_csv.setGeometry(QRect(335, 235, 110, 40))
         sizePolicy.setHeightForWidth(self.PB_import_csv.sizePolicy().hasHeightForWidth())
         self.PB_import_csv.setSizePolicy(sizePolicy)
         self.PB_import_csv.setFont(font4)
         self.PB_import_csv.setStyleSheet(u"/*border-width	\u908a\u6846\u7c97\u7d30	1px, 5px\n"
+"border-style	\u908a\u6846\u6a23\u5f0f	solid (\u5be6\u7dda), dashed (\u865b\u7dda), dotted (\u9ede\u7dda)\n"
+"border-top-width	\u53ea\u8a2d\u5b9a\u4e0a\u65b9\u908a\u6846	2px\n"
+"border-radius	\u5713\u89d2\u7a0b\u5ea6	15px (\u534a\u5f91)\n"
+"font-family: \"Microsoft YaHei\";\n"
+"font-size: 10; */ \n"
+"/* \u5e73\u6642\u7684\u6a23\u5f0f */\n"
+"QPushButton {\n"
+"	border-style: solid; \n"
+"	border-width: 1;\n"
+"	background-color: #B5B5B5;\n"
+"	border-top-color: white;\n"
+"	border-left-color: white;\n"
+"	border-bottom-color: black;\n"
+"	border-right-color: black;\n"
+"}\n"
+"\n"
+"/* \u6ed1\u9f20\u79fb\u4e0a\u53bb\u6642 (:hover) */\n"
+"/*QPushButton:hover {\n"
+"    background-color: #e1f5fe;\n"
+"}*/\n"
+"\n"
+"/* \u6309\u4e0b\u53bb\u7684\u77ac\u9593 (:pressed) */\n"
+"QPushButton:pressed {\n"
+"	border-style: solid; \n"
+"	border-width: 1;\n"
+"	background-color: #999999;\n"
+"	border-top-color: black;\n"
+"	border-left-color: black;\n"
+"	border-bottom-color: white;\n"
+"	bord"
+                        "er-right-color: white;\n"
+"}")
+        self.PB_write_step = QPushButton(self.step_groupBox)
+        self.PB_write_step.setObjectName(u"PB_write_step")
+        self.PB_write_step.setGeometry(QRect(335, 100, 110, 40))
+        sizePolicy.setHeightForWidth(self.PB_write_step.sizePolicy().hasHeightForWidth())
+        self.PB_write_step.setSizePolicy(sizePolicy)
+        self.PB_write_step.setFont(font4)
+        self.PB_write_step.setStyleSheet(u"/*border-width	\u908a\u6846\u7c97\u7d30	1px, 5px\n"
 "border-style	\u908a\u6846\u6a23\u5f0f	solid (\u5be6\u7dda), dashed (\u865b\u7dda), dotted (\u9ede\u7dda)\n"
 "border-top-width	\u53ea\u8a2d\u5b9a\u4e0a\u65b9\u908a\u6846	2px\n"
 "border-radius	\u5713\u89d2\u7a0b\u5ea6	15px (\u534a\u5f91)\n"
@@ -1011,7 +1050,7 @@ class Ui_MainWindow(object):
         self.label_pc_ip.raise_()
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1020, 33))
+        self.menubar.setGeometry(QRect(0, 0, 1016, 33))
         self.menubar.setFont(font)
         self.File = QMenu(self.menubar)
         self.File.setObjectName(u"File")
@@ -1091,10 +1130,11 @@ class Ui_MainWindow(object):
         self.label_step_no.setText(QCoreApplication.translate("MainWindow", u"step", None))
         self.PB_step_up.setText("")
         self.PB_step_down.setText("")
-        self.PB_read_step.setText(QCoreApplication.translate("MainWindow", u"\u8b80\u53d6", None))
+        self.PB_read_step.setText(QCoreApplication.translate("MainWindow", u"\u8b80\u53d6PLC", None))
         self.PB_export_csv.setText(QCoreApplication.translate("MainWindow", u"Export .csv", None))
         self.PB_Clear_process.setText(QCoreApplication.translate("MainWindow", u"\u6e05\u9664\u8cc7\u6599", None))
         self.PB_import_csv.setText(QCoreApplication.translate("MainWindow", u"Import .csv", None))
+        self.PB_write_step.setText(QCoreApplication.translate("MainWindow", u"\u5beb\u5165PLC", None))
         self.setting_groupBox.setTitle("")
         self.plc_setting_groupBox.setTitle(QCoreApplication.translate("MainWindow", u"PLC connection settings", None))
         self.label_ip4.setText(QCoreApplication.translate("MainWindow", u"Server  IP4", None))

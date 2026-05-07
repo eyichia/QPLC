@@ -91,12 +91,12 @@
             "font_family": "Microsoft YaHei"
         },
         "PB_read_step": {
-            "text": "Read",
+            "text": "Read PLC",
             "font_size": 14,
             "font_family": "Microsoft YaHei"
         },
         "PB_write_step": {
-            "text": "Write",
+            "text": "Write PLC",
             "font_size": 14,
             "font_family": "Microsoft YaHei"
         },
@@ -133,6 +133,7 @@
         "csv_save_fail": "CSV Saving Failed",
         "csv_open_title": "Opening CSV Data",
         "updated": "Successfully Read and Updated",
+        "write_fail": "Write failed, please check if there is data?",
         "about_title": "Regarding The Winding Step Sequence Decoding Program",
         "soft_name": "Winding Step Sequence Decoding Tool",
         "dev_label": "Developer:",
@@ -201,10 +202,13 @@
         "s3": "Reconnecting",
         "s10": "Reading",
         "s11": "Reading complete",
-        "s12": "Model mismatch",
+        "s12": "Writing",
+        "s13": "Writing complete",
+        "s20": "Model mismatch",
         "e800": "Read failed",
         "e801": "Exceeded maximum number of retries",
         "e802": "Invalid address or out of range",
-        "e803": "Communication failed"
+        "e803": "Communication failed",
+        "e810": "Write failed"
     }
 }

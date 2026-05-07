@@ -1,3 +1,4 @@
+from os import write
 import time
 import re
 import pymcprotocol
@@ -6,7 +7,8 @@ from PySide6.QtCore import QThread, Signal
 # 背景 PLC 連線程式
 class PLC1Worker(QThread):
     step_info = Signal(int, int)
-    steps_data = Signal(list) # 如果需要傳回更多數據，可以使用 list 或 dict
+    read_steps_data = Signal(list) # 如果需要傳回更多數據，可以使用 list 或 dict
+    write_steps_data = Signal(list) # 如果需要傳回更多數據，可以使用 list 或 dict
     sm413_status = Signal(bool)
     plc1_status = Signal(str, str, str)
 # initial
@@ -18,6 +20,7 @@ class PLC1Worker(QThread):
         self.addr_len = ""
         self.running = True # 控制迴圈開關
         self.batch_read_trigger = False 
+        self.batch_write_trigger = False
         self.batch_start_addr = ""
         self.batch_size = 0
         self.status = "non"
@@ -30,6 +33,14 @@ class PLC1Worker(QThread):
         self.batch_read_trigger = True    
         self.status = "s10" # 正在讀取步驟數據
         print(f"已觸發讀取步驟數據: 起始位址={start_addr}, 總長度={total_length}") # 這行可以幫助確認觸發是否成功
+# 觸發寫入step        
+    def trigger_write_steps(self, data, start_addr, total_length):
+        self.batch_data = data
+        self.batch_start_addr = start_addr
+        self.batch_size = total_length
+        self.batch_write_trigger = True    
+        self.status = "s12" # 正在寫入步驟數據
+        print(f"已觸發寫入步驟數據: 起始位址={start_addr}, 總長度={total_length}")
 # 【新增】必須加入這個位址遞增工具，否則分段讀取會當機
     def increment_address(self, addr, offset):
         # 拆分 D2100 -> prefix="D", number=2100
@@ -96,13 +107,45 @@ class PLC1Worker(QThread):
                             else:
                                 raise Exception("PLC 回傳空數據")
                         if all_results:
-                            self.steps_data.emit(all_results) # 全部讀完後一次發送給 UI
+                            self.read_steps_data.emit(all_results) # 全部讀完後一次發送給 UI
                             self.status = "s11" # 讀取完成
                     except Exception as e:
                         self.status_error = "e800" # 讀取失敗
                         self.status_msg = str(e) # 如果位址不存在，e 裡面通常會包含 PLC 回傳的十六進制錯誤碼
                     finally:
                         self.batch_read_trigger = False
+
+                if self.batch_write_trigger:
+                    try:
+                        current_addr = self.batch_start_addr
+                        written_count = 0 # 記錄已經寫入多少個字
+                        remaining_size = self.batch_size
+                        MAX_CHUNK = 900 # 設定單次讀取上限為 900，保留一點安全邊際
+                        while remaining_size > 0:
+                            write_now = min(MAX_CHUNK, remaining_size)
+                            chunk_data = self.batch_data[written_count : written_count + write_now]
+                            print(f"正在寫入位址: {current_addr}, 長度: {write_now}")
+                            print(f"檢查寫入資料範圍: 最小值={min(chunk_data)}, 最大值={max(chunk_data)}")
+                            # 【參數修正】：使用 wordvalues 傳入數據列表
+                            plc.batchwrite_wordunits(
+                                headdevice = current_addr, 
+                                values = chunk_data
+                            )
+                            # 計算下一次的起始位址與剩餘長度
+                            current_addr = self.increment_address(current_addr, write_now)
+                            remaining_size -= write_now
+                            written_count += write_now
+
+                            # 寫入成功後，發送通知給 UI (寫入通常不回傳數據，傳回原數據或 True 即可)
+                        self.write_steps_data.emit(self.batch_data) 
+                        self.status = "s13" # 寫入完成
+                        
+                    except Exception as e:
+                        self.status_error = "e810" # 寫入失敗
+                        self.status_msg = str(e)
+                        print(f"寫入失敗詳細資訊: {e}")
+                    finally:
+                        self.batch_write_trigger = False       
                 
                 time.sleep(0.5) # 正常每 500ms 讀一次      
             except Exception as e:
