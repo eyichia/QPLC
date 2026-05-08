@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'QPLC_StepConvertToCsv_GUI.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.11.0
+## Created by: Qt User Interface Compiler version 6.10.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1016, 752)
+        MainWindow.resize(1012, 744)
         MainWindow.setStyleSheet(u"background-color: #B5B5B5;")
         self.file_exit = QAction(MainWindow)
         self.file_exit.setObjectName(u"file_exit")
@@ -510,7 +510,7 @@ class Ui_MainWindow(object):
 "QPushButton {\n"
 "	border-style: solid; \n"
 "	border-width: 1;\n"
-"	background-color: #B5B5B5;\n"
+"	background-color: #00FF00;\n"
 "	border-top-color: white;\n"
 "	border-left-color: white;\n"
 "	border-bottom-color: black;\n"
@@ -526,7 +526,7 @@ class Ui_MainWindow(object):
 "QPushButton:pressed {\n"
 "	border-style: solid; \n"
 "	border-width: 1;\n"
-"	background-color: #999999;\n"
+"	background-color: #008800;\n"
 "	border-top-color: black;\n"
 "	border-left-color: black;\n"
 "	border-bottom-color: white;\n"
@@ -537,6 +537,7 @@ class Ui_MainWindow(object):
         self.Process.setObjectName(u"Process")
         self.Process.setGeometry(QRect(15, 455, 440, 156))
         self.Process.setFont(font)
+        self.Process.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.Process.setStyleSheet(u"QTextEdit{\n"
 "	border-style: solid; \n"
 "	border-width: 1;\n"
@@ -546,6 +547,7 @@ class Ui_MainWindow(object):
 "	border-bottom-color: white;\n"
 "	border-right-color: white;\n"
 "}")
+        self.Process.setReadOnly(True)
         self.PB_Clear_process = QPushButton(self.step_groupBox)
         self.PB_Clear_process.setObjectName(u"PB_Clear_process")
         self.PB_Clear_process.setGeometry(QRect(335, 405, 110, 40))
@@ -1036,6 +1038,7 @@ class Ui_MainWindow(object):
 "	border-right-color: white;\n"
 "}")
         self.label_connect_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label_connect_status.setWordWrap(True)
         self.label_pc_ip = QLabel(self.centralwidget)
         self.label_pc_ip.setObjectName(u"label_pc_ip")
         self.label_pc_ip.setEnabled(True)
@@ -1050,7 +1053,7 @@ class Ui_MainWindow(object):
         self.label_pc_ip.raise_()
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1016, 33))
+        self.menubar.setGeometry(QRect(0, 0, 1012, 33))
         self.menubar.setFont(font)
         self.File = QMenu(self.menubar)
         self.File.setObjectName(u"File")

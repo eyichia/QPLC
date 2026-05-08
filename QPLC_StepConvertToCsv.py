@@ -293,6 +293,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.response_sl_val.clear()
         self.current_plc_data = []
         self.step_list = []
+        self.Process.setText("Step")
         self.display_plc_status("s0", "non", "")
         self.step_no.setValue(1)
         for i in range(1, 11):
@@ -408,8 +409,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     raw_input = str(step_code[j+1]).split(";")[0] # 安全取得輸入值
                     if rmk == "cylinder":
                         # 氣壓缸位元處理
-                        bit_list = [b for b in step_code[j+1].split(";") if b.isdigit()]
-                        val = sum(1 << int(b) for b in bit_list)
+                        if ";" in step_code[j+1]:
+                            bit_list = [b for b in step_code[j+1].split(";") if b.isdigit()]
+                            val = sum(1 << int(b) for b in bit_list)
+                        else: 
+                            val = 0
                         if ty in ["SD", "UD"]:
                             _data[id], _data[id+1] = convert_32_to_DW16(val)
                         else:
@@ -442,7 +446,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             except Exception as e:
                 print(f"解析第 {i} 行時出錯: {e}")
                 continue
-        print(f"data: {data[:900]}")
+        #print(f"len={len(data)}, data: {data[:900]}")
         return data      
 # step data to step list解碼        
     def decode_step_data(self, data):
@@ -506,6 +510,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                     if name: # 確保名稱不是空的
                                         _result.append(name) # 【修改 2】將名稱加入列表
                                 logic = logic << 1
+                            if not _result: # 如果沒有動作的 added
+                                _result.append("0") # 代表沒選用氣缸   
                             #print(cyl_data,logic,_bit,_result)    
                             result = ";".join(_result)
                         else: # 數值,字串等參數
@@ -635,28 +641,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if not file_path: return
 
         try:
-            # newline='' 防止 Windows 存檔出現多餘空行
-            # utf-8-sig 確保 Excel 開啟中文不會亂碼
-            with open(file_path, mode='r', encoding='utf-8-sig') as f:
-                reader = csv.reader(f)
-                self.step_list = []
-                for row in reader:
-                    self.step_list.append(row)
-                #print(self.step_list)
+            # 嘗試用不同的編碼讀取
+            encodings = ['utf-8-sig', 'cp950', 'big5', 'utf-8']
+            content = None
+            for enc in encodings:
+                try:
+                    with open(file_path, 'r', encoding=enc) as f:
+                        self.step_list = list(csv.reader(f))
+                    break # 成功就跳出迴圈
+                except UnicodeDecodeError:
+                    continue # 失敗就試下一個
+            else: # 如果迴圈正常結束 (沒有被 break)
+                raise UnicodeDecodeError("無法讀取檔案", None, 0, 0, "Unknown encoding")
 
             self.Process.clear()
             for r in self.step_list:
                 self.Process.append(" | ".join(map(str, r)))  
-            
-            self.ui_display_steps()  
+
+            data = self.encode_step_list(self.step_list)
+            self.decode_step_data(data)
             self.PB_export_csv.setEnabled(True)
-            self.encode_step_list(self.step_list)
-            
+
             title, text = self.get_msg("success", "成功"), self.get_msg("updated", "成功讀取並更新")
             icon, buttons = self.logo_pixmap, QMessageBox.StandardButton.Ok
             theme, font_size, icon_size = "default", 12, 64
             show_prompt_window(self, title, text, icon, buttons, theme, font_size, icon_size) 
         except Exception as e:
+            print(f"Error: {e}")
             title, text = self.get_msg("fail"), f"{self.get_msg('csv_load_fail', 'CSV 載入失敗')}{str(e)}"
             icon, buttons = QMessageBox.Icon.Warning, QMessageBox.StandardButton.Close
             theme, font_size, icon_size = "default", 12, 64

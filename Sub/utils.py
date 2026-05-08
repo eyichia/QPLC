@@ -114,15 +114,17 @@ def convert_16_to_32(low, high, signed=True):
     # 將兩個 16-bit 數字合併成一個 32-bit 數字
     combined = (high_u << 16) | low_u
     # 如果最高位是 1，表示這是一個負數，進行符號擴展
+    # 有號32位元範圍 (-2147483648 ~ 2147483647)
+    # 無號32位元範圍 (0 ~ 4294967295)
     if signed:
-        if combined >= 0x80000000:
-            combined -= 0x100000000
+        if combined > 0x7FFF_FFFF: # 2147483647
+            combined -= 0x1_0000_0000 # 4294967296
     return combined  
 # 16bit有符號轉換 (PLC裡的數字如果大於32767就代表是負數，要轉換成Python的負數表示法)      
 def convert_16bit_signed(value):
     # 如果大於 32767，代表在 PLC 裡是負數
-    if value > 32767:
-        return value - 65536
+    if value > 32767: # 0x7FFF
+        return value - 65536 # 0x1_0000
     return value
 # float轉16bit有符號轉換 (PLC裡的數字如果大於32767就代表是負數，要轉換成Python的負數表示法)      
 def convert_float_to_unsigned(value, bit):

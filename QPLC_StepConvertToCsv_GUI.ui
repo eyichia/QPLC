@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1016</width>
-    <height>752</height>
+    <width>1012</width>
+    <height>744</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1038,7 +1038,7 @@ font-size: 10; */
 QPushButton {
 	border-style: solid; 
 	border-width: 1;
-	background-color: #B5B5B5;
+	background-color: #00FF00;
 	border-top-color: white;
 	border-left-color: white;
 	border-bottom-color: black;
@@ -1054,7 +1054,7 @@ QPushButton {
 QPushButton:pressed {
 	border-style: solid; 
 	border-width: 1;
-	background-color: #999999;
+	background-color: #008800;
 	border-top-color: black;
 	border-left-color: black;
 	border-bottom-color: white;
@@ -1080,6 +1080,9 @@ QPushButton:pressed {
        <pointsize>10</pointsize>
       </font>
      </property>
+     <property name="layoutDirection">
+      <enum>Qt::LayoutDirection::LeftToRight</enum>
+     </property>
      <property name="styleSheet">
       <string notr="true">QTextEdit{
 	border-style: solid; 
@@ -1090,6 +1093,9 @@ QPushButton:pressed {
 	border-bottom-color: white;
 	border-right-color: white;
 }</string>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="PB_Clear_process">
@@ -2245,6 +2251,9 @@ QComboBox QAbstractItemView {
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
     </widget>
    </widget>
    <widget class="QLabel" name="label_pc_ip">
@@ -2287,7 +2296,7 @@ QComboBox QAbstractItemView {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1016</width>
+     <width>1012</width>
      <height>33</height>
     </rect>
    </property>
