@@ -81,12 +81,12 @@
     },
     "QPushButton": {
         "PB_connect_plc": {
-            "text": "连线",
+            "text": "连线 PLC",
             "font_size": 14,
             "font_family": "Microsoft YaHei"
         },
         "PB_deconnect_plc": {
-            "text": "离线",
+            "text": "离线 PLC",
             "font_size": 14,
             "font_family": "Microsoft YaHei"
         },

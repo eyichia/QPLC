@@ -42,9 +42,9 @@ def external_path(relative_path):
 # 主畫面
 class MainWindow(QMainWindow, Ui_MainWindow):
     # 軟體資訊
-    VERSION = " v1.1.3"
+    VERSION = " v1.3.3" # 1=1種PLC,3=3種語言(基本繁簡英),3=3種機型
     DEVELOPER = " 江乙加 Eric Chiang"
-    VER_DATE = " 2026-05-04"
+    VER_DATE = " 2026-05-12"
     COPYRIGHT = f" 2026 {DEVELOPER}" #" 2026 " + DEVELOPER
     
 
@@ -54,8 +54,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         
         # --- 動態讀取 Model 資料夾取得機型 ---
+        self.external_model = False # True = 外部 Model 資料夾，False = 內嵌 Model 資料夾
         self.FORMAT_NAME_LIST = []
-        model_dir = external_path("Model")
+        if self.external_model == True:
+            model_dir = external_path("Model") # 外部的 Model 資料夾 加入檔案.json擴充機型
+        else:
+            model_dir = resource_path("Model") # 你的語言包資料夾 加入檔案.json擴充機型後 需重新打包成.exe
         if os.path.exists(model_dir):
             for f in os.listdir(model_dir):
                 if f.endswith(".json"):
@@ -147,6 +151,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.PB_export_csv.clicked.connect(self.export_summary_csv)
         self.PB_import_csv.clicked.connect(self.import_summary_csv)
         self.PB_Clear_process.clicked.connect(self.clear_process)
+        self.PB_zoom_in.clicked.connect(lambda: self.zoom_in_out(2))
+        self.PB_zoom_out.clicked.connect(lambda: self.zoom_in_out(-2))
         self.model.currentIndexChanged.connect(self.load_model_json)
         # PLC 相關
         self.PB_read_step.clicked.connect(self.read_step_data) # 讀取步序
@@ -244,7 +250,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # 自動掃描 Model 資料夾並載入 JSON
     def load_model_json(self):
         #self.model_format = {}
-        model_dir = external_path("Model") # 外部的 Model 資料夾
+        if self.external_model == True:
+            model_dir = external_path("Model") # 外部的 Model 資料夾 加入檔案.json擴充機型
+        else:
+            model_dir = resource_path("Model") # 你的語言包資料夾 加入檔案.json擴充機型後 需重新打包成.exe   
         model_key = self.model.currentText()
         model_name = f"{model_key}.json"
         if not os.path.exists(model_dir):
@@ -585,13 +594,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             print("沒有步驟數據可供匯出")
             return
         # 獲取存檔路徑 (利用你的萬用助手)
+        reports_dir = external_path("Reports")
         file_path = data_processing(
-            parent=self,
-            folder="Reports",
-            filename=f"Step_code_{self.current_lang}",
-            format="csv",
-            title=self.get_msg("csv_save_title"),
-            mode="save"
+            parent = self,
+            folder = reports_dir,
+            filename = f"Step_code_{self.current_lang}",
+            format = "csv",
+            title = self.get_msg("csv_save_title"),
+            mode = "save"
         )
         if not file_path: return
 
@@ -630,13 +640,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 # """ 輸入橫向對比報表 (CSV 格式) """
     def import_summary_csv(self):
+        reports_dir = external_path("Reports")
         file_path = data_processing(
-            parent=self,
-            folder="Reports",
-            filename=f"Step_code_{self.current_lang}",
-            format="csv",
-            title=self.get_msg("csv_open_title"),
-            mode="open"
+            parent = self,
+            folder = reports_dir,
+            filename = f"Step_code_{self.current_lang}",
+            format = "csv",
+            title = self.get_msg("csv_open_title"),
+            mode = "open"
         )
         if not file_path: return
 
@@ -691,8 +702,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 widget = getattr(self, f"step_{i}", None)
                 widget.clear()
                 widget.setStyleSheet("background-color: #B5B5B5;")
-            
+# zoom in/out
+    def zoom_in_out(self, size):
+        current_font_size = self.Process.font().pointSize()
+        font_size = current_font_size + size
+        if font_size < 6:
+            font_size = 6
+        elif font_size > 20:
+            font_size = 20    
         
+        font = QFont("Microsoft YaHei", font_size)
+        self.Process.setFont(font)    
         
 # ----- PLC 連線與數據處理相關函式 -----
 # 連接PLC
@@ -733,7 +753,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.step_data = data # 儲存到 MainWindow 的屬性，方便其他方法使用
         self.current_plc_data = data
         self.decode_step_data(data) # 呼叫解碼函式來處理數據
-        #print(data) # 數值list
+        print(f"長度={len(data)} 內容={data}") # 數值list
     @Slot(list)
     def data_write_plc(self):
         pass    
